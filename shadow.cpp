@@ -1,0 +1,49 @@
+#include "shadow.h"
+#include "application.h"
+
+CShadow::CShadow()
+{
+}
+
+CShadow::~CShadow()
+{
+}
+
+CShadow* CShadow::Create(D3DXVECTOR3 pos)
+{
+	CShadow *pObj = nullptr;
+	pObj = new CShadow;
+
+	if (pObj != nullptr)
+	{
+		pObj->SetPos(pos);
+		pObj->Init();
+	}
+
+	return pObj;
+}
+
+HRESULT CShadow::Init()
+{
+	CObject3D::SetScale(D3DXVECTOR3(30.0f,0.0f, 30.0f));
+	CObject3D::Init();
+	CObject3D::SetBlend(BLEND_SUBSTRUCT);
+	CObject3D::SetTexture(CTexture::TEXTURE_SHADOW);
+	return S_OK;
+}
+
+void CShadow::Uninit()
+{
+	CObject3D::Uninit();
+}
+
+void CShadow::Update()
+{
+	CApplication::GetInstance();
+	CObject3D::Update();
+}
+
+void CShadow::Draw()
+{
+	CObject3D::Draw();
+}
