@@ -6,6 +6,7 @@
 #include "player.h"
 #include "shadow.h"
 #include "camera.h"
+#include "bullet.h"
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 //プレイヤーのコンストラクタ
@@ -91,7 +92,6 @@ void CPlayer::Update()
 	//床判定の上だった場合
 	if (m_bCollision)
 	{
-		m_Collisionpos = m_pos;
 		m_pos.y = posOld.y;
 		m_bJump = true;
 	}
@@ -107,43 +107,68 @@ void CPlayer::Update()
 	{
 		m_pos.z -= 1.5f;
 		m_rotDest.y = camera->rot.y + D3DX_PI * 0.0f;				//目的の角度
+
+		//右奥
+		if(CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_RIGHT))
+			m_pos.x -= 1.5f,
+			m_rotDest.y = camera->rot.y + D3DX_PI * 0.25f;
+
+		//左奥
+		else if(CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_LEFT))
+			m_pos.x += 1.5f,
+			m_rotDest.y = camera->rot.y - D3DX_PI * 0.25f;
 	}
 
 	//後
-	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_DOWN))
+	else if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_DOWN))
 	{
 		m_pos.z += 1.5f;
 		m_rotDest.y = camera->rot.y - D3DX_PI * 1.0f;
+
+		//右後
+		if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_RIGHT))
+			m_pos.x -= 1.5f,
+			m_rotDest.y = camera->rot.y + D3DX_PI * 0.75f;
+
+		//左後
+		else if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_LEFT))
+			m_pos.x += 1.5f,
+			m_rotDest.y = camera->rot.y - D3DX_PI * 0.75f;
 	}
 
 	//右
-	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_RIGHT))
+	else if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_RIGHT))
 	{
 		m_pos.x -= 1.5f;
 		m_rotDest.y = camera->rot.y + D3DX_PI * 0.5f;
 	}
 
 	//左
-	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_LEFT))
+	else if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_LEFT))
 	{
 		m_pos.x += 1.5f;
 		m_rotDest.y = camera->rot.y - D3DX_PI * 0.5f;
 	}
 
-	//ジャンプ
-	if (m_bJump)
+	if (CApplication::GetInstance()->GetInputKeyboard()->GetTrigger(DIK_RETURN))
 	{
-		if (CApplication::GetInstance()->GetInputKeyboard()->GetTrigger(DIK_SPACE))
+		m_pBullet = m_pBullet->Create(D3DXVECTOR3(m_pos.x, m_pos.y + 15.0f, m_pos.z), D3DXVECTOR3(10.0f, 10.0f, 10.0f));
+	}
+
+	if (CApplication::GetInstance()->GetInputKeyboard()->GetTrigger(DIK_SPACE))
+	{
+		if (m_bJump)
 		{
-			m_move.y += ((m_move.y + 20.0f) - m_move.y) * 0.4f;
+ 			m_move.y = ((m_move.y + 20.0f) - m_move.y) * 0.4f;
 		}
 	}
-	
-	if (m_pos.y < m_Collisionpos.y)
+
+	if (m_bCollision)
 	{
-		m_pos.y = 0.0f;
-		m_move.y = 0.0f;
+		if(m_pos.y < m_Collisionpos.y) m_pos.y = m_Collisionpos.y;
 	}
+
+	KillZ(-300.0f);
 
 	//目的の方向の正規化
 	if (m_rotDest.y - m_rot.y > D3DX_PI)
@@ -163,6 +188,7 @@ void CPlayer::Update()
 	SetMove(m_move);
 	SetRot(m_rot);
 	m_pShadow->SetPos(m_pos / 2);
+	m_pShadow->SetZBuff(D3DCMP_EQUAL);
 
 	//======================
 	//正規化
@@ -184,4 +210,12 @@ void CPlayer::Update()
 void CPlayer::Draw()
 {
 	CObjectX::Draw();
+}
+
+void CPlayer::KillZ(float Z)
+{
+	if (m_pos.y < Z)
+	{
+		m_pos = m_Collisionpos;
+	}
 }

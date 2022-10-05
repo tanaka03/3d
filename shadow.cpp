@@ -25,7 +25,7 @@ CShadow* CShadow::Create(D3DXVECTOR3 pos)
 
 HRESULT CShadow::Init()
 {
-	CObject3D::SetScale(D3DXVECTOR3(30.0f,0.0f, 30.0f));
+	CObject3D::SetScale(D3DXVECTOR3(30.0f, 0.0f, 30.0f));
 	CObject3D::Init();
 	CObject3D::SetBlend(BLEND_SUBSTRUCT);
 	SetZBuff(D3DCMP_LESSEQUAL);

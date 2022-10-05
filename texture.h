@@ -22,6 +22,7 @@ public: /* ’è‹` */
 	{
 		TEXTURE_GRASS = 0,
 		TEXTURE_SHADOW,
+		TEXTURE_BULLET,
 		TEXTURE_MAX,
 		TEXTURE_NONE,	// Žg—p‚µ‚È‚¢
 	};

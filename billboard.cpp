@@ -9,7 +9,7 @@ CBillboard::CBillboard() : m_texture(CTexture::TEXTURE_NONE)
 {
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	m_scale = D3DXVECTOR3(100.0f, 0.0f, 100.0f);
-	m_Zfunc = D3DCMP_EQUAL;
+	m_blend = BLEND_NONE;
 }
 
 CBillboard::~CBillboard()
@@ -35,10 +35,10 @@ HRESULT CBillboard::Init()
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 	// 頂点情報を設定
-	pVtx[0].pos = D3DXVECTOR3(-m_scale.x, -m_scale.y, m_scale.z);
-	pVtx[1].pos = D3DXVECTOR3(m_scale.x, -m_scale.y, m_scale.z);
-	pVtx[2].pos = D3DXVECTOR3(-m_scale.x, m_scale.y, -m_scale.z);
-	pVtx[3].pos = D3DXVECTOR3(m_scale.x, m_scale.y, -m_scale.z);
+	pVtx[0].pos = D3DXVECTOR3(-m_scale.x, m_scale.y, 0.0f);
+	pVtx[1].pos = D3DXVECTOR3(m_scale.x, m_scale.y, 0.0f);
+	pVtx[2].pos = D3DXVECTOR3(-m_scale.x, -m_scale.y, 0.0f);
+	pVtx[3].pos = D3DXVECTOR3(m_scale.x, -m_scale.y, 0.0f);
 
 	//各頂点の法線の設定　※　ベクトルの大きさは1にする必要がある
 	pVtx[0].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
@@ -76,30 +76,6 @@ void CBillboard::Uninit()
 
 void CBillboard::Update()
 {
-	auto pos = GetPos();
-	pos += GetMove();
-
-	SetPos(pos);
-
-	VERTEX_3D* pVtx = NULL;
-
-	//頂点バッファをロックし、頂点情報へのポインタを取得
-	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
-
-	// 頂点情報を設定
-	pVtx[0].pos = m_objpos + D3DXVECTOR3(-GetScale().x, -GetScale().y, GetScale().z);
-	pVtx[1].pos = m_objpos + D3DXVECTOR3(GetScale().x, -GetScale().y, GetScale().z);
-	pVtx[2].pos = m_objpos + D3DXVECTOR3(-GetScale().x, GetScale().y, -GetScale().z);
-	pVtx[3].pos = m_objpos + D3DXVECTOR3(GetScale().x, GetScale().y, -GetScale().z);
-
-	// 頂点カラーの設定
-	pVtx[0].col = m_col;
-	pVtx[1].col = m_col;
-	pVtx[2].col = m_col;
-	pVtx[3].col = m_col;
-
-	//頂点バッファのアンロック
-	m_pVtxBuff->Unlock();
 }
 
 void CBillboard::Draw()
@@ -152,10 +128,6 @@ void CBillboard::Draw()
 	//カメラから見て近い部分を上書き
 	pDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
 
-	//Zバッファに関わらず描画
-	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
-	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
-
 	//アルファテスト
 	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
 	pDevice->SetRenderState(D3DRS_ALPHAREF, 0);
@@ -170,10 +142,19 @@ void CBillboard::Draw()
 	//頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_3D);
 
+	//テクスチャの設定
+	pDevice->SetTexture(0, pTexture->GetTexture(m_texture));
+
 	//ポリゴンの描画
 	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP,
 		0,
 		2);
+
+	//ライトを有効にする
+	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
+
+	//アルファテストを無効
+	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 }
 
 void CBillboard::SetUV(float Xtop, float Xbottom, float Ytop, float Ybottom)

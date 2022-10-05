@@ -6,7 +6,7 @@
 
 #include "renderer.h"
 
-#define MAX_OBJECT	(256)
+#define MAX_OBJECT	(512)
 
 class CObject
 {

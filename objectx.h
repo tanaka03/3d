@@ -13,8 +13,6 @@ public:
 	CObjectX();
 	~CObjectX() override;
 
-	static CObjectX* Create(D3DXVECTOR3 pos);
-
 	HRESULT Init() override;
 	void Uninit() override;
 	void Update() override;

@@ -6,13 +6,15 @@
 
 #include "billboard.h"
 
+class CShadow;
+
 class CBullet : public CBillboard
 {
 public:
 	CBullet();
 	~CBullet() override;
 
-	static CBullet* Create(D3DXVECTOR3 pos);
+	static CBullet* Create(D3DXVECTOR3 pos, D3DXVECTOR3 move);
 
 	HRESULT Init() override;
 	void Uninit() override;
@@ -20,6 +22,9 @@ public:
 	void Draw() override;
 
 private:
+	D3DXVECTOR3 m_pos;
+	D3DXVECTOR3 m_move;
+	CShadow *m_pShadow;
 };
 
 #endif

@@ -62,7 +62,7 @@ void CPolygon::Update()
 
 		CPlayer *pPlayer = (CPlayer*)pObject;
 		auto playerPos = pPlayer->GetPos();
-		auto collision = PlaneCollision(playerPos, pos, 50.0f, 2.0f);
+		auto collision = PlaneCollision(playerPos, pos, 62.0f, 2.0f);
 
 		if (!collision)
 		{
@@ -71,6 +71,7 @@ void CPolygon::Update()
 		}
 
 		pPlayer->SetCollision(true);
+		pPlayer->SetCollisionPos(pos);
 	}
 }
 

@@ -107,6 +107,9 @@ void CObject3D::Draw()
 	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();
 	D3DXMATRIX mtxRot, mtxTrans;				//計算用マトリックス
 
+	//テクスチャの設定を戻す
+	pDevice->SetTexture(0, NULL);
+
 	switch (m_blend)
 	{
 	case BLEND_ADDITIVE:

@@ -8,6 +8,7 @@
 
 class CShadow;
 class CCamera;
+class CBullet;
 
 class CPlayer : public CObjectX
 {
@@ -20,9 +21,12 @@ public:
 	void Uninit() override;
 	void Update() override;
 	void Draw() override;
+	void KillZ(float Z);
 
+	void SetCollisionPos(D3DXVECTOR3 pos) { m_Collisionpos = pos; }
 	void SetCollision(bool set) { m_bCollision = set; }
 
+	D3DXVECTOR3 GetCollisionPos() { return m_Collisionpos; }
 	bool GetCollision() { return m_bCollision; }
 
 private:
@@ -33,6 +37,7 @@ private:
 	D3DXVECTOR3 m_rotDest;
 	CShadow *m_pShadow;
 	CCamera *m_pCamera;
+	CBullet *m_pBullet;
 	bool m_bCollision;
 	bool m_bJump;
 };
