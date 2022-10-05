@@ -71,6 +71,8 @@ void CObject3D::Uninit()
 		m_pVtxBuff->Release();
 		m_pVtxBuff = nullptr;
 	}
+
+	CObject3D::Release();
 }
 
 void CObject3D::Update()
@@ -167,6 +169,11 @@ void CObject3D::Draw()
 	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
 	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+
+
+	//テクスチャの設定
+	pDevice->SetTexture(0, NULL);
+
 }
 
 void CObject3D::SetUV(float Xtop, float Xbottom, float Ytop, float Ybottom)

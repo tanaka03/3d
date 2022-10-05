@@ -72,10 +72,14 @@ void CBillboard::Uninit()
 		m_pVtxBuff->Release();
 		m_pVtxBuff = nullptr;
 	}
+	CBillboard::Release();
 }
 
 void CBillboard::Update()
 {
+	auto pos = GetPos();
+	pos += GetMove();
+	SetPos(pos);
 }
 
 void CBillboard::Draw()
@@ -155,6 +159,10 @@ void CBillboard::Draw()
 
 	//アルファテストを無効
 	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+
+	//テクスチャの設定
+	pDevice->SetTexture(0, NULL);
+
 }
 
 void CBillboard::SetUV(float Xtop, float Xbottom, float Ytop, float Ybottom)

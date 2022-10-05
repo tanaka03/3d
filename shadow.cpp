@@ -3,13 +3,14 @@
 
 CShadow::CShadow()
 {
+	m_bInfinity = false;
 }
 
 CShadow::~CShadow()
 {
 }
 
-CShadow* CShadow::Create(D3DXVECTOR3 pos)
+CShadow* CShadow::Create(D3DXVECTOR3 pos, int life)
 {
 	CShadow *pObj = nullptr;
 	pObj = new CShadow;
@@ -17,6 +18,7 @@ CShadow* CShadow::Create(D3DXVECTOR3 pos)
 	if (pObj != nullptr)
 	{
 		pObj->SetPos(pos);
+		pObj->SetLife(life);
 		pObj->Init();
 	}
 
@@ -44,6 +46,15 @@ void CShadow::Update()
 
 	auto pos = GetPos();
 	SetPos(pos);
+
+	if (m_nLife <= 0)
+	{
+		if (!m_bInfinity)
+		{
+			Uninit();
+			return;
+		}
+	}
 }
 
 void CShadow::Draw()

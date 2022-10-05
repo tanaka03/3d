@@ -14,17 +14,22 @@ public:
 	CBullet();
 	~CBullet() override;
 
-	static CBullet* Create(D3DXVECTOR3 pos, D3DXVECTOR3 move);
+	static CBullet* Create(D3DXVECTOR3 pos, D3DXVECTOR3 move, int life);
 
 	HRESULT Init() override;
 	void Uninit() override;
 	void Update() override;
 	void Draw() override;
 
+	void SetLife(int life) { m_life = life; }
+
+	int GetLife() { return m_life; }
+
 private:
 	D3DXVECTOR3 m_pos;
 	D3DXVECTOR3 m_move;
 	CShadow *m_pShadow;
+	int m_life;
 };
 
 #endif

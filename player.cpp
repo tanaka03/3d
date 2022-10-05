@@ -64,7 +64,8 @@ HRESULT CPlayer::Init()
 		&m_mesh);
 
 	CObjectX::Init();
-	m_pShadow = m_pShadow->Create(GetPos());
+	m_pShadow = m_pShadow->Create(GetPos(), 100);
+	m_pShadow->SetEnable(true);
 
 	return S_OK;
 }
@@ -152,7 +153,7 @@ void CPlayer::Update()
 
 	if (CApplication::GetInstance()->GetInputKeyboard()->GetTrigger(DIK_RETURN))
 	{
-		m_pBullet = m_pBullet->Create(D3DXVECTOR3(m_pos.x, m_pos.y + 15.0f, m_pos.z), D3DXVECTOR3(10.0f, 10.0f, 10.0f));
+		CBullet::Create(D3DXVECTOR3(m_pos.x, m_pos.y + 15.0f, m_pos.z), D3DXVECTOR3(-sinf(m_rot.y), 0.0f, -cosf(m_rot.y)), 100);
 	}
 
 	if (CApplication::GetInstance()->GetInputKeyboard()->GetTrigger(DIK_SPACE))
@@ -188,7 +189,9 @@ void CPlayer::Update()
 	SetMove(m_move);
 	SetRot(m_rot);
 	m_pShadow->SetPos(m_pos / 2);
-	m_pShadow->SetZBuff(D3DCMP_EQUAL);
+
+	//Ç±Ç¢Ç¬Ç™Ç‚ÇËÇ‹ÇµÇΩÅ´
+	//m_pShadow->SetZBuff(D3DCMP_EQUAL);
 
 	//======================
 	//ê≥ãKâª
