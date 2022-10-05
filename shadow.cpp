@@ -4,6 +4,7 @@
 CShadow::CShadow()
 {
 	m_bInfinity = false;
+	m_bScaleDown = false;
 }
 
 CShadow::~CShadow()
@@ -32,6 +33,8 @@ HRESULT CShadow::Init()
 	CObject3D::SetBlend(BLEND_SUBSTRUCT);
 	SetZBuff(D3DCMP_LESSEQUAL);
 	CObject3D::SetTexture(CTexture::TEXTURE_SHADOW);
+
+	m_startScale = GetScale();
 	return S_OK;
 }
 
@@ -43,9 +46,21 @@ void CShadow::Uninit()
 void CShadow::Update()
 {
 	CObject3D::Update();
+	m_Scale = GetScale();
 
-	auto pos = GetPos();
-	SetPos(pos);
+	if (m_bScaleDown)
+	{
+		m_Scale.x += (10.0f - m_Scale.x) * 0.2f;
+		m_Scale.z += (10.0f - m_Scale.z) * 0.2f;
+	}
+
+	else if (!m_bScaleDown)
+	{
+		m_Scale.x += (m_startScale.x - m_Scale.x) * 0.2f;
+		m_Scale.z += (m_startScale.z - m_Scale.z) * 0.2f;
+	}
+
+	SetScale(m_Scale);
 
 	if (m_nLife <= 0)
 	{

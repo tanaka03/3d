@@ -57,6 +57,8 @@ void CObjectX::Uninit()
 		m_buffMat->Release();
 		m_buffMat = NULL;
 	}
+
+	CObjectX::Release();
 }
 
 //

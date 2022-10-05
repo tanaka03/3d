@@ -15,6 +15,7 @@ public:
 	{
 		OBJTYPE_NONE = 0,
 		OBJTYPE_PLAYER,
+		OBJTYPE_BULLET,
 		OBJTYPE_MAX
 	};
 

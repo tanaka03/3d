@@ -64,8 +64,9 @@ HRESULT CPlayer::Init()
 		&m_mesh);
 
 	CObjectX::Init();
-	m_pShadow = m_pShadow->Create(GetPos(), 100);
-	m_pShadow->SetEnable(true);
+	m_pShadow = CShadow::Create(GetPos(), 100);
+	m_pShadow->SetLifeNone(true);
+	m_pShadow->SetScale(D3DXVECTOR3(30.0f,0.0f,30.0f));
 
 	return S_OK;
 }
@@ -76,7 +77,6 @@ HRESULT CPlayer::Init()
 void CPlayer::Uninit()
 {
 	CObjectX::Uninit();
-	CObjectX::Release();
 }
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
@@ -153,7 +153,7 @@ void CPlayer::Update()
 
 	if (CApplication::GetInstance()->GetInputKeyboard()->GetTrigger(DIK_RETURN))
 	{
-		CBullet::Create(D3DXVECTOR3(m_pos.x, m_pos.y + 15.0f, m_pos.z), D3DXVECTOR3(-sinf(m_rot.y), 0.0f, -cosf(m_rot.y)), 100);
+		CBullet::Create(D3DXVECTOR3(m_pos.x, m_pos.y + 35.0f, m_pos.z), D3DXVECTOR3(-sinf(m_rot.y), 0.0f, -cosf(m_rot.y)), 100);
 	}
 
 	if (CApplication::GetInstance()->GetInputKeyboard()->GetTrigger(DIK_SPACE))
@@ -166,7 +166,17 @@ void CPlayer::Update()
 
 	if (m_bCollision)
 	{
+		m_pShadow->SetScale(D3DXVECTOR3(30.0f, 0.0f, 30.0f));
+
 		if(m_pos.y < m_Collisionpos.y) m_pos.y = m_Collisionpos.y;
+	}
+
+	else if(!m_bCollision)
+	{
+		//落ちる速度が０より上だった場合、影が縮小
+		if (m_move.y > 0) m_pShadow->SetScaleDown(true);
+		//落ちる速度が-３より下だった場合、影が拡大
+		else if (m_move.y < -3) m_pShadow->SetScaleDown(false);
 	}
 
 	KillZ(-300.0f);
@@ -188,7 +198,7 @@ void CPlayer::Update()
 	SetPos(m_pos);
 	SetMove(m_move);
 	SetRot(m_rot);
-	m_pShadow->SetPos(m_pos / 2);
+	m_pShadow->SetPos(D3DXVECTOR3(m_pos.x / 2, m_Collisionpos.y, m_pos.z / 2));
 
 	//こいつがやりました↓
 	//m_pShadow->SetZBuff(D3DCMP_EQUAL);

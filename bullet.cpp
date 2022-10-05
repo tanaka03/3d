@@ -5,6 +5,7 @@
 
 CBullet::CBullet()
 {
+	SetObjType(OBJTYPE_BULLET);
 	m_life = 0;
 }
 
@@ -37,6 +38,8 @@ HRESULT CBullet::Init()
 	SetBlend(BLEND_NONE);
 
 	m_pShadow = CShadow::Create(GetPos(), 100);
+	m_pShadow->SetScale(D3DXVECTOR3(5.0f, 0.0f, 5.0f));
+
 	return S_OK;
 }
 
@@ -52,7 +55,6 @@ void CBullet::Update()
 	m_life--;
 
 	m_pShadow->SetPos(D3DXVECTOR3(m_pos.x, 0.0f, m_pos.z) / 2);
-	m_pShadow->SetScale(D3DXVECTOR3(10.0f,0.0f,10.0f));
 
 	if (m_life <= 0)
 	{

@@ -20,14 +20,19 @@ public:
 	void Draw() override;
 
 	void SetLife(int life) { m_nLife = life; }
-	void SetEnable(bool set) { m_bInfinity = set; }
+	void SetLifeNone(bool set) { m_bInfinity = set; }
+	void SetScaleDown(bool set) { m_bScaleDown = set; }
 
 	int GetLife() { return m_nLife; }
-	bool GetEnable() { return m_bInfinity; }
+	bool SetLifeNone() { return m_bInfinity; }
+	bool GetScaleDown() { return m_bScaleDown; }
 
 private:
 	int m_nLife;
+	D3DXVECTOR3 m_Scale;
+	D3DXVECTOR3 m_startScale;
 	bool m_bInfinity = false;
+	bool m_bScaleDown;
 };
 
 #endif
