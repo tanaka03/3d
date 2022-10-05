@@ -1,30 +1,22 @@
 #include "objectx.h"
 #include "application.h"
 
+//＝＝＝＝＝＝＝＝＝＝＝＝＝
+//オブジェクトXのコンストラクタ
+//＝＝＝＝＝＝＝＝＝＝＝＝＝
 CObjectX::CObjectX()
 {
 }
 
+//＝＝＝＝＝＝＝＝＝＝＝＝＝
+//オブジェクトXのデストラクタ
+//＝＝＝＝＝＝＝＝＝＝＝＝＝
 CObjectX::~CObjectX()
 {
 }
 
-CObjectX* CObjectX::Create(D3DXVECTOR3 pos)
-{
-	CObjectX *pObj = nullptr;
-	pObj = new CObjectX;
-
-	if (pObj != nullptr)
-	{
-		pObj->SetPos(pos);
-		pObj->Init();
-	}
-
-	return pObj;
-}
-
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
-//プレイヤーの初期化
+//オブジェクトXの初期化
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
 HRESULT CObjectX::Init()
 {
@@ -48,7 +40,7 @@ HRESULT CObjectX::Init()
 }
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
-//プレイヤーの終了
+//オブジェクトXの終了
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
 void CObjectX::Uninit()
 {
@@ -68,14 +60,17 @@ void CObjectX::Uninit()
 }
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
-//プレイヤーの更新
+//オブジェクトXの更新
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
 void CObjectX::Update()
 {
+	auto pos = GetPos();
+	pos += GetMove();
+	SetPos(pos);
 }
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
-//プレイヤーの描画
+//オブジェクトXの描画
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
 void CObjectX::Draw()
 {

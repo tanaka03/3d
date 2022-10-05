@@ -64,7 +64,7 @@ public:
 	void SetScale(float width, float height) { m_Width = width, m_Height = height; }
 	void SetTexture(CTexture::TEXTURE texture) { m_texture = texture; }// テクスチャの設定
 
-																	   //ゲッター
+	//ゲッター
 	D3DXVECTOR3 GetPos() override { return m_objpos; }
 	D3DXVECTOR3 GetMove() { return m_move; }
 	D3DXVECTOR2 GetScale() { return D3DXVECTOR2(m_Width, m_Height); }

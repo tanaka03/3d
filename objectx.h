@@ -23,20 +23,17 @@ public:
 	//セッター
 	void SetPos(D3DXVECTOR3 pos) override { m_objpos = pos; }
 	void SetMove(D3DXVECTOR3 move) { m_move = move; }
-	void SetCol(D3DXCOLOR col) { m_col = col; }
 	void SetScale(D3DXVECTOR3 scale) { m_scale = scale; }
+	void SetRot(D3DXVECTOR3 rot) { m_rot = rot; }
+	void SetCol(D3DXCOLOR col) { m_col = col; }
 	void SetTexture(CTexture::TEXTURE texture) { m_texture = texture; }// テクスチャの設定
 
 	//ゲッター
 	D3DXVECTOR3 GetPos() override { return m_objpos; }
 	D3DXVECTOR3 GetMove() { return m_move; }
 	D3DXVECTOR3 GetScale() { return m_scale; }
+	D3DXVECTOR3 GetRot() { return m_rot; }
 	D3DXCOLOR GetCol() { return m_col; }
-
-protected:
-	LPD3DXBUFFER m_buffMat;
-	DWORD m_dwNum;
-	LPD3DXMESH m_mesh;
 
 private:
 	D3DXVECTOR3 m_objpos;

@@ -6,6 +6,8 @@
 
 #include "renderer.h"
 
+class CObject;
+
 class CCamera
 {
 public:
@@ -29,11 +31,17 @@ public:
 	HRESULT Init(void);
 	void Uninit(void);
 	void Update(void);
+
+	//セッター
 	void SetCamera(void);
-	CAMERA GetCamera(void) { return m_camera; }
+	void SetTraction(bool set) { m_bTraction = set; }
+
+	//ゲッター
+	CAMERA *GetCamera(void) { return &m_camera; }
 
 private:
 	CAMERA m_camera;
+	bool m_bTraction;
 };
 
 #endif

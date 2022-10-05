@@ -15,6 +15,7 @@ CApplication* CApplication::m_pApplication = nullptr;
 CInputKeyboard *CApplication::m_pInputKeyboard = nullptr;
 CRenderer *CApplication::m_pRenderer = nullptr;
 CTexture *CApplication::m_pTexture = nullptr;
+CCamera *CApplication::m_pCamera = nullptr;
 CObject *g_apObject = nullptr;
 CObject3D *g_apObject3d = nullptr;
 
@@ -55,7 +56,7 @@ HRESULT CApplication::Init(HWND hWnd, HINSTANCE hInstance)
 	m_pCamera = new CCamera;
 	m_pCamera->Init();
 
-	m_pPolygon->Create(D3DXVECTOR3(0.0f, 0.0f,-10.0f));
+	m_pPolygon->Create(D3DXVECTOR3(0.0f, 0.0f,0.0f));
 	m_pPlayer->Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
 	return S_OK;

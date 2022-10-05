@@ -1,28 +1,13 @@
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-//Object3D.h
+//Billboard.h
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-#ifndef _OBJECT3D_H_
-#define _OBJECT3D_H_
+#ifndef _BILLBOARD_H_
+#define _BILLBOARD_H_
 
 #include "object.h"
 #include "texture.h"
 
-//*****************************************************************************
-// 構造体定義
-//*****************************************************************************
-// 頂点フォーマット
-const DWORD FVF_VERTEX_3D(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1);
-
-//頂点情報[3D]の構造体を定義
-struct VERTEX_3D
-{
-	D3DXVECTOR3 pos;	//頂点座標
-	D3DXVECTOR3 nor;	//法線ベクトル
-	D3DCOLOR col;		//頂点カラー
-	D3DXVECTOR2 tex;	//テクスチャ
-};
-
-class CObject3D : public CObject
+class CBillboard : public CObject
 {
 public:
 	enum EBlend
@@ -33,15 +18,14 @@ public:
 		BLEND_MAX
 	};
 
-	CObject3D();
-	~CObject3D() override;
+	CBillboard();
+	~CBillboard() override;
 
 	HRESULT Init() override;
 	void Uninit() override;
 	void Update() override;
 	void Draw() override;
 	void SetUV(float Xtop, float Xbottom, float Ytop, float Ybottom);
-	bool PlaneCollision(D3DXVECTOR3 pos, D3DXVECTOR3 Destpos, float Length, float CollisionVal);
 
 	//セッター
 	void SetPos(D3DXVECTOR3 pos) override { m_objpos = pos; }

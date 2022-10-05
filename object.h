@@ -6,11 +6,18 @@
 
 #include "renderer.h"
 
-#define MAX_OBJECT	(512)
+#define MAX_OBJECT	(256)
 
 class CObject
 {
 public:
+	enum EObjType
+	{
+		OBJTYPE_NONE = 0,
+		OBJTYPE_PLAYER,
+		OBJTYPE_MAX
+	};
+
 	CObject();
 	virtual ~CObject();
 
@@ -24,17 +31,24 @@ public:
 	static void UpdateAll();
 	static void DrawAll();
 
+	void SetObjType(EObjType obj) { m_objtype = obj; }
+
 	CObject *GetMyObject(int nNum);
+	EObjType GetObjType() { return m_objtype; }
 	virtual D3DXVECTOR3 GetPos() = 0;
 	int GetObjAll() { return m_nNumAll; }
 
 protected:
 	void Release();
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;
+	LPD3DXBUFFER m_buffMat;
+	DWORD m_dwNum;
+	LPD3DXMESH m_mesh;
 
 private:
 	static CObject *CObject::m_apObject[MAX_OBJECT];
 	static int m_nNumAll;
+	EObjType m_objtype;
 	int m_nID;			//äiî[êÊÇÃî‘çÜ
 };
 

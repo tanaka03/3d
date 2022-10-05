@@ -1,21 +1,22 @@
 #include "application.h"
+#include "billboard.h"
 #include "object3d.h"
 #include "input.h"
 #include "keyboard.h"
 #include "texture.h"
 
-CObject3D::CObject3D() : m_texture(CTexture::TEXTURE_NONE)
+CBillboard::CBillboard() : m_texture(CTexture::TEXTURE_NONE)
 {
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	m_scale = D3DXVECTOR3(100.0f, 0.0f, 100.0f);
 	m_Zfunc = D3DCMP_EQUAL;
 }
 
-CObject3D::~CObject3D()
+CBillboard::~CBillboard()
 {
 }
 
-HRESULT CObject3D::Init()
+HRESULT CBillboard::Init()
 {
 	//頂点バッファの生成
 	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();
@@ -63,7 +64,7 @@ HRESULT CObject3D::Init()
 	return S_OK;
 }
 
-void CObject3D::Uninit()
+void CBillboard::Uninit()
 {
 	//頂点バッファの破壊
 	if (m_pVtxBuff != nullptr)
@@ -73,7 +74,7 @@ void CObject3D::Uninit()
 	}
 }
 
-void CObject3D::Update()
+void CBillboard::Update()
 {
 	auto pos = GetPos();
 	pos += GetMove();
@@ -101,11 +102,11 @@ void CObject3D::Update()
 	m_pVtxBuff->Unlock();
 }
 
-void CObject3D::Draw()
+void CBillboard::Draw()
 {
 	CTexture* pTexture = CApplication::GetInstance()->GetTexture();
 	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();
-	D3DXMATRIX mtxRot, mtxTrans;				//計算用マトリックス
+	D3DXMATRIX mtxTrans, mtxView;				//計算用マトリックス
 
 	switch (m_blend)
 	{
@@ -128,20 +129,37 @@ void CObject3D::Draw()
 	//ワールドマトリックスを初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
 
-	//向きを反映
-	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_rot.y, m_rot.x, m_rot.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
+	pDevice->GetTransform(D3DTS_VIEW, &mtxView);
+
+	//カメラの逆行列を設定
+	m_mtxWorld._11 = mtxView._11;
+	m_mtxWorld._12 = mtxView._21;
+	m_mtxWorld._13 = mtxView._31;
+	m_mtxWorld._21 = mtxView._12;
+	m_mtxWorld._22 = mtxView._22;
+	m_mtxWorld._23 = mtxView._32;
+	m_mtxWorld._31 = mtxView._13;
+	m_mtxWorld._32 = mtxView._23;
+	m_mtxWorld._33 = mtxView._33;
 
 	//位置を反映
 	D3DXMatrixTranslation(&mtxTrans, m_objpos.x, m_objpos.y, m_objpos.z);
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
 
-	//Zテスト
-	pDevice->SetRenderState(D3DRS_ZFUNC, m_Zfunc);
+	//ライトを無効にする
+	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+
+	//カメラから見て近い部分を上書き
+	pDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
+
+	//Zバッファに関わらず描画
+	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
 	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 
-	//カリング無効
-	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	//アルファテスト
+	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+	pDevice->SetRenderState(D3DRS_ALPHAREF, 0);
+	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
 
 	//ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
@@ -152,21 +170,13 @@ void CObject3D::Draw()
 	//頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_3D);
 
-	//テクスチャの設定
-	pDevice->SetTexture(0, pTexture->GetTexture(m_texture));
-
 	//ポリゴンの描画
 	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP,
 		0,
 		2);
-
-	//設定を元に戻す
-	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 }
 
-void CObject3D::SetUV(float Xtop, float Xbottom, float Ytop, float Ybottom)
+void CBillboard::SetUV(float Xtop, float Xbottom, float Ytop, float Ybottom)
 {
 	VERTEX_3D* pVtx;        //頂点情報へのポインタ
 
@@ -181,25 +191,4 @@ void CObject3D::SetUV(float Xtop, float Xbottom, float Ytop, float Ybottom)
 
 	//頂点バッファのアンロック
 	m_pVtxBuff->Unlock();
-}
-
-//＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-//平面判定
-//＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-bool CObject3D::PlaneCollision(D3DXVECTOR3 pos, D3DXVECTOR3 Destpos, float Length, float CollisionVal)
-{
-	float fDistance = ((Destpos.x - pos.x) * (Destpos.x - pos.x)) +
-		((Destpos.z - pos.z) * (Destpos.z - pos.z));
-
-	D3DXVECTOR3 vec = Destpos - pos;
-	float fYDistance = ((Destpos.y - pos.y) * (Destpos.y - pos.y));
-	float Y = D3DXVec3Dot(&D3DXVECTOR3(0, 1, 0), &vec);
-
-	float fRad = powf((Length + Length), CollisionVal);
-
-	if (fDistance <= fRad && fYDistance <= Y)
-	{
-		return true;
-	}
-	return false;
 }

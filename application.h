@@ -32,7 +32,7 @@ public:
 	static CInputKeyboard *GetInputKeyboard() { return m_pInputKeyboard; }
 	static CRenderer *GetRenderer() { return m_pRenderer; }
 	CTexture *GetTexture() { return m_pTexture; }
-	CCamera *GetCamera() { return m_pCamera; }
+	static CCamera *GetCamera() { return m_pCamera; }
 	CLight *GetLight() { return m_pLight; }
 
 	static CApplication* GetInstance()
@@ -48,7 +48,7 @@ public:
 private:
 	CObject *m_pObject;
 	CLight *m_pLight;
-	CCamera *m_pCamera;
+	static CCamera *m_pCamera;
 	static CInputKeyboard *m_pInputKeyboard;
 	static CRenderer *m_pRenderer;
 	static CTexture *m_pTexture;

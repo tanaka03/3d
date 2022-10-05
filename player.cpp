@@ -5,12 +5,17 @@
 #include "keyboard.h"
 #include "player.h"
 #include "shadow.h"
+#include "camera.h"
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 //プレイヤーのコンストラクタ
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 CPlayer::CPlayer()
 {
+	SetObjType(OBJTYPE_PLAYER);
+	m_rot = D3DXVECTOR3(0.0f,0.0f,0.0f);
+	m_bCollision = false;
+	m_bJump = false;
 }
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
@@ -77,8 +82,100 @@ void CPlayer::Uninit()
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 void CPlayer::Update()
 {
-	m_pShadow->SetPos(GetPos());
+	CCamera *pCamera = CApplication::GetCamera();
+	CCamera::CAMERA *camera = pCamera->GetCamera();
 	CObjectX::Update();
+	m_pos = GetPos();
+	auto posOld = GetPos();
+
+	//床判定の上だった場合
+	if (m_bCollision)
+	{
+		m_Collisionpos = m_pos;
+		m_pos.y = posOld.y;
+		m_bJump = true;
+	}
+
+	else
+	{
+		m_move.y -= 0.5f;
+		m_bJump = false;
+	}
+
+	//奥
+	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_UP))
+	{
+		m_pos.z -= 1.5f;
+		m_rotDest.y = camera->rot.y + D3DX_PI * 0.0f;				//目的の角度
+	}
+
+	//後
+	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_DOWN))
+	{
+		m_pos.z += 1.5f;
+		m_rotDest.y = camera->rot.y - D3DX_PI * 1.0f;
+	}
+
+	//右
+	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_RIGHT))
+	{
+		m_pos.x -= 1.5f;
+		m_rotDest.y = camera->rot.y + D3DX_PI * 0.5f;
+	}
+
+	//左
+	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_LEFT))
+	{
+		m_pos.x += 1.5f;
+		m_rotDest.y = camera->rot.y - D3DX_PI * 0.5f;
+	}
+
+	//ジャンプ
+	if (m_bJump)
+	{
+		if (CApplication::GetInstance()->GetInputKeyboard()->GetTrigger(DIK_SPACE))
+		{
+			m_move.y += ((m_move.y + 20.0f) - m_move.y) * 0.4f;
+		}
+	}
+	
+	if (m_pos.y < m_Collisionpos.y)
+	{
+		m_pos.y = 0.0f;
+		m_move.y = 0.0f;
+	}
+
+	//目的の方向の正規化
+	if (m_rotDest.y - m_rot.y > D3DX_PI)
+	{
+		m_rotDest.y -= D3DX_PI * 2;
+	}
+
+	else if (m_rotDest.y - m_rot.y < -D3DX_PI)
+	{
+		m_rotDest.y += D3DX_PI * 2;
+	}
+
+	//モデルの回転の慣性
+	m_rot.y += (m_rotDest.y - m_rot.y) * 0.1f;
+
+	SetPos(m_pos);
+	SetMove(m_move);
+	SetRot(m_rot);
+	m_pShadow->SetPos(m_pos / 2);
+
+	//======================
+	//正規化
+	//======================
+	if (m_rot.y > D3DX_PI)
+	{
+		m_rot.y -= D3DX_PI * 2;
+	}
+
+	else if (m_rot.y < -D3DX_PI)
+	{
+		m_rot.y += D3DX_PI * 2;
+	}
 }
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝

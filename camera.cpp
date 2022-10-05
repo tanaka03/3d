@@ -5,10 +5,12 @@
 #include "camera.h"
 #include "input.h"
 #include "keyboard.h"
+#include "player.h"
 
 CCamera::CCamera()
 {
 	memset(&m_camera, 0, sizeof(CCamera));
+	m_bTraction = false;
 }
 
 CCamera::~CCamera()
@@ -53,7 +55,7 @@ void CCamera::Update()
 	//注視点
 	//===========================
 	//左
-	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_Q) == true)
+	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_Q))
 	{
 		m_camera.rot.y -= 0.05f;
 		m_camera.posR.x = m_camera.posV.x - sinf(m_camera.rot.y) * m_camera.fDistance;
@@ -61,7 +63,7 @@ void CCamera::Update()
 	}
 
 	//右
-	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_E) == true)
+	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_E))
 	{
 		m_camera.rot.y += 0.05f;
 		m_camera.posR.x = m_camera.posV.x - sinf(m_camera.rot.y) * m_camera.fDistance;
@@ -72,7 +74,7 @@ void CCamera::Update()
 	//視点
 	//===========================
 	//左
-	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_J) == true)
+	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_J))
 	{
 		m_camera.rot.y -= 0.05f;
 		m_camera.posV.x = m_camera.posR.x + sinf(m_camera.rot.y) * m_camera.fDistance;
@@ -80,7 +82,7 @@ void CCamera::Update()
 	}
 	
 	//右
-	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_L) == true)
+	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_L))
 	{
 		m_camera.rot.y += 0.05f;
 		m_camera.posV.x = m_camera.posR.x + sinf(m_camera.rot.y) * m_camera.fDistance;
@@ -91,7 +93,7 @@ void CCamera::Update()
 	//カメラ移動
 	//===========================
 	//前
-	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_W) == true)
+	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_W))
 	{
 		m_camera.posV.x -= sinf(m_camera.rot.y) * 0.8f;
 		m_camera.posV.z -= cosf(m_camera.rot.y) * 0.8f;
@@ -100,7 +102,7 @@ void CCamera::Update()
 	}
 
 	//後
-	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_S) == true)
+	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_S))
 	{
 		m_camera.posV.x += sinf(m_camera.rot.y) * 0.8f;
 		m_camera.posV.z += cosf(m_camera.rot.y) * 0.8f;
@@ -109,7 +111,7 @@ void CCamera::Update()
 	}
 
 	//右
-	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_D) == true)
+	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_D))
 	{
 		m_camera.posV.x -= sinf(m_camera.rot.y + D3DX_PI * 0.5f) * 0.8f;
 		m_camera.posV.z -= cosf(m_camera.rot.y + D3DX_PI * 0.5f) * 0.8f;
@@ -118,7 +120,7 @@ void CCamera::Update()
 	}
 
 	//左
-	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_A) == true)
+	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_A))
 	{
 		m_camera.posV.x += sinf(m_camera.rot.y + D3DX_PI * 0.5f) * 0.8f;
 		m_camera.posV.z += cosf(m_camera.rot.y + D3DX_PI * 0.5f) * 0.8f;
@@ -127,49 +129,75 @@ void CCamera::Update()
 	}
 
 	//上昇
-	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_R) == true)
+	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_R))
 	{
 		m_camera.posV.y += sinf(m_camera.rot.x + D3DX_PI * 0.5f) * 0.8f;
 		m_camera.posV.y += cosf(m_camera.rot.z + D3DX_PI * 0.5f) * 0.8f;
 	}
 
 	//下降
-	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_F) == true)
+	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_F))
 	{
 		m_camera.posV.y -= sinf(m_camera.rot.x + D3DX_PI * 0.5f) * 0.8f;
 		m_camera.posV.y -= cosf(m_camera.rot.z + D3DX_PI * 0.5f) * 0.8f;
 	}
 
 	//上
-	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_I) == true)
+	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_I))
 	{
 		m_camera.rot.x -= 0.05f;
 		m_camera.posR.y = m_camera.posV.y - tanf(m_camera.rot.x) * m_camera.fDistance;
 	}
 
 	//下
-	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_K) == true)
+	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_K))
 	{
 		m_camera.rot.x += 0.05f;
 		m_camera.posR.y = m_camera.posV.y - tanf(m_camera.rot.x) * m_camera.fDistance;
 	}
 	
+	if (CApplication::GetInstance()->GetInputKeyboard()->GetTrigger(DIK_Z))
+	{
+		m_bTraction = ((!m_bTraction) ? true : false);
+	}
 
 	//===========================
 	//モデルに追従
 	//===========================
-	//m_camera.posR.x += (m_camera.posRDest.x - m_camera.posR.x) * 0.5f;
-	//m_camera.posV.x += (m_camera.posVDest.x - m_camera.posV.x) * 0.5f;
+	if (m_bTraction)
+	{
+		for (int i = 0; i < MAX_OBJECT; i++)
+		{
+			CObject *pObject = nullptr;
+			pObject = pObject->GetMyObject(i);
 
-	//m_camera.posR.z += (m_camera.posRDest.z - m_camera.posR.z) * 0.5f;
-	//m_camera.posV.z += (m_camera.posVDest.z - m_camera.posV.z) * 0.5f;
+			if (pObject == nullptr)
+			{
+				continue;
+			}
 
-	//m_camera.posRDest.x = pPlayer->pos.x + sinf(pPlayer->rot.y) * 0.5f;
-	//m_camera.posRDest.z = pPlayer->pos.z + cosf(pPlayer->rot.y) * 0.5f;
+			CObject::EObjType objType;
+			objType = pObject->GetObjType();
 
-	//m_camera.posVDest.x = pPlayer->pos.x + sinf(m_camera.rot.x) * m_camera.fDistance;
-	//m_camera.posVDest.z = pPlayer->pos.z + cosf(m_camera.rot.z) * m_camera.fDistance;
+			if (objType != CObject::OBJTYPE_PLAYER)
+			{
+				continue;
+			}
+			CPlayer *pPlayer = (CPlayer*)pObject;
 
+			m_camera.posR.x += (m_camera.posRDest.x - m_camera.posR.x) * 0.5f;
+			m_camera.posV.x += (m_camera.posVDest.x - m_camera.posV.x) * 0.5f;
+
+			m_camera.posR.z += (m_camera.posRDest.z - m_camera.posR.z) * 0.5f;
+			m_camera.posV.z += (m_camera.posVDest.z - m_camera.posV.z) * 0.5f;
+
+			m_camera.posRDest.x = pPlayer->GetPos().x + sinf(pPlayer->GetRot().y) * 0.5f;
+			m_camera.posRDest.z = pPlayer->GetPos().z + cosf(pPlayer->GetRot().y) * 0.5f;
+
+			m_camera.posVDest.x = pPlayer->GetPos().x + sinf(m_camera.rot.x) * m_camera.fDistance;
+			m_camera.posVDest.z = pPlayer->GetPos().z + cosf(m_camera.rot.z) * m_camera.fDistance;
+		}
+	}
 
 	//======================
 	//正規化

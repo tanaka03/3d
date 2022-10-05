@@ -149,6 +149,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="application.cpp" />
+    <ClCompile Include="billboard.cpp" />
+    <ClCompile Include="bullet.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="keyboard.cpp" />
@@ -166,6 +168,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
+    <ClInclude Include="billboard.h" />
+    <ClInclude Include="bullet.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="keyboard.h" />
