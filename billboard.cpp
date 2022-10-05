@@ -80,6 +80,26 @@ void CBillboard::Update()
 	auto pos = GetPos();
 	pos += GetMove();
 	SetPos(pos);
+
+	VERTEX_3D* pVtx = NULL;
+
+	//頂点バッファをロックし、頂点情報へのポインタを取得
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	// 頂点情報を設定
+	pVtx[0].pos = D3DXVECTOR3(-m_scale.x, m_scale.y, 0.0f);
+	pVtx[1].pos = D3DXVECTOR3(m_scale.x, m_scale.y, 0.0f);
+	pVtx[2].pos = D3DXVECTOR3(-m_scale.x, -m_scale.y, 0.0f);
+	pVtx[3].pos = D3DXVECTOR3(m_scale.x, -m_scale.y, 0.0f);
+
+	// 頂点カラーの設定
+	pVtx[0].col = m_col;
+	pVtx[1].col = m_col;
+	pVtx[2].col = m_col;
+	pVtx[3].col = m_col;
+
+	//頂点バッファのアンロック
+	m_pVtxBuff->Unlock();
 }
 
 void CBillboard::Draw()
@@ -131,6 +151,10 @@ void CBillboard::Draw()
 
 	//カメラから見て近い部分を上書き
 	pDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
+
+	//Zテスト
+	pDevice->SetRenderState(D3DRS_ZFUNC, m_Zfunc);
+	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 
 	//アルファテスト
 	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);

@@ -96,6 +96,9 @@
     <ClCompile Include="bullet.cpp">
       <Filter>ソース ファイル\Object\ビルボード</Filter>
     </ClCompile>
+    <ClCompile Include="effect.cpp">
+      <Filter>ソース ファイル\Object\ビルボード</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h">
@@ -147,6 +150,9 @@
       <Filter>ヘッダー ファイル\Object\ビルボード</Filter>
     </ClInclude>
     <ClInclude Include="bullet.h">
+      <Filter>ヘッダー ファイル\Object\ビルボード</Filter>
+    </ClInclude>
+    <ClInclude Include="effect.h">
       <Filter>ヘッダー ファイル\Object\ビルボード</Filter>
     </ClInclude>
   </ItemGroup>

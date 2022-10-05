@@ -64,9 +64,8 @@ HRESULT CPlayer::Init()
 		&m_mesh);
 
 	CObjectX::Init();
-	m_pShadow = CShadow::Create(GetPos(), 100);
+	m_pShadow = CShadow::Create(GetPos(), D3DXVECTOR3(30.0f, 0.0f, 30.0f), 100);
 	m_pShadow->SetLifeNone(true);
-	m_pShadow->SetScale(D3DXVECTOR3(30.0f,0.0f,30.0f));
 
 	return S_OK;
 }
@@ -153,7 +152,7 @@ void CPlayer::Update()
 
 	if (CApplication::GetInstance()->GetInputKeyboard()->GetTrigger(DIK_RETURN))
 	{
-		CBullet::Create(D3DXVECTOR3(m_pos.x, m_pos.y + 35.0f, m_pos.z), D3DXVECTOR3(-sinf(m_rot.y), 0.0f, -cosf(m_rot.y)), 100);
+		CBullet::Create(D3DXVECTOR3(m_pos.x, m_pos.y + 30.0f, m_pos.z), D3DXVECTOR3(-sinf(m_rot.y), 0.0f, -cosf(m_rot.y)), 100);
 	}
 
 	if (CApplication::GetInstance()->GetInputKeyboard()->GetTrigger(DIK_SPACE))
@@ -179,7 +178,7 @@ void CPlayer::Update()
 		else if (m_move.y < -3) m_pShadow->SetScaleDown(false);
 	}
 
-	KillZ(-300.0f);
+	BackBased(-300.0f);
 
 	//–Ú“I‚Ì•ûŒü‚Ì³‹K‰»
 	if (m_rotDest.y - m_rot.y > D3DX_PI)
@@ -225,9 +224,9 @@ void CPlayer::Draw()
 	CObjectX::Draw();
 }
 
-void CPlayer::KillZ(float Z)
+void CPlayer::BackBased(float Y)
 {
-	if (m_pos.y < Z)
+	if (m_pos.y < Y)
 	{
 		m_pos = m_Collisionpos;
 	}

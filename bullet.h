@@ -7,6 +7,7 @@
 #include "billboard.h"
 
 class CShadow;
+class CEffect;
 
 class CBullet : public CBillboard
 {
@@ -29,6 +30,7 @@ private:
 	D3DXVECTOR3 m_pos;
 	D3DXVECTOR3 m_move;
 	CShadow *m_pShadow;
+	CEffect *m_pEffect;
 	int m_life;
 };
 

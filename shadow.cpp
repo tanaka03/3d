@@ -11,7 +11,7 @@ CShadow::~CShadow()
 {
 }
 
-CShadow* CShadow::Create(D3DXVECTOR3 pos, int life)
+CShadow* CShadow::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, int life)
 {
 	CShadow *pObj = nullptr;
 	pObj = new CShadow;
@@ -19,6 +19,7 @@ CShadow* CShadow::Create(D3DXVECTOR3 pos, int life)
 	if (pObj != nullptr)
 	{
 		pObj->SetPos(pos);
+		pObj->SetScale(scale);
 		pObj->SetLife(life);
 		pObj->Init();
 	}
@@ -28,7 +29,6 @@ CShadow* CShadow::Create(D3DXVECTOR3 pos, int life)
 
 HRESULT CShadow::Init()
 {
-	CObject3D::SetScale(D3DXVECTOR3(30.0f, 0.0f, 30.0f));
 	CObject3D::Init();
 	CObject3D::SetBlend(BLEND_SUBSTRUCT);
 	SetZBuff(D3DCMP_LESSEQUAL);

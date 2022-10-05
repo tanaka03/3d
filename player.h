@@ -21,7 +21,7 @@ public:
 	void Uninit() override;
 	void Update() override;
 	void Draw() override;
-	void KillZ(float Z);
+	void BackBased(float Y);
 
 	void SetCollisionPos(D3DXVECTOR3 pos) { m_Collisionpos = pos; }
 	void SetCollision(bool set) { m_bCollision = set; }

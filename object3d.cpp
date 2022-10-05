@@ -170,7 +170,6 @@ void CObject3D::Draw()
 	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
-
 	//テクスチャの設定
 	pDevice->SetTexture(0, NULL);
 

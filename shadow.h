@@ -12,7 +12,7 @@ public:
 	CShadow();
 	~CShadow() override;
 
-	static CShadow* Create(D3DXVECTOR3 pos, int life);
+	static CShadow* Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, int life);
 
 	HRESULT Init() override;
 	void Uninit() override;

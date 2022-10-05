@@ -21,7 +21,8 @@ const char* CTexture::s_FileName[] =
 {// テクスチャのパス
 	"data/TEXTURE/grass.jpg",			// 草
 	"data/TEXTURE/shadow000.jpg",		// 影
-	"data/TEXTURE/bullet000.png"		// 弾
+	"data/TEXTURE/bullet000.png",		// 弾
+	"data/TEXTURE/bright.png"			// エフェクト１
 };
 static_assert(sizeof(CTexture::s_FileName) / sizeof(CTexture::s_FileName[0]) == CTexture::TEXTURE_MAX, "aho");
 
