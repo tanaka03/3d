@@ -7,20 +7,25 @@
 #include "object.h"
 #include "object3d.h"
 #include "objectx.h"
-
 #include "polygon.h"
 #include "player.h"
+
+#include "debugproc.h"
 
 CApplication* CApplication::m_pApplication = nullptr;
 CInputKeyboard *CApplication::m_pInputKeyboard = nullptr;
 CRenderer *CApplication::m_pRenderer = nullptr;
 CTexture *CApplication::m_pTexture = nullptr;
 CCamera *CApplication::m_pCamera = nullptr;
+
+CDebugProc *CApplication::m_pDebugProc = nullptr;
+
 CObject *g_apObject = nullptr;
 CObject3D *g_apObject3d = nullptr;
 
 CApplication::CApplication()
 {
+	m_bWire = false;
 }
 
 CApplication::~CApplication()
@@ -39,6 +44,10 @@ HRESULT CApplication::Init(HWND hWnd, HINSTANCE hInstance)
 		return -1;
 	}
 
+	m_pDebugProc = new CDebugProc;
+	m_pDebugProc->Init();
+	m_pDebugProc->Print("ああ:%d いい:%f うう:%f ええ:%c おお:%s",800, 50.0, 200.55, 'c', "おはようございます");
+
 	//キーボードクラスの生成
 	m_pInputKeyboard = new CInputKeyboard;
 
@@ -56,14 +65,23 @@ HRESULT CApplication::Init(HWND hWnd, HINSTANCE hInstance)
 	m_pCamera = new CCamera;
 	m_pCamera->Init();
 
-	m_pPolygon->Create(D3DXVECTOR3(0.0f, 0.0f,0.0f));
-	m_pPlayer->Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	m_pPolygon = CPolygon::Create(D3DXVECTOR3(0.0f, 0.0f,0.0f));
+	m_pPlayer = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
 	return S_OK;
 }
 
 void CApplication::Uninit()
 {
+	//デバッグプロシージャの破棄
+	if (m_pDebugProc != nullptr)
+	{
+		m_pDebugProc->Uninit();
+
+		delete m_pDebugProc;
+		m_pDebugProc = nullptr;
+	}
+
 	//テクスチャクラスの破棄
 	if (m_pTexture != nullptr)
 	{
@@ -119,6 +137,14 @@ void CApplication::Update()
 
 	m_pRenderer->Update();
 	m_pCamera->Update();
+
+	//ワイヤーフレームにする処理
+	if (m_pInputKeyboard->GetTrigger(DIK_F2))
+	{
+		m_bWire = ((!m_bWire) ? true : false);
+		if(m_bWire) m_pRenderer->GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+		else if(!m_bWire) m_pRenderer->GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+	}
 }
 
 void CApplication::Draw()

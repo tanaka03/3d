@@ -12,6 +12,7 @@ class CRenderer;
 class CTexture;
 class CCamera;
 class CLight;
+class CDebugProc;
 
 class CPolygon;
 class CPlayer;
@@ -34,6 +35,7 @@ public:
 	CTexture *GetTexture() { return m_pTexture; }
 	static CCamera *GetCamera() { return m_pCamera; }
 	CLight *GetLight() { return m_pLight; }
+	static CDebugProc *GetDebugProc() { return m_pDebugProc; }
 
 	static CApplication* GetInstance()
 	{
@@ -48,13 +50,15 @@ public:
 private:
 	CObject *m_pObject;
 	CLight *m_pLight;
+	CPlayer *m_pPlayer;
+	CPolygon *m_pPolygon;
+	bool m_bWire;
+
 	static CCamera *m_pCamera;
 	static CInputKeyboard *m_pInputKeyboard;
 	static CRenderer *m_pRenderer;
 	static CTexture *m_pTexture;
-
-	CPlayer *m_pPlayer;
-	CPolygon *m_pPolygon;
+	static CDebugProc *m_pDebugProc;
 };
 
 #endif

@@ -2,6 +2,7 @@
 #include "renderer.h"
 #include "object.h"
 #include "camera.h"
+#include "debugproc.h"
 #include <tchar.h> // _T
 
 CRenderer::CRenderer()
@@ -48,7 +49,7 @@ HRESULT CRenderer::Init(HWND hWnd, bool bWindow)
 	m_pD3dpp.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;	// リフレッシュレート
 	m_pD3dpp.PresentationInterval = D3DPRESENT_INTERVAL_DEFAULT;	// インターバル
 
-																	// ディスプレイアダプタを表すためのデバイスを作成
+	// ディスプレイアダプタを表すためのデバイスを作成
 	if (FAILED(m_pD3D->CreateDevice(D3DADAPTER_DEFAULT,
 		D3DDEVTYPE_HAL,
 		hWnd,
@@ -98,7 +99,6 @@ HRESULT CRenderer::Init(HWND hWnd, bool bWindow)
 	m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
 	m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_CURRENT);
 
-
 #ifdef _DEBUG
 	// デバッグ情報表示用フォントの生成
 	D3DXCreateFont(m_pD3DDevice, 18, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
@@ -142,10 +142,7 @@ void CRenderer::Uninit()
 //=============================================================================
 void CRenderer::Update()
 {
-	//CParticleManager *particleManager = CApplication::GetParticleManager();
-
 	CObject::UpdateAll();
-	//particleManager->Update();
 }
 
 //=============================================================================
@@ -170,9 +167,11 @@ void CRenderer::Draw()
 		m_pD3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 		m_pD3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
+		CApplication::GetDebugProc()->Draw();
+
 #ifdef _DEBUG
 		// FPS表示
-		DrawFPS();
+		//DrawFPS();
 #endif // _DEBUG
 		CObject::DrawAll();
 
@@ -205,7 +204,6 @@ void CRenderer::ReCreateDevice()
 		PostQuitMessage(0);
 		return;
 	}
-
 }
 
 //デバイスロスト発生時の処理

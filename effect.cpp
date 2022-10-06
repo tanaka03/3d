@@ -60,14 +60,17 @@ void CEffect::Update()
 	CBillboard::Update();
 	m_pos = GetPos();
 	m_scale = GetScale();
+	m_col = GetCol();
 
+	m_col.a -= 0.02f;
 	m_scale.x -= 0.1f;
 	m_scale.y -= 0.1f;
 
 	SetScale(m_scale);
+	SetCol(m_col);
 
 	m_life--;
-	if (m_life <= 0)
+	if (m_life <= 0 || m_col.a <= 0.0f)
 	{
 		Uninit();
 		return;
