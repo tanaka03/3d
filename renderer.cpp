@@ -167,12 +167,13 @@ void CRenderer::Draw()
 		m_pD3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 		m_pD3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
-		CApplication::GetDebugProc()->Draw();
-
 #ifdef _DEBUG
+		CDebugProc::Draw();
+
 		// FPSï\é¶
-		//DrawFPS();
+		DrawFPS();
 #endif // _DEBUG
+
 		CObject::DrawAll();
 
 		// Direct3DÇ…ÇÊÇÈï`âÊÇÃèIóπ

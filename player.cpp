@@ -7,6 +7,7 @@
 #include "shadow.h"
 #include "camera.h"
 #include "bullet.h"
+#include "debugproc.h"
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 //プレイヤーのコンストラクタ
@@ -180,6 +181,10 @@ void CPlayer::Update()
 
 	BackBased(-300.0f);
 
+#ifdef _DEBUG
+	CDebugProc::Print("目的の向き%f\n現在の向き%f\n現在の位置 X:%f Y:%f Z:%f", m_rotDest.y, m_rot.y, m_pos.x, m_pos.y, m_pos.z);
+#endif
+
 	//目的の方向の正規化
 	if (m_rotDest.y - m_rot.y > D3DX_PI)
 	{
@@ -229,5 +234,6 @@ void CPlayer::BackBased(float Y)
 	if (m_pos.y < Y)
 	{
 		m_pos = m_Collisionpos;
+		m_move.y = 0.0f;
 	}
 }

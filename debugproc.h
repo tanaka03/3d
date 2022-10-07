@@ -21,11 +21,8 @@ public:
 	static void Draw();
 
 private:
-	static const int Max_Str = 1024;
 	static std::string m_Str;
-
 	static LPD3DXFONT m_pFont;
-	static char m_aStr[Max_Str];
 };
 
 #endif

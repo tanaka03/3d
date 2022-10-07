@@ -37,10 +37,10 @@
     <Filter Include="ソース ファイル\Object\objectX">
       <UniqueIdentifier>{181167f3-d84e-4774-84e0-c3e69b3acab1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\Object\ビルボード">
+    <Filter Include="ソース ファイル\Object\Billboard">
       <UniqueIdentifier>{68dc69ad-17bd-487d-8b42-b43e3c170a5e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ヘッダー ファイル\Object\ビルボード">
+    <Filter Include="ヘッダー ファイル\Object\Billboard">
       <UniqueIdentifier>{9a32ab94-b502-44c1-ae01-78ef29d3b963}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -91,16 +91,16 @@
       <Filter>ソース ファイル\Object\object3D</Filter>
     </ClCompile>
     <ClCompile Include="billboard.cpp">
-      <Filter>ソース ファイル\Object\ビルボード</Filter>
+      <Filter>ソース ファイル\Object\Billboard</Filter>
     </ClCompile>
     <ClCompile Include="bullet.cpp">
-      <Filter>ソース ファイル\Object\ビルボード</Filter>
+      <Filter>ソース ファイル\Object\Billboard</Filter>
     </ClCompile>
     <ClCompile Include="debugproc.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="effect.cpp">
-      <Filter>ソース ファイル\Object\ビルボード</Filter>
+      <Filter>ソース ファイル\Object\Billboard</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -150,13 +150,13 @@
       <Filter>ヘッダー ファイル\Object\object3D</Filter>
     </ClInclude>
     <ClInclude Include="billboard.h">
-      <Filter>ヘッダー ファイル\Object\ビルボード</Filter>
+      <Filter>ヘッダー ファイル\Object\Billboard</Filter>
     </ClInclude>
     <ClInclude Include="bullet.h">
-      <Filter>ヘッダー ファイル\Object\ビルボード</Filter>
+      <Filter>ヘッダー ファイル\Object\Billboard</Filter>
     </ClInclude>
     <ClInclude Include="effect.h">
-      <Filter>ヘッダー ファイル\Object\ビルボード</Filter>
+      <Filter>ヘッダー ファイル\Object\Billboard</Filter>
     </ClInclude>
     <ClInclude Include="debugproc.h">
       <Filter>ヘッダー ファイル</Filter>

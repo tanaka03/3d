@@ -40,6 +40,7 @@ void CPolygon::Uninit()
 void CPolygon::Update()
 {
 	CObject3D::Update();
+	m_scale = GetScale();
 	auto pos = GetPos();
 
 	for (int i = 0; i < MAX_OBJECT; i++)

@@ -21,6 +21,9 @@ CDebugProc::~CDebugProc()
 
 void CDebugProc::Init()
 {
+	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();
+	D3DXCreateFont(pDevice, 25, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
+		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, _T("Debug"), &m_pFont);
 }
 
 void CDebugProc::Uninit()
@@ -61,29 +64,30 @@ void CDebugProc::Print(const char *pFormat, ...)
 
 		if (destStr == "%d")
 		{//intŒ^
-			int Arg = va_arg(args, int);
+			auto Arg = va_arg(args, int);
 			argStr = to_string(Arg);
 			nCntAdd = argStr.length();
-			m_Str.replace(pos - nCntDeleted, 2, argStr);
-			nCntDeleted += 2;
+			m_Str.replace(pos - nCntDeleted, destStr.length(), argStr);
+			nCntDeleted += destStr.length();
 		}
 
 		if (destStr == "%f")
-		{//floatŒ^
-			double Arg = va_arg(args, double);
+		{//doubleŒ^ifloat‚¾‚Æva_arg‚ÅˆÃ–Ù“I‚Édouble‚É•ÏŠ·‚³‚ê‚Ä‚¤‚Ü‚­‚¢‚©‚È‚¢j
+			auto Arg = va_arg(args, double);
 			argStr = to_string(Arg);
+			argStr += 'f';
 			nCntAdd = argStr.length();
-			m_Str.replace(pos - nCntDeleted, 2, argStr);
-			nCntDeleted += 2;
+			m_Str.replace(pos - nCntDeleted, destStr.length(), argStr);
+			nCntDeleted += destStr.length();
 		}
 
 		if (destStr == "%c")
 		{//charŒ^
-			char Arg = va_arg(args, char);
+			auto Arg = va_arg(args, char);
 			argStr = Arg;
 			nCntAdd = argStr.length();
-			m_Str.replace(pos - nCntDeleted, 2, argStr);
-			nCntDeleted += 2;
+			m_Str.replace(pos - nCntDeleted, destStr.length(), argStr);
+			nCntDeleted += destStr.length();
 		}
 
 		if (destStr == "%s")
@@ -91,8 +95,8 @@ void CDebugProc::Print(const char *pFormat, ...)
 			const char* Arg = va_arg(args, const char*);
 			argStr = Arg;
 			nCntAdd = argStr.length();
-			m_Str.replace(pos - nCntDeleted, 2, argStr);
-			nCntDeleted += 2;
+			m_Str.replace(pos - nCntDeleted, destStr.length(), argStr);
+			nCntDeleted += destStr.length();
 		}
 
 		nCntDeleted -= nCntAdd;
@@ -103,17 +107,12 @@ void CDebugProc::Print(const char *pFormat, ...)
 
 void CDebugProc::Draw()
 {
-	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();
-
-	D3DXCreateFont(pDevice, 25, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
-		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, _T("Debug"), &m_pFont);
-
 	if (m_pFont == nullptr)
 	{
 		return;
 	}
 
-	RECT rect = { 0, 20, SCREEN_WIDTH, SCREEN_HEIGHT };
+	RECT rect = { 0, 10, SCREEN_WIDTH, SCREEN_HEIGHT };
 
 	wsprintf((TCHAR*)m_Str.c_str(), _T(m_Str.c_str()));
 

@@ -44,9 +44,10 @@ HRESULT CApplication::Init(HWND hWnd, HINSTANCE hInstance)
 		return -1;
 	}
 
+#ifdef _DEBUG
 	m_pDebugProc = new CDebugProc;
 	m_pDebugProc->Init();
-	m_pDebugProc->Print("ああ:%d いい:%f うう:%f ええ:%c おお:%s",800, 50.0, 200.55, 'c', "おはようございます");
+#endif
 
 	//キーボードクラスの生成
 	m_pInputKeyboard = new CInputKeyboard;
@@ -73,6 +74,7 @@ HRESULT CApplication::Init(HWND hWnd, HINSTANCE hInstance)
 
 void CApplication::Uninit()
 {
+#ifdef _DEBUG
 	//デバッグプロシージャの破棄
 	if (m_pDebugProc != nullptr)
 	{
@@ -81,6 +83,7 @@ void CApplication::Uninit()
 		delete m_pDebugProc;
 		m_pDebugProc = nullptr;
 	}
+#endif
 
 	//テクスチャクラスの破棄
 	if (m_pTexture != nullptr)

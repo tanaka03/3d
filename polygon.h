@@ -20,6 +20,7 @@ public:
 	void Draw() override;
 
 private:
+	D3DXVECTOR3 m_scale;
 };
 
 #endif
