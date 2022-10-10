@@ -32,10 +32,11 @@ public:
 
 	static CInputKeyboard *GetInputKeyboard() { return m_pInputKeyboard; }
 	static CRenderer *GetRenderer() { return m_pRenderer; }
-	CTexture *GetTexture() { return m_pTexture; }
 	static CCamera *GetCamera() { return m_pCamera; }
-	CLight *GetLight() { return m_pLight; }
 	static CDebugProc *GetDebugProc() { return m_pDebugProc; }
+	static CPlayer *GetPlayer() { return m_pPlayer; }
+	CTexture *GetTexture() { return m_pTexture; }
+	CLight *GetLight() { return m_pLight; }
 
 	static CApplication* GetInstance()
 	{
@@ -50,10 +51,10 @@ public:
 private:
 	CObject *m_pObject;
 	CLight *m_pLight;
-	CPlayer *m_pPlayer;
 	CPolygon *m_pPolygon;
 	bool m_bWire;
 
+	static CPlayer *m_pPlayer;
 	static CCamera *m_pCamera;
 	static CInputKeyboard *m_pInputKeyboard;
 	static CRenderer *m_pRenderer;

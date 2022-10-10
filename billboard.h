@@ -35,6 +35,7 @@ public:
 	void SetTexture(CTexture::TEXTURE texture) { m_texture = texture; }// テクスチャの設定
 	void SetBlend(EBlend blend) { m_blend = blend; }
 	void SetZBuff(_D3DCMPFUNC func) { m_Zfunc = func; }
+	void SetRelease(bool set) override { m_bRelease = set; }
 
 	//ゲッター
 	D3DXVECTOR3 GetPos() override { return m_objpos; }
@@ -44,6 +45,7 @@ public:
 	EBlend GetBlend() { return m_blend; }
 	float GetWidth() { return m_Width; }
 	float GetHeight() { return m_Height; }
+	bool GetRelease() override { return m_bRelease; }
 
 private:
 	CTexture::TEXTURE m_texture;	// テクスチャの列挙型
@@ -57,6 +59,7 @@ private:
 	EBlend m_blend;
 	float m_Width;
 	float m_Height;
+	bool m_bRelease;
 };
 
 #endif

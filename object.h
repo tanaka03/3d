@@ -5,6 +5,7 @@
 #define _OBJECT_H_
 
 #include "renderer.h"
+#include <list>
 
 #define MAX_OBJECT	(1024)
 
@@ -27,17 +28,20 @@ public:
 	virtual void Uninit() = 0;
 	virtual void Update() = 0;
 	virtual void Draw() = 0;
-	virtual void SetPos(D3DXVECTOR3 pos) = 0;
 	static void ReleaseAll();
 	static void UpdateAll();
 	static void DrawAll();
 
 	void SetObjType(EObjType obj) { m_objtype = obj; }
+	virtual void SetPos(D3DXVECTOR3 pos) = 0;
+	virtual void SetRelease(bool set) = 0;
 
 	CObject *GetMyObject(int nNum);
 	EObjType GetObjType() { return m_objtype; }
-	virtual D3DXVECTOR3 GetPos() = 0;
 	int GetObjAll() { return m_nNumAll; }
+
+	virtual D3DXVECTOR3 GetPos() = 0;
+	virtual bool GetRelease() = 0;
 
 protected:
 	void Release();
@@ -47,10 +51,16 @@ protected:
 	LPD3DXMESH m_mesh;
 
 private:
+	static std::list<CObject*> m_lst;
+	static std::list<CObject*>::iterator m_prev;
+
 	static CObject *CObject::m_apObject[MAX_OBJECT];
 	static int m_nNumAll;
+
 	EObjType m_objtype;
 	int m_nID;			//äiî[êÊÇÃî‘çÜ
+
+	bool m_bRelease = false;
 };
 
 #endif

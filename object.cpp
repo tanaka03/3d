@@ -1,9 +1,15 @@
 #include "object.h"
 #include <assert.h>
+#include <iostream>
+
+using namespace std;
 
 //===============================
 //静的メンバ変数宣言
 //===============================
+list<CObject*> CObject::m_lst;
+list<CObject*>::iterator CObject::m_prev;
+
 CObject *CObject::m_apObject[MAX_OBJECT];
 int CObject::m_nNumAll = 0;
 
@@ -12,16 +18,7 @@ int CObject::m_nNumAll = 0;
 //===============================
 CObject::CObject()
 {
-	for (int i = 0; i < MAX_OBJECT; i++)
-	{
-		if (m_apObject[i] == nullptr)
-		{
-			m_apObject[i] = this;
-			m_nID = i;
-			m_nNumAll++;
-			break;
-		}
-	}
+	m_lst.push_back(this);
 }
 
 //===============================
@@ -36,14 +33,14 @@ CObject::~CObject()
 //===============================
 void CObject::ReleaseAll()
 {
-	//メモリ解放
-	for (int i = 0; i < MAX_OBJECT; i++)
+	for (CObject *p : m_lst)
 	{
-		//NULLチェック
-		if (m_apObject[i] != nullptr)
+		if (p != nullptr)
 		{
-			m_apObject[i]->Release();
+			continue;
 		}
+
+		p->Release();
 	}
 }
 
@@ -52,13 +49,22 @@ void CObject::ReleaseAll()
 //===============================
 void CObject::UpdateAll()
 {
-	for (int i = 0; i < MAX_OBJECT; i++)
+	for (auto itr = m_lst.begin(); itr != m_lst.end();)
 	{
-		if (m_apObject[i] != nullptr)
+		CObject *p = *itr;
+		if (p == nullptr)
 		{
-			// ポリゴンの更新処理
-			m_apObject[i]->Update();
+			continue;
 		}
+
+		p->Update();
+
+		if (p->GetRelease() == true)
+		{
+			itr = m_prev;
+		}
+
+		itr++;
 	}
 }
 
@@ -67,14 +73,14 @@ void CObject::UpdateAll()
 //===============================
 void CObject::DrawAll()
 {
-	for (int i = 0; i < MAX_OBJECT; i++)
+	for (CObject *p : m_lst)
 	{
-		// ポリゴンの描画処理
-		if (m_apObject[i] != nullptr)
+		if (p == nullptr)
 		{
-			// ポリゴンの更新処理
-			m_apObject[i]->Draw();
+			continue;
 		}
+
+		p->Draw();
 	}
 }
 
@@ -83,13 +89,21 @@ void CObject::DrawAll()
 //===============================
 void CObject::Release()
 {
-	if (m_apObject[m_nID] != nullptr)
+	for (auto itr = m_lst.begin(); itr != m_lst.end();)
 	{
-		int nID = m_nID;
+		CObject *p = *itr;
+		bool check = p->GetRelease();
+		if (check)
+		{
+			m_prev = prev(itr);
+			m_lst.erase(itr);
+			return;
+		}
 
-		delete m_apObject[nID];
-		m_apObject[nID] = nullptr;
-		m_nNumAll--;
+		else
+		{
+			itr++;
+		}
 	}
 }
 

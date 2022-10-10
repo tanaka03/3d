@@ -17,6 +17,7 @@ CInputKeyboard *CApplication::m_pInputKeyboard = nullptr;
 CRenderer *CApplication::m_pRenderer = nullptr;
 CTexture *CApplication::m_pTexture = nullptr;
 CCamera *CApplication::m_pCamera = nullptr;
+CPlayer *CApplication::m_pPlayer = nullptr;
 
 CDebugProc *CApplication::m_pDebugProc = nullptr;
 

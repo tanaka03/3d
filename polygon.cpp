@@ -1,6 +1,7 @@
 #include "polygon.h"
 #include "object3d.h"
 #include "player.h"
+#include "application.h"
 
 CPolygon::CPolygon()
 {
@@ -39,38 +40,17 @@ void CPolygon::Uninit()
 
 void CPolygon::Update()
 {
+	CPlayer *pPlayer = CApplication::GetPlayer();
 	CObject3D::Update();
 	m_scale = GetScale();
 	auto pos = GetPos();
 
-	for (int i = 0; i < MAX_OBJECT; i++)
+	auto playerPos = pPlayer->GetPos();
+	auto collision = PlaneCollision(playerPos, pos, 62.0f, 2.0f);
+	pPlayer->SetCollision(false);
+
+	if (collision)
 	{
-		CObject *pObject = nullptr;
-		pObject = pObject->GetMyObject(i);
-
-		if (pObject == nullptr)
-		{
-			continue;
-		}
-
-		CObject::EObjType objType;
-		objType = pObject->GetObjType();
-
-		if (objType != CObject::OBJTYPE_PLAYER)
-		{
-			continue;
-		}
-
-		CPlayer *pPlayer = (CPlayer*)pObject;
-		auto playerPos = pPlayer->GetPos();
-		auto collision = PlaneCollision(playerPos, pos, 62.0f, 2.0f);
-
-		if (!collision)
-		{
-			pPlayer->SetCollision(false);
-			continue;
-		}
-
 		pPlayer->SetCollision(true);
 		pPlayer->SetCollisionPos(pos);
 	}

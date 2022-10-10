@@ -63,6 +63,7 @@ public:
 	void SetLife(int nLife) { m_nLife = nLife; }
 	void SetScale(float width, float height) { m_Width = width, m_Height = height; }
 	void SetTexture(CTexture::TEXTURE texture) { m_texture = texture; }// テクスチャの設定
+	void SetRelease(bool set) override { m_bRelease = set; }
 
 	//ゲッター
 	D3DXVECTOR3 GetPos() override { return m_objpos; }
@@ -73,6 +74,7 @@ public:
 	int GetLife() { return m_nLife; }
 	float GetWidth() { return m_Width; }
 	float GetHeight() { return m_Height; }
+	bool GetRelease() override { return m_bRelease; }
 
 private:
 	D3DXVECTOR3 m_objpos;
@@ -88,6 +90,7 @@ private:
 	int m_nCntY;
 	bool m_bState;
 	bool m_bUseMyCol = false;
+	bool m_bRelease;
 };
 
 #endif
