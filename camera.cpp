@@ -164,40 +164,40 @@ void CCamera::Update()
 	//===========================
 	//ÉÇÉfÉãÇ…í«è]
 	//===========================
-	if (m_bTraction)
-	{
-		for (int i = 0; i < MAX_OBJECT; i++)
-		{
-			CObject *pObject = nullptr;
-			pObject = pObject->GetMyObject(i);
+	//if (m_bTraction)
+	//{
+	//	for (int i = 0; i < MAX_OBJECT; i++)
+	//	{
+	//		CObject *pObject = nullptr;
+	//		pObject = pObject->GetMyObject(i);
 
-			if (pObject == nullptr)
-			{
-				continue;
-			}
+	//		if (pObject == nullptr)
+	//		{
+	//			continue;
+	//		}
 
-			CObject::EObjType objType;
-			objType = pObject->GetObjType();
+	//		CObject::EObjType objType;
+	//		objType = pObject->GetObjType();
 
-			if (objType != CObject::OBJTYPE_PLAYER)
-			{
-				continue;
-			}
-			CPlayer *pPlayer = (CPlayer*)pObject;
+	//		if (objType != CObject::OBJTYPE_PLAYER)
+	//		{
+	//			continue;
+	//		}
+	//		CPlayer *pPlayer = (CPlayer*)pObject;
 
-			m_camera.posR.x += (m_camera.posRDest.x - m_camera.posR.x) * 0.5f;
-			m_camera.posV.x += (m_camera.posVDest.x - m_camera.posV.x) * 0.5f;
+	//		m_camera.posR.x += (m_camera.posRDest.x - m_camera.posR.x) * 0.5f;
+	//		m_camera.posV.x += (m_camera.posVDest.x - m_camera.posV.x) * 0.5f;
 
-			m_camera.posR.z += (m_camera.posRDest.z - m_camera.posR.z) * 0.5f;
-			m_camera.posV.z += (m_camera.posVDest.z - m_camera.posV.z) * 0.5f;
+	//		m_camera.posR.z += (m_camera.posRDest.z - m_camera.posR.z) * 0.5f;
+	//		m_camera.posV.z += (m_camera.posVDest.z - m_camera.posV.z) * 0.5f;
 
-			m_camera.posRDest.x = pPlayer->GetPos().x + sinf(pPlayer->GetRot().y) * 0.5f;
-			m_camera.posRDest.z = pPlayer->GetPos().z + cosf(pPlayer->GetRot().y) * 0.5f;
+	//		m_camera.posRDest.x = pPlayer->GetPos().x + sinf(pPlayer->GetRot().y) * 0.5f;
+	//		m_camera.posRDest.z = pPlayer->GetPos().z + cosf(pPlayer->GetRot().y) * 0.5f;
 
-			m_camera.posVDest.x = pPlayer->GetPos().x + sinf(m_camera.rot.x) * m_camera.fDistance;
-			m_camera.posVDest.z = pPlayer->GetPos().z + cosf(m_camera.rot.z) * m_camera.fDistance;
-		}
-	}
+	//		m_camera.posVDest.x = pPlayer->GetPos().x + sinf(m_camera.rot.x) * m_camera.fDistance;
+	//		m_camera.posVDest.z = pPlayer->GetPos().z + cosf(m_camera.rot.z) * m_camera.fDistance;
+	//	}
+	//}
 
 	//======================
 	//ê≥ãKâª

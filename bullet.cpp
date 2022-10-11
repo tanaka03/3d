@@ -46,6 +46,8 @@ HRESULT CBullet::Init()
 
 void CBullet::Uninit()
 {
+	m_pEffect->Uninit();
+	m_pShadow->Uninit();
 	CBillboard::Uninit();
 }
 
@@ -60,7 +62,6 @@ void CBullet::Update()
 	m_life--;
 	if (m_life <= 0)
 	{
-		m_pShadow->Uninit();
 		Uninit();
 		return;
 	}

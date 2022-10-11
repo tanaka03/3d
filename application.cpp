@@ -10,6 +10,10 @@
 #include "polygon.h"
 #include "player.h"
 
+#include "meshfield.h"
+#include "cylinder.h"
+#include "sphere.h"
+
 #include "debugproc.h"
 
 CApplication* CApplication::m_pApplication = nullptr;
@@ -70,6 +74,8 @@ HRESULT CApplication::Init(HWND hWnd, HINSTANCE hInstance)
 	m_pPolygon = CPolygon::Create(D3DXVECTOR3(0.0f, 0.0f,0.0f));
 	m_pPlayer = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
+	//CMeshField::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(20.0f,0.0f,20.0f), 5, 5);
+	CSphere::Create(D3DXVECTOR3(50.0f, 0.0f, 0.0f), 30.0f, 30, 30);
 	return S_OK;
 }
 
@@ -85,6 +91,26 @@ void CApplication::Uninit()
 		m_pDebugProc = nullptr;
 	}
 #endif
+
+	CObject::ReleaseAll();
+
+	//プレイヤークラスの破棄
+	if (m_pPlayer != nullptr)
+	{
+		m_pPlayer->Uninit();
+
+		delete m_pPlayer;
+		m_pPlayer = nullptr;
+	}
+
+	//ポリゴンクラスの破棄
+	if (m_pPolygon != nullptr)
+	{
+		m_pPolygon->Uninit();
+
+		delete m_pPolygon;
+		m_pPolygon = nullptr;
+	}
 
 	//テクスチャクラスの破棄
 	if (m_pTexture != nullptr)
@@ -102,6 +128,15 @@ void CApplication::Uninit()
 
 		delete m_pCamera;
 		m_pCamera = nullptr;
+	}
+
+	//ライトクラスの破棄
+	if (m_pLight != nullptr)
+	{
+		m_pLight->Uninit();
+
+		delete m_pLight;
+		m_pLight = nullptr;
 	}
 
 	//キーボードクラスの破棄

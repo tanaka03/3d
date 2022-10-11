@@ -44,18 +44,25 @@ HRESULT CObjectX::Init()
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
 void CObjectX::Uninit()
 {
+	//頂点バッファの破壊
+	if (m_pVtxBuff != nullptr)
+	{
+		m_pVtxBuff->Release();
+		m_pVtxBuff = nullptr;
+	}
+
 	//メッシュの解放
-	if (m_mesh = NULL)
+	if (m_mesh = nullptr)
 	{
 		m_mesh->Release();
-		m_mesh = NULL;
+		m_mesh = nullptr;
 	}
 
 	//マテリアルの破棄
-	if (m_buffMat != NULL)
+	if (m_buffMat != nullptr)
 	{
 		m_buffMat->Release();
-		m_buffMat = NULL;
+		m_buffMat = nullptr;
 	}
 
 	SetRelease(true);

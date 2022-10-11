@@ -34,13 +34,12 @@ public:
 
 	void SetObjType(EObjType obj) { m_objtype = obj; }
 	virtual void SetPos(D3DXVECTOR3 pos) = 0;
+	//virtual void SetPriority(int priority) = 0;
 	virtual void SetRelease(bool set) = 0;
 
-	CObject *GetMyObject(int nNum);
 	EObjType GetObjType() { return m_objtype; }
-	int GetObjAll() { return m_nNumAll; }
-
 	virtual D3DXVECTOR3 GetPos() = 0;
+	//virtual int GetPriority() = 0;
 	virtual bool GetRelease() = 0;
 
 protected:
@@ -53,9 +52,6 @@ protected:
 private:
 	static std::list<CObject*> m_lst;
 	static std::list<CObject*>::iterator m_prev;
-
-	static CObject *CObject::m_apObject[MAX_OBJECT];
-	static int m_nNumAll;
 
 	EObjType m_objtype;
 	int m_nID;			//äiî[êÊÇÃî‘çÜ

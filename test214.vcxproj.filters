@@ -43,6 +43,12 @@
     <Filter Include="ヘッダー ファイル\Object\Billboard">
       <UniqueIdentifier>{9a32ab94-b502-44c1-ae01-78ef29d3b963}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Object\Mesh">
+      <UniqueIdentifier>{90dd4a7d-cca7-4634-9e4c-2b3300caae4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Object\Mesh">
+      <UniqueIdentifier>{1467fb33-47d8-4b57-b2b2-3afd0b9df4cd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -102,6 +108,18 @@
     <ClCompile Include="effect.cpp">
       <Filter>ソース ファイル\Object\Billboard</Filter>
     </ClCompile>
+    <ClCompile Include="meshfield.cpp">
+      <Filter>ソース ファイル\Object\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="mesh.cpp">
+      <Filter>ソース ファイル\Object\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="cylinder.cpp">
+      <Filter>ソース ファイル\Object\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="sphere.cpp">
+      <Filter>ソース ファイル\Object\Mesh</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h">
@@ -160,6 +178,18 @@
     </ClInclude>
     <ClInclude Include="debugproc.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="meshfield.h">
+      <Filter>ヘッダー ファイル\Object\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="mesh.h">
+      <Filter>ヘッダー ファイル\Object\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="cylinder.h">
+      <Filter>ヘッダー ファイル\Object\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="sphere.h">
+      <Filter>ヘッダー ファイル\Object\Mesh</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

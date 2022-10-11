@@ -10,9 +10,6 @@ using namespace std;
 list<CObject*> CObject::m_lst;
 list<CObject*>::iterator CObject::m_prev;
 
-CObject *CObject::m_apObject[MAX_OBJECT];
-int CObject::m_nNumAll = 0;
-
 //===============================
 //オブジェクトのコンストラクタ
 //===============================
@@ -33,15 +30,18 @@ CObject::~CObject()
 //===============================
 void CObject::ReleaseAll()
 {
-	for (CObject *p : m_lst)
+	for (auto itr = m_lst.begin(); itr != m_lst.end();)
 	{
+		CObject *p = *itr;
 		if (p != nullptr)
 		{
 			continue;
 		}
 
-		p->Release();
+		p->Uninit();
 	}
+
+	m_lst.clear();
 }
 
 //===============================
@@ -59,7 +59,7 @@ void CObject::UpdateAll()
 
 		p->Update();
 
-		if (p->GetRelease() == true)
+		if (p->GetRelease())
 		{
 			itr = m_prev;
 		}
@@ -105,9 +105,4 @@ void CObject::Release()
 			itr++;
 		}
 	}
-}
-
-CObject *CObject::GetMyObject(int nNum)
-{
-	return m_apObject[nNum];
 }
