@@ -65,6 +65,7 @@ void CObject::ReleaseAll()
 	while (pObj)
 	{
 		CObject *pObjNext = pObj->m_Next;
+		pObj->Uninit();
 		pObj->Release();
 		pObj = pObjNext;
 	}

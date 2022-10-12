@@ -94,24 +94,6 @@ void CApplication::Uninit()
 
 	CObject::ReleaseAll();
 
-	//プレイヤークラスの破棄
-	if (m_pPlayer != nullptr)
-	{
-		m_pPlayer->Uninit();
-
-		//delete m_pPlayer;
-		m_pPlayer = nullptr;
-	}
-
-	//ポリゴンクラスの破棄
-	if (m_pPolygon != nullptr)
-	{
-		m_pPolygon->Uninit();
-
-		//delete m_pPolygon;
-		m_pPolygon = nullptr;
-	}
-
 	//テクスチャクラスの破棄
 	if (m_pTexture != nullptr)
 	{
