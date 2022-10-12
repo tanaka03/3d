@@ -73,8 +73,7 @@ void CBillboard::Uninit()
 		m_pVtxBuff = nullptr;
 	}
 
-	SetRelease(true);
- 	CBillboard::Release();
+	SetDestroy(true);
 }
 
 void CBillboard::Update()

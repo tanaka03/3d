@@ -7,15 +7,34 @@ using namespace std;
 //===============================
 //静的メンバ変数宣言
 //===============================
-list<CObject*> CObject::m_lst;
-list<CObject*>::iterator CObject::m_prev;
+//list<CObject*> CObject::m_lst;
+//list<CObject*>::iterator CObject::m_prev;
+
+CObject* CObject::m_Top = nullptr;
+CObject* CObject::m_Current = nullptr;
 
 //===============================
 //オブジェクトのコンストラクタ
 //===============================
 CObject::CObject()
 {
-	m_lst.push_back(this);
+	//m_lst.push_back(this);
+
+	if (m_Top == nullptr)
+	{
+		this->m_Prev = nullptr;
+		this->m_Next = nullptr;
+		m_Top = this;
+		m_Current = this;
+	}
+
+	else
+	{
+		this->m_Next = nullptr;
+		this->m_Prev = m_Current;
+		this->m_Prev->m_Next = this;
+		m_Current = this;
+	}
 }
 
 //===============================
@@ -30,18 +49,25 @@ CObject::~CObject()
 //===============================
 void CObject::ReleaseAll()
 {
-	for (auto itr = m_lst.begin(); itr != m_lst.end();)
+	/*STL使う方*/
+	//for (auto itr = m_lst.begin(); itr != m_lst.end();)
+	//{
+	//	CObject *p = *itr;
+	//	if (p != nullptr)
+	//	{
+	//		continue;
+	//	}
+
+	//	p->Uninit();
+	//}
+
+	CObject *pObj = m_Top;
+	while (pObj)
 	{
-		CObject *p = *itr;
-		if (p != nullptr)
-		{
-			continue;
-		}
-
-		p->Uninit();
+		CObject *pObjNext = pObj->m_Next;
+		pObj->Release();
+		pObj = pObjNext;
 	}
-
-	m_lst.clear();
 }
 
 //===============================
@@ -49,22 +75,39 @@ void CObject::ReleaseAll()
 //===============================
 void CObject::UpdateAll()
 {
-	for (auto itr = m_lst.begin(); itr != m_lst.end();)
+	/*STL使う方*/
+	//for (auto itr = m_lst.begin(); itr != m_lst.end();)
+	//{
+	//	CObject *p = *itr;
+	//	if (p == nullptr)
+	//	{
+	//		continue;
+	//	}
+
+	//	p->Update();
+
+	//	if (p->GetRelease())
+	//	{
+	//		itr = m_prev;
+	//	}
+
+	//	itr++;
+	//}
+
+	CObject *pObj = m_Top;
+	while(pObj)
 	{
-		CObject *p = *itr;
-		if (p == nullptr)
-		{
-			continue;
-		}
+		CObject *pObjNext = pObj->m_Next;
+		pObj->Update();
+		pObj = pObjNext;
+	}
 
-		p->Update();
-
-		if (p->GetRelease())
-		{
-			itr = m_prev;
-		}
-
-		itr++;
+	pObj = m_Top;
+	while (pObj)
+	{
+		CObject *pObjNext = pObj->m_Next;
+		pObj->Release();
+		pObj = pObjNext;
 	}
 }
 
@@ -73,14 +116,23 @@ void CObject::UpdateAll()
 //===============================
 void CObject::DrawAll()
 {
-	for (CObject *p : m_lst)
-	{
-		if (p == nullptr)
-		{
-			continue;
-		}
+	/*STL使う方*/
+	//for (CObject *p : m_lst)
+	//{
+	//	if (p == nullptr)
+	//	{
+	//		continue;
+	//	}
 
-		p->Draw();
+	//	p->Draw();
+	//}
+
+	CObject *pObj = m_Top;
+	while (pObj)
+	{
+		CObject *pObjNext = pObj->m_Next;
+		pObj->Draw();
+		pObj = pObj->m_Next;
 	}
 }
 
@@ -89,20 +141,56 @@ void CObject::DrawAll()
 //===============================
 void CObject::Release()
 {
-	for (auto itr = m_lst.begin(); itr != m_lst.end();)
+	/*STL使う方*/
+	//for (auto itr = m_lst.begin(); itr != m_lst.end();)
+	//{
+	//	CObject *p = *itr;
+	//	bool check = p->GetRelease();
+	//	if (check)
+	//	{
+	//		m_prev = prev(itr);
+	//		m_lst.erase(itr);
+
+	//		if (p != nullptr)
+	//		{
+	//			delete p;
+	//			p = nullptr;
+	//		}
+	//		return;
+	//	}
+
+	//	else
+	//	{
+	//		itr++;
+	//	}
+	//}
+
+	if (this->GetDestroy())
 	{
-		CObject *p = *itr;
-		bool check = p->GetRelease();
-		if (check)
+		if (this->m_Next != nullptr && this->m_Prev != nullptr)
 		{
-			m_prev = prev(itr);
-			m_lst.erase(itr);
-			return;
+			this->m_Next->m_Prev = this->m_Prev;
+			this->m_Prev->m_Next = this->m_Next;
 		}
 
-		else
+		else if (this->m_Prev == nullptr && this->m_Next != nullptr)
 		{
-			itr++;
+			this->m_Next->m_Prev = nullptr;
+			m_Top = this->m_Next;
 		}
+
+		else if (this->m_Next == nullptr && this->m_Prev != nullptr)
+		{
+			this->m_Prev->m_Next = nullptr;
+			m_Current = this->m_Prev;
+		}
+
+		else if (this->m_Next == nullptr && this->m_Prev == nullptr)
+		{
+			m_Top = nullptr;
+			m_Current = nullptr;
+		}
+
+		delete this;
 	}
 }

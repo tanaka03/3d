@@ -93,6 +93,8 @@ void CMesh::Uninit()
 		m_pIdxBuff->Release();
 		m_pIdxBuff = nullptr;
 	}
+
+	SetDestroy(true);
 }
 
 //

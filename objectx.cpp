@@ -65,8 +65,7 @@ void CObjectX::Uninit()
 		m_buffMat = nullptr;
 	}
 
-	SetRelease(true);
-	CObjectX::Release();
+	SetDestroy(true);
 }
 
 //

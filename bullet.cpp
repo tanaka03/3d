@@ -46,8 +46,6 @@ HRESULT CBullet::Init()
 
 void CBullet::Uninit()
 {
-	m_pEffect->Uninit();
-	m_pShadow->Uninit();
 	CBillboard::Uninit();
 }
 
@@ -56,12 +54,13 @@ void CBullet::Update()
 	CBillboard::Update();
 	m_pos = GetPos();
 
-	m_pEffect = CEffect::Create(m_pos, D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXCOLOR(0.0f,0.6f,0.6f,1.0f), 80, CEffect::EFFECT_DEFAULT);
+	CEffect::Create(m_pos, D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXCOLOR(0.0f,0.6f,0.6f,1.0f), 80, CEffect::EFFECT_DEFAULT);
 	m_pShadow->SetPos(D3DXVECTOR3(m_pos.x, 0.0f, m_pos.z) / 2);
 
 	m_life--;
 	if (m_life <= 0)
 	{
+		m_pShadow->SetDestroy(true);
 		Uninit();
 		return;
 	}

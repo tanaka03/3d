@@ -84,8 +84,7 @@ void CObject2D::Uninit()
 		m_pVtxBuff = nullptr;
 	}
 
-	CObject2D::SetRelease(true);
-	CObject2D::Release();
+	SetDestroy(true);
 }
 
 //

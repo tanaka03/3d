@@ -35,12 +35,14 @@ public:
 	void SetObjType(EObjType obj) { m_objtype = obj; }
 	virtual void SetPos(D3DXVECTOR3 pos) = 0;
 	//virtual void SetPriority(int priority) = 0;
-	virtual void SetRelease(bool set) = 0;
+	virtual void SetDestroy(bool set) = 0;
 
 	EObjType GetObjType() { return m_objtype; }
 	virtual D3DXVECTOR3 GetPos() = 0;
 	//virtual int GetPriority() = 0;
-	virtual bool GetRelease() = 0;
+	virtual bool GetDestroy() = 0;
+
+	CObject *GetPrev() { return m_Prev; }
 
 protected:
 	void Release();
@@ -50,13 +52,18 @@ protected:
 	LPD3DXMESH m_mesh;
 
 private:
-	static std::list<CObject*> m_lst;
-	static std::list<CObject*>::iterator m_prev;
+	//static std::list<CObject*> m_lst;
+	//static std::list<CObject*>::iterator m_prev;
+
+	static CObject *m_Top;
+	static CObject *m_Current;
+	CObject *m_Prev;
+	CObject *m_Next;
 
 	EObjType m_objtype;
 	int m_nID;			//äiî[êÊÇÃî‘çÜ
 
-	bool m_bRelease = false;
+	bool m_bDestroy = false;
 };
 
 #endif

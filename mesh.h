@@ -24,7 +24,7 @@ public:
 	void SetCol(D3DXCOLOR col) { m_col = col; }
 	void SetScale(D3DXVECTOR3 scale) { m_scale = scale; }
 	void SetTexture(CTexture::TEXTURE texture) { m_texture = texture; }// テクスチャの設定
-	void SetRelease(bool set) override { m_bRelease = set; }
+	void SetDestroy(bool set) override { m_bRelease = set; }
 	void SetVtxNum(int num) { m_MeshField_VertexNum = num; }
 	void SetIdxNum(int num) { m_MeshField_IndexNum = num; }
 	void SetPrimNum(int num) { m_MeshField_PrimitiveNum = num; }
@@ -41,7 +41,7 @@ public:
 	int GetPrimNum() { return m_MeshField_PrimitiveNum; }
 	int GetX() { return m_meshX; }
 	int GetZ() { return m_meshZ; }
-	bool GetRelease() override { return m_bRelease; }
+	bool GetDestroy() override { return m_bRelease; }
 
 protected:
 	LPDIRECT3DINDEXBUFFER9 m_pIdxBuff;		//インデックスバッファへのポインタ
