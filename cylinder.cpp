@@ -5,13 +5,14 @@ CCylinder::CCylinder()
 {
 	m_fAngle = 0.0f;
 	m_fRadius = 0.0f;
+	m_fHeight = 10.0f;
 }
 
 CCylinder::~CCylinder()
 {
 }
 
-CCylinder *CCylinder::Create(D3DXVECTOR3 pos, float radius, int X, int Z)
+CCylinder *CCylinder::Create(D3DXVECTOR3 pos, float height, float radius, int X, int Z)
 {
 	CCylinder *pMesh = nullptr;
 	pMesh = new CCylinder;
@@ -23,6 +24,7 @@ CCylinder *CCylinder::Create(D3DXVECTOR3 pos, float radius, int X, int Z)
 		pMesh->SetX(X);
 		pMesh->SetZ(Z);
 		pMesh->SetRadius(radius);
+		pMesh->SetHeight(height);
 		pMesh->SetPos(pos);
 		pMesh->Init();
 	}
@@ -52,7 +54,7 @@ HRESULT CCylinder::Init()
 
 			//頂点座標の設定
 			pVtx[(nCntV * (meshZ + 1)) + nCntH].pos = D3DXVECTOR3(sinf(m_fAngle * nCntH) * m_fRadius,
-				100.0f * nCntV,
+				m_fHeight * nCntV,
 				cosf(m_fAngle * nCntH) * m_fRadius);
 
 			//各頂点の法線の設定　※ベクトルの大きさは1にする必要がある
@@ -62,7 +64,7 @@ HRESULT CCylinder::Init()
 			pVtx[(nCntV * (meshZ + 1)) + nCntH].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
 			//テクスチャ座標
-			pVtx[(nCntV * (meshZ + 1)) + nCntH].tex = D3DXVECTOR2(0.0f + 0.5 * (nCntH % (meshX + 1)), 0.0f + 0.5 * (nCntV / (meshZ + 1)));
+			pVtx[(nCntV * (meshZ + 1)) + nCntH].tex = D3DXVECTOR2(0.0f + (nCntH % (meshX + 1)), 1.0f + (nCntV / (meshZ + 1)));
 		}
 	}
 

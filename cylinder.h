@@ -13,7 +13,7 @@ public:
 	CCylinder();
 	~CCylinder();
 
-	static CCylinder* Create(D3DXVECTOR3 pos, float radius, int X, int Z);
+	static CCylinder* Create(D3DXVECTOR3 pos, float height,float radius, int X, int Z);
 
 	HRESULT Init();
 	void Uninit();
@@ -21,12 +21,15 @@ public:
 	void Draw();
 
 	void SetRadius(float radius) { m_fRadius = radius; }
+	void SetHeight(float height) { m_fHeight = height; }
 
 	float GetRadius() { return m_fRadius; }
+	float GetHeight() { return m_fHeight; }
 
 private:
 	float m_fAngle;
 	float m_fRadius;
+	float m_fHeight;
 };
 
 #endif

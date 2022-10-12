@@ -42,8 +42,6 @@ HRESULT CApplication::Init(HWND hWnd, HINSTANCE hInstance)
 {
 	//レンダリングクラスの生成
 	m_pRenderer = new CRenderer;
-
-	// 初期化処理
 	if (FAILED(m_pRenderer->Init(hWnd, TRUE)))
 	{//初期化処理が失敗した場合
 		return -1;
@@ -56,7 +54,6 @@ HRESULT CApplication::Init(HWND hWnd, HINSTANCE hInstance)
 
 	//キーボードクラスの生成
 	m_pInputKeyboard = new CInputKeyboard;
-
 	if (FAILED(m_pInputKeyboard->Init(hInstance, hWnd)))
 	{//初期化処理が失敗した場合
 		return -1;
@@ -75,6 +72,7 @@ HRESULT CApplication::Init(HWND hWnd, HINSTANCE hInstance)
 	m_pPlayer = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
 	//CMeshField::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(20.0f,0.0f,20.0f), 5, 5);
+	//CCylinder::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), 10.0f, 25.0f, 10, 10);
 	//CSphere::Create(D3DXVECTOR3(50.0f, 0.0f, 0.0f), 30.0f, 30, 30);
 	return S_OK;
 }
