@@ -8,6 +8,7 @@
 #include "camera.h"
 #include "bullet.h"
 #include "debugproc.h"
+#include "file.h"
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 //プレイヤーのコンストラクタ
@@ -68,6 +69,8 @@ HRESULT CPlayer::Init()
 	m_pShadow = CShadow::Create(GetPos(), D3DXVECTOR3(30.0f, 0.0f, 30.0f), 100);
 	m_pShadow->SetLifeNone(true);
 
+	CApplication::GetFile()->LoadText("data/FILE/aa.txt");
+
 	return S_OK;
 }
 
@@ -99,7 +102,7 @@ void CPlayer::Update()
 
 	else
 	{
-		m_move.y -= 0.5f;
+		//m_move.y -= 0.5f;
 		m_bJump = false;
 	}
 

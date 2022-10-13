@@ -20,9 +20,9 @@ CMeshField *CMeshField::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, int X, int Z)
 		// ポリゴンの初期化処理
 		pMesh->SetX(X);
 		pMesh->SetZ(Z);
-		pMesh->Init();
 		pMesh->SetPos(pos);
 		pMesh->SetScale(scale);
+		pMesh->Init();
 	}
 
 	return pMesh;
@@ -30,12 +30,12 @@ CMeshField *CMeshField::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, int X, int Z)
 
 HRESULT CMeshField::Init()
 {
-	CMesh::Init();
-
 	auto pos = GetPos();
 	auto scale = GetScale();
 	int meshX = GetX();
 	int meshZ = GetZ();
+
+	CMesh::Init();
 
 	//頂点バッファをロック
 	VERTEX_3D * pVtx = nullptr;

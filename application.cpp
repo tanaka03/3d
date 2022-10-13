@@ -9,6 +9,7 @@
 #include "objectx.h"
 #include "polygon.h"
 #include "player.h"
+#include "file.h"
 
 #include "meshfield.h"
 #include "cylinder.h"
@@ -22,7 +23,7 @@ CRenderer *CApplication::m_pRenderer = nullptr;
 CTexture *CApplication::m_pTexture = nullptr;
 CCamera *CApplication::m_pCamera = nullptr;
 CPlayer *CApplication::m_pPlayer = nullptr;
-
+CFile *CApplication::m_pFile = nullptr;
 CDebugProc *CApplication::m_pDebugProc = nullptr;
 
 CObject *g_apObject = nullptr;
@@ -59,6 +60,9 @@ HRESULT CApplication::Init(HWND hWnd, HINSTANCE hInstance)
 		return -1;
 	}
 
+	//ファイルクラスの生成
+	m_pFile = new CFile;
+
 	//テクスチャクラスの生成
 	m_pTexture = new CTexture;
 
@@ -68,10 +72,10 @@ HRESULT CApplication::Init(HWND hWnd, HINSTANCE hInstance)
 	m_pCamera = new CCamera;
 	m_pCamera->Init();
 
-	m_pPolygon = CPolygon::Create(D3DXVECTOR3(0.0f, 0.0f,0.0f));
+	//m_pPolygon = CPolygon::Create(D3DXVECTOR3(0.0f, 0.0f,0.0f));
 	m_pPlayer = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
-	//CMeshField::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(20.0f,0.0f,20.0f), 5, 5);
+	CMeshField::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(100.0f,0.0f, 100.0f), 25, 25);
 	//CCylinder::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), 10.0f, 25.0f, 10, 10);
 	//CSphere::Create(D3DXVECTOR3(50.0f, 0.0f, 0.0f), 30.0f, 30, 30);
 	return S_OK;
@@ -136,6 +140,13 @@ void CApplication::Uninit()
 
 		delete m_pRenderer;
 		m_pRenderer = nullptr;
+	}
+
+	//ファイルクラスの破棄
+	if (m_pFile != nullptr)
+	{
+		delete m_pFile;
+		m_pFile = nullptr;
 	}
 
 	// アプリケーションの解放

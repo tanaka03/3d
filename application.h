@@ -13,6 +13,7 @@ class CTexture;
 class CCamera;
 class CLight;
 class CDebugProc;
+class CFile;
 
 class CPolygon;
 class CPlayer;
@@ -35,6 +36,7 @@ public:
 	static CCamera *GetCamera() { return m_pCamera; }
 	static CDebugProc *GetDebugProc() { return m_pDebugProc; }
 	static CPlayer *GetPlayer() { return m_pPlayer; }
+	static CFile *GetFile() { return m_pFile; }
 	CTexture *GetTexture() { return m_pTexture; }
 	CLight *GetLight() { return m_pLight; }
 
@@ -60,6 +62,7 @@ private:
 	static CRenderer *m_pRenderer;
 	static CTexture *m_pTexture;
 	static CDebugProc *m_pDebugProc;
+	static CFile *m_pFile;
 };
 
 #endif

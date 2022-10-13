@@ -102,6 +102,7 @@ void CMesh::Uninit()
 //
 void CMesh::Update()
 {
+
 }
 
 //
