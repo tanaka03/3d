@@ -75,7 +75,7 @@ HRESULT CApplication::Init(HWND hWnd, HINSTANCE hInstance)
 	//m_pPolygon = CPolygon::Create(D3DXVECTOR3(0.0f, 0.0f,0.0f));
 	m_pPlayer = CPlayer::Create(D3DXVECTOR3(100.0f, 0.0f, -100.0f));
 
-	CMeshField::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(200.0f,0.0f, 200.0f), 10, 10);
+	CMeshField::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(25.0f,0.0f, 25.0f), 50, 50);
 	//CCylinder::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), 10.0f, 25.0f, 10, 10);
 	//CSphere::Create(D3DXVECTOR3(50.0f, 0.0f, 0.0f), 30.0f, 30, 30);
 	return S_OK;

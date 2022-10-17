@@ -4,7 +4,10 @@
 #include "object3d.h"
 #include "player.h"
 
+#include <vector>
 #include <stdio.h>
+
+using namespace std;
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
 //メッシュのコンストラクタ
@@ -143,7 +146,7 @@ void CMesh::Update()
 		auto posB = pVtx[pIdx[i + 1]].pos;
 		auto posC = pVtx[pIdx[i + 2]].pos;
 
-		//ポリゴンの頂点のベクトル
+		//頂点のベクトル
 		auto vecA = posB - posA;
 		auto vecB = posC - posB;
 		auto vecC = posA - posC;
@@ -166,19 +169,15 @@ void CMesh::Update()
 			pVtx[pIdx[i + 1]].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
 			pVtx[pIdx[i + 2]].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
 
-			auto P1 = pVtx[pIdx[i]].pos;
-			auto P2 = pVtx[pIdx[i + 1]].pos;
-			auto P3 = pVtx[pIdx[i + 2]].pos;
-
-			auto V1 = P2 - P1;
-			auto V2 = P3 - P1;
+			//メッシュの判定
+			auto V1 = posB - posA;
+			auto V2 = posC - posA;
 			D3DXVECTOR3 normal;
 
-			//メッシュの判定
 			D3DXVec3Cross(&normal, &V2, &V1);
 			D3DXVec3Normalize(&normal, &normal);
 			D3DXVec3Dot(&normal, &playerPos);
-			playerPos.y = P1.y - ((playerPos.x - P1.x) * normal.x + (playerPos.z - P1.z) * normal.z) / normal.y;
+			playerPos.y = posA.y - ((playerPos.x - posA.x) * normal.x + (playerPos.z - posA.z) * normal.z) / normal.y;
 
 			pPlayer->SetPos(playerPos);
 			break;

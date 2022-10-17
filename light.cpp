@@ -31,7 +31,7 @@ void CLight::Init()
 	m_light[0].Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
 	//ƒ‰ƒCƒg‚Ì•ûŒü‚ğİ’è
-	vecDir = D3DXVECTOR3(0.2f, -1.0f, -0.4f);
+	vecDir = D3DXVECTOR3(0.6f, -3.0f, 0.6f);
 
 	//³‹K‰»‚·‚é
 	D3DXVec3Normalize(&vecDir, &vecDir);
