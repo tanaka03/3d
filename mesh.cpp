@@ -176,9 +176,9 @@ void CMesh::Update()
 
 			D3DXVec3Cross(&normal, &V2, &V1);
 			D3DXVec3Normalize(&normal, &normal);
-			D3DXVec3Dot(&normal, &playerPos);
 			playerPos.y = posA.y - ((playerPos.x - posA.x) * normal.x + (playerPos.z - posA.z) * normal.z) / normal.y;
 
+			pPlayer->SetCollision(true);
 			pPlayer->SetPos(playerPos);
 			break;
 		}

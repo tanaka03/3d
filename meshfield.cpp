@@ -87,7 +87,7 @@ HRESULT CMeshField::Init()
 
 		D3DXVec3Normalize(&Normal, &Normal);
 
-		pVtx[pIdx[i + 0]].nor += Normal;
+		pVtx[pIdx[i]].nor += Normal;
 		pVtx[pIdx[i + 1]].nor += Normal;
 		pVtx[pIdx[i + 2]].nor += Normal;
 	}

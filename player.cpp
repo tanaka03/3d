@@ -102,7 +102,7 @@ void CPlayer::Update()
 
 	else
 	{
-		//m_move.y -= 0.5f;
+		m_move.y -= 0.5f;
 		m_bJump = false;
 	}
 
