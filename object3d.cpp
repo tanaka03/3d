@@ -173,6 +173,8 @@ void CObject3D::Draw()
 	//テクスチャの設定
 	pDevice->SetTexture(0, NULL);
 
+	//カリングの設定を元に戻す
+	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 }
 
 void CObject3D::SetUV(float Xtop, float Xbottom, float Ytop, float Ybottom)

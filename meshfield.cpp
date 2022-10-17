@@ -30,12 +30,13 @@ CMeshField *CMeshField::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, int X, int Z)
 
 HRESULT CMeshField::Init()
 {
+	CMesh::Init();
+
 	auto pos = GetPos();
 	auto scale = GetScale();
 	int meshX = GetX();
 	int meshZ = GetZ();
-
-	CMesh::Init();
+	m_MeshField_VertexNum = GetVtxNum();
 
 	//頂点バッファをロック
 	VERTEX_3D * pVtx = nullptr;
@@ -45,13 +46,13 @@ HRESULT CMeshField::Init()
 	for (int nCnt = 0; nCnt < m_MeshField_VertexNum; nCnt++)
 	{
 		//頂点座標の設定
-		pVtx[nCnt].pos = D3DXVECTOR3(pos.x + scale.x * (nCnt % (meshX + 1)), 0.0f, pos.z - scale.z * (nCnt / (meshZ + 1)));
+		pVtx[nCnt].pos = D3DXVECTOR3(pos.x + scale.x * (nCnt % (meshX + 1)), pos.y, pos.z - scale.z * (nCnt / (meshZ + 1)));
 
 		//各頂点の法線の設定　※　ベクトルの大きさは1にする必要がある
 		pVtx[nCnt].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 
 		//頂点カラー
-		pVtx[nCnt].col = GetCol();
+		pVtx[nCnt].col = D3DXCOLOR(1.0f,1.0f,1.0f,1.0f);
 
 		//テクスチャ座標
 		pVtx[nCnt].tex = D3DXVECTOR2(0.0f + 0.5f * (nCnt % (meshZ + 1)), 0.0f + 0.5f * (nCnt / (meshZ + 1)));
