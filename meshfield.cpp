@@ -46,7 +46,7 @@ HRESULT CMeshField::Init()
 	for (int nCnt = 0; nCnt < m_MeshField_VertexNum; nCnt++)
 	{
 		//頂点座標の設定
-		pVtx[nCnt].pos = D3DXVECTOR3(pos.x + scale.x * (nCnt % (meshX + 1)), pos.y, pos.z - scale.z * (nCnt / (meshZ + 1)));
+		pVtx[nCnt].pos = D3DXVECTOR3(pos.x + scale.x * (nCnt % (meshX + 1)), rand() % 50, pos.z - scale.z * (nCnt / (meshZ + 1)));
 
 		//各頂点の法線の設定　※　ベクトルの大きさは1にする必要がある
 		pVtx[nCnt].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);

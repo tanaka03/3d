@@ -133,40 +133,55 @@ void CMesh::Update()
 
 	for (int i = 0; i < m_MeshField_PrimitiveNum; i++)
 	{
-		if (pIdx[i] != pIdx[i + 1] && pIdx[i] != pIdx[i + 2] && pIdx[i + 1] != pIdx[i + 2])
+		if (pIdx[i] == pIdx[i + 1] && pIdx[i] == pIdx[i + 2] && pIdx[i + 1] == pIdx[i + 2])
 		{
-			//頂点の位置
-			auto posA = pVtx[pIdx[i]].pos + m_objpos;
-			auto posB = pVtx[pIdx[i + 1]].pos + m_objpos;
-			auto posC = pVtx[pIdx[i + 2]].pos + m_objpos;
+			continue;
+		}
 
-			//ポリゴンの頂点のベクトル
-			auto vecA = posB - posA;
-			auto vecB = posC - posB;
-			auto vecC = posA - posC;
+		//頂点の位置
+		auto posA = pVtx[pIdx[i]].pos;
+		auto posB = pVtx[pIdx[i + 1]].pos;
+		auto posC = pVtx[pIdx[i + 2]].pos;
 
-			//ポリゴンの頂点とプレイヤーの位置のベクトル
-			auto DistanceA = playerPos - posA;
-			auto DistanceB = playerPos - posB;
-			auto DistanceC = playerPos - posC;
+		//ポリゴンの頂点のベクトル
+		auto vecA = posB - posA;
+		auto vecB = posC - posB;
+		auto vecC = posA - posC;
 
-			//ポリゴンの頂点のベクトルとプレイヤーから頂点のベクトルの計算結果
-			float fResult1 = vecA.x * DistanceA.z - vecA.z * DistanceA.x;
-			float fResult2 = vecB.x * DistanceB.z - vecB.z * DistanceB.x;
-			float fResult3 = vecC.x * DistanceC.z - vecC.z * DistanceC.x;
+		//ポリゴンの頂点とプレイヤーの位置のベクトル
+		auto DistanceA = playerPos - posA;
+		auto DistanceB = playerPos - posB;
+		auto DistanceC = playerPos - posC;
 
-			if (fResult1 * fResult2 >= 0 &&
-				fResult2 * fResult3 >= 0 &&
-				fResult3 * fResult1 >= 0)
-			{//ポリゴンの範囲内に入った場合
-				pVtx[pIdx[i]].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
-				pVtx[pIdx[i + 1]].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
-				pVtx[pIdx[i + 2]].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+		//ポリゴンの頂点のベクトルとプレイヤーから頂点のベクトルの計算結果
+		float fResult1 = vecA.x * DistanceA.z - vecA.z * DistanceA.x;
+		float fResult2 = vecB.x * DistanceB.z - vecB.z * DistanceB.x;
+		float fResult3 = vecC.x * DistanceC.z - vecC.z * DistanceC.x;
 
-				//D3DXVec3Cross();
+		if (fResult1 * fResult2 >= 0 &&
+			fResult2 * fResult3 >= 0 &&
+			fResult3 * fResult1 >= 0)
+		{//ポリゴンの範囲内に入った場合
+			pVtx[pIdx[i]].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+			pVtx[pIdx[i + 1]].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+			pVtx[pIdx[i + 2]].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
 
-				break;
-			}
+			auto P1 = pVtx[pIdx[i]].pos;
+			auto P2 = pVtx[pIdx[i + 1]].pos;
+			auto P3 = pVtx[pIdx[i + 2]].pos;
+
+			auto V1 = P2 - P1;
+			auto V2 = P3 - P1;
+			D3DXVECTOR3 normal;
+
+			//メッシュの判定
+			D3DXVec3Cross(&normal, &V2, &V1);
+			D3DXVec3Normalize(&normal, &normal);
+			D3DXVec3Dot(&normal, &playerPos);
+			playerPos.y = P1.y - ((playerPos.x - P1.x) * normal.x + (playerPos.z - P1.z) * normal.z) / normal.y;
+
+			pPlayer->SetPos(playerPos);
+			break;
 		}
 	}
 
