@@ -14,6 +14,7 @@ class CCamera;
 class CLight;
 class CDebugProc;
 class CFile;
+class CModel;
 
 class CPolygon;
 class CPlayer;
@@ -37,8 +38,9 @@ public:
 	static CDebugProc *GetDebugProc() { return m_pDebugProc; }
 	static CPlayer *GetPlayer() { return m_pPlayer; }
 	static CFile *GetFile() { return m_pFile; }
+	static CModel *GetModel() { return m_pModel; }
+	static CLight *GetLight() { return m_pLight; }
 	CTexture *GetTexture() { return m_pTexture; }
-	CLight *GetLight() { return m_pLight; }
 
 	static CApplication* GetInstance()
 	{
@@ -52,10 +54,10 @@ public:
 
 private:
 	CObject *m_pObject;
-	CLight *m_pLight;
 	CPolygon *m_pPolygon;
 	bool m_bWire;
 
+	static CLight *m_pLight;
 	static CPlayer *m_pPlayer;
 	static CCamera *m_pCamera;
 	static CInputKeyboard *m_pInputKeyboard;
@@ -63,6 +65,7 @@ private:
 	static CTexture *m_pTexture;
 	static CDebugProc *m_pDebugProc;
 	static CFile *m_pFile;
+	static CModel *m_pModel;
 };
 
 #endif

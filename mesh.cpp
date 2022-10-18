@@ -4,6 +4,8 @@
 #include "object3d.h"
 #include "player.h"
 
+#include "debugproc.h"
+
 #include <vector>
 #include <stdio.h>
 
@@ -58,7 +60,7 @@ HRESULT CMesh::Init()
 	//インデックスバッファ
 	//==========================
 	//インデックスバッファをロック
-	WORD * pIdx;
+	WORD *pIdx;
 
 	m_pIdxBuff->Lock(0, 0, (void**)&pIdx, 0);
 
@@ -122,11 +124,11 @@ void CMesh::Update()
 	D3DXVECTOR3 playerPos = pPlayer->GetPos();
 
 	//インデックスバッファをロック
-	WORD * pIdx;
+	WORD *pIdx;
 	m_pIdxBuff->Lock(0, 0, (void**)&pIdx, 0);
 
 	//頂点バッファをロック
-	VERTEX_3D * pVtx = nullptr;
+	VERTEX_3D *pVtx = nullptr;
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 	for (int cnt = 0; cnt < m_MeshField_VertexNum; cnt++)

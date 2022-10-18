@@ -17,6 +17,7 @@ CPlayer::CPlayer()
 {
 	SetObjType(OBJTYPE_PLAYER);
 	m_rot = D3DXVECTOR3(0.0f,0.0f,0.0f);
+	m_fSpeed = 1.5f;
 	m_bCollision = false;
 	m_bJump = false;
 }
@@ -54,6 +55,7 @@ HRESULT CPlayer::Init()
 {
 	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();
 	CObjectX::SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	//CObjectX::SetModel(CModel::MODEL_FOKKO);
 
 	//Xファイルの読み込み(体)
 	D3DXLoadMeshFromX("data\\MODEL\\fokko.x",
@@ -68,8 +70,6 @@ HRESULT CPlayer::Init()
 	CObjectX::Init();
 	m_pShadow = CShadow::Create(GetPos(), D3DXVECTOR3(30.0f, 0.0f, 30.0f), 100);
 	m_pShadow->SetLifeNone(true);
-
-	CApplication::GetFile()->LoadText("data/FILE/aa.txt");
 
 	return S_OK;
 }
@@ -109,48 +109,48 @@ void CPlayer::Update()
 	//奥
 	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_UP))
 	{
-		m_pos.z -= 1.5f;
+		m_pos.z -= m_fSpeed;
 		m_rotDest.y = camera->rot.y + D3DX_PI * 0.0f;				//目的の角度
 
 		//右奥
 		if(CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_RIGHT))
-			m_pos.x -= 1.5f,
+			m_pos.x -= m_fSpeed,
 			m_rotDest.y = camera->rot.y + D3DX_PI * 0.25f;
 
 		//左奥
 		else if(CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_LEFT))
-			m_pos.x += 1.5f,
+			m_pos.x += m_fSpeed,
 			m_rotDest.y = camera->rot.y - D3DX_PI * 0.25f;
 	}
 
 	//後
 	else if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_DOWN))
 	{
-		m_pos.z += 1.5f;
+		m_pos.z += m_fSpeed;
 		m_rotDest.y = camera->rot.y - D3DX_PI * 1.0f;
 
 		//右後
 		if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_RIGHT))
-			m_pos.x -= 1.5f,
+			m_pos.x -= m_fSpeed,
 			m_rotDest.y = camera->rot.y + D3DX_PI * 0.75f;
 
 		//左後
 		else if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_LEFT))
-			m_pos.x += 1.5f,
+			m_pos.x += m_fSpeed,
 			m_rotDest.y = camera->rot.y - D3DX_PI * 0.75f;
 	}
 
 	//右
 	else if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_RIGHT))
 	{
-		m_pos.x -= 1.5f;
+		m_pos.x -= m_fSpeed;
 		m_rotDest.y = camera->rot.y + D3DX_PI * 0.5f;
 	}
 
 	//左
 	else if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_LEFT))
 	{
-		m_pos.x += 1.5f;
+		m_pos.x += m_fSpeed;
 		m_rotDest.y = camera->rot.y - D3DX_PI * 0.5f;
 	}
 
@@ -185,7 +185,7 @@ void CPlayer::Update()
 	BackBased(-300.0f);
 
 #ifdef _DEBUG
-	CDebugProc::Print("目的の向き%f\n現在の向き%f\n現在の位置 X:%f Y:%f Z:%f", m_rotDest.y, m_rot.y, m_pos.x, m_pos.y, m_pos.z);
+	//CDebugProc::Print("目的の向き%f\n現在の向き%f\n現在の位置 X:%f Y:%f Z:%f", m_rotDest.y, m_rot.y, m_pos.x, m_pos.y, m_pos.z);
 #endif
 
 	//目的の方向の正規化

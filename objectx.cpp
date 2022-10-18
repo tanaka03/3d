@@ -1,5 +1,6 @@
 #include "objectx.h"
 #include "application.h"
+#include "light.h"
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
 //オブジェクトXのコンストラクタ
@@ -23,6 +24,13 @@ HRESULT CObjectX::Init()
 	int nNumVtx;		//頂点数
 	DWORD sizeFVF;		//頂点フォーマットのサイズ
 	BYTE *pVtxBuff;		//頂点バッファへのポインタ
+
+	//↓これ不完全
+	//CModel::ModelData Modeldata = CApplication::GetModel()->GetModel(m_model);
+
+	//m_mesh = Modeldata.m_mesh;
+	//m_buffMat = Modeldata.m_buffMat;
+	//m_dwNum = Modeldata.m_dwNum;
 
 	//頂点数の取得
 	nNumVtx = m_mesh->GetNumVertices();
@@ -84,21 +92,28 @@ void CObjectX::Update()
 void CObjectX::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();	//デバイスの取得
+	D3DXVECTOR3 vecdir = CApplication::GetLight()->GetVecDir();
 	D3DXMATRIX mtxRot, mtxTrans;				//計算用マトリックス
 	D3DMATERIAL9 matDef;						//現在のマテリアルを保存
 	D3DXMATERIAL *pMat;							//マテリアルデータへのポインタ
 
+	//モデルの影
+	D3DXMATRIX mtxShadow;
+	D3DXPLANE planeField;
+	D3DXVECTOR4 vecLight;
+	D3DXVECTOR3 pos, normal;
+
 	//テクスチャの設定を戻す
 	pDevice->SetTexture(0, NULL);
 
-	//ワールドマトリックスを初期化(親)
+	//ワールドマトリックスを初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
 
-	//向きを反映(親)
+	//向きを反映
 	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_rot.y, m_rot.x, m_rot.z);
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
 
-	//位置を反映(親)
+	//位置を反映
 	D3DXMatrixTranslation(&mtxTrans, m_objpos.x, m_objpos.y, m_objpos.z);
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
 
@@ -108,6 +123,21 @@ void CObjectX::Draw()
 
 	//ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
+
+	//-----------------------------------------------------------------
+	//シャドウマトリックスの初期化
+	//D3DXMatrixIdentity(&mtxShadow);
+
+	//vecLight = D3DXVECTOR4(vecdir.x, vecdir.y, vecdir.z, 0.0f);
+
+	//pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	//normal = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+
+	//D3DXPlaneFromPointNormal(&planeField, &pos, &normal);
+	//D3DXMatrixShadow(&mtxShadow, &vecLight, &planeField);
+
+	//D3DXMatrixMultiply(&mtxShadow, &mtxShadow, &m_mtxWorld);
+	//-----------------------------------------------------------------
 
 	//現在のマテリアルを保存
 	pDevice->GetMaterial(&matDef);

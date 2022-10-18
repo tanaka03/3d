@@ -38,6 +38,7 @@ private:
 	CShadow *m_pShadow;
 	CCamera *m_pCamera;
 	CBullet *m_pBullet;
+	float m_fSpeed;
 	bool m_bCollision;
 	bool m_bJump;
 };

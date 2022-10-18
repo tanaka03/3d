@@ -10,6 +10,7 @@
 #include "polygon.h"
 #include "player.h"
 #include "file.h"
+#include "model.h"
 
 #include "meshfield.h"
 #include "cylinder.h"
@@ -25,6 +26,8 @@ CCamera *CApplication::m_pCamera = nullptr;
 CPlayer *CApplication::m_pPlayer = nullptr;
 CFile *CApplication::m_pFile = nullptr;
 CDebugProc *CApplication::m_pDebugProc = nullptr;
+CModel *CApplication::m_pModel = nullptr;
+CLight *CApplication::m_pLight = nullptr;
 
 CObject *g_apObject = nullptr;
 CObject3D *g_apObject3d = nullptr;
@@ -66,9 +69,14 @@ HRESULT CApplication::Init(HWND hWnd, HINSTANCE hInstance)
 	//テクスチャクラスの生成
 	m_pTexture = new CTexture;
 
+	//モデルクラスの生成
+	m_pModel = new CModel;
+
+	//ライトクラスの生成
 	m_pLight = new CLight;
 	m_pLight->Init();
 
+	//カメラクラスの生成
 	m_pCamera = new CCamera;
 	m_pCamera->Init();
 
@@ -147,6 +155,15 @@ void CApplication::Uninit()
 	{
 		delete m_pFile;
 		m_pFile = nullptr;
+	}
+
+	//モデルクラスの破棄
+	if (m_pModel != nullptr)
+	{
+		m_pModel->ReleaseAll();
+
+		delete m_pModel;
+		m_pModel = nullptr;
 	}
 
 	// アプリケーションの解放

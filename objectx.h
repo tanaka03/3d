@@ -6,6 +6,7 @@
 
 #include "object.h"
 #include "texture.h"
+#include "model.h"
 
 class CObjectX : public CObject
 {
@@ -25,6 +26,7 @@ public:
 	void SetRot(D3DXVECTOR3 rot) { m_rot = rot; }
 	void SetCol(D3DXCOLOR col) { m_col = col; }
 	void SetTexture(CTexture::TEXTURE texture) { m_texture = texture; }// テクスチャの設定
+	void SetModel(CModel::EModel model) { m_model = model; }
 	void SetDestroy(bool set) override { m_bRelease = set; }
 
 	//ゲッター
@@ -38,6 +40,7 @@ public:
 private:
 	D3DXVECTOR3 m_objpos;
 	CTexture::TEXTURE m_texture;	// テクスチャの列挙型
+	CModel::EModel m_model;
 	D3DXVECTOR3 m_move;
 	D3DXVECTOR3 m_rot;
 	D3DXVECTOR3 m_scale;

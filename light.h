@@ -16,9 +16,12 @@ public:
 	void Uninit();
 	void Update();
 
+	D3DXVECTOR3 GetVecDir() { return m_vecDir; }
+
 private:
 	static const int MaxLight = 1;
 	D3DLIGHT9 m_light[MaxLight];		//ƒ‰ƒCƒgî•ñ
+	D3DXVECTOR3 m_vecDir;
 };
 
 #endif
