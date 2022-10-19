@@ -25,13 +25,6 @@ HRESULT CObjectX::Init()
 	DWORD sizeFVF;		//頂点フォーマットのサイズ
 	BYTE *pVtxBuff;		//頂点バッファへのポインタ
 
-	//↓これ不完全
-	//CModel::ModelData Modeldata = CApplication::GetModel()->GetModel(m_model);
-
-	//m_mesh = Modeldata.m_mesh;
-	//m_buffMat = Modeldata.m_buffMat;
-	//m_dwNum = Modeldata.m_dwNum;
-
 	//頂点数の取得
 	nNumVtx = m_mesh->GetNumVertices();
 
@@ -92,16 +85,9 @@ void CObjectX::Update()
 void CObjectX::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();	//デバイスの取得
-	D3DXVECTOR3 vecdir = CApplication::GetLight()->GetVecDir();
 	D3DXMATRIX mtxRot, mtxTrans;				//計算用マトリックス
 	D3DMATERIAL9 matDef;						//現在のマテリアルを保存
 	D3DXMATERIAL *pMat;							//マテリアルデータへのポインタ
-
-	//モデルの影
-	D3DXMATRIX mtxShadow;
-	D3DXPLANE planeField;
-	D3DXVECTOR4 vecLight;
-	D3DXVECTOR3 pos, normal;
 
 	//テクスチャの設定を戻す
 	pDevice->SetTexture(0, NULL);
@@ -121,29 +107,64 @@ void CObjectX::Draw()
 	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
 	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 
+	//モデルの影
+	Shadow();
+
 	//ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
-
-	//-----------------------------------------------------------------
-	//シャドウマトリックスの初期化
-	//D3DXMatrixIdentity(&mtxShadow);
-
-	//vecLight = D3DXVECTOR4(vecdir.x, vecdir.y, vecdir.z, 0.0f);
-
-	//pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	//normal = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-
-	//D3DXPlaneFromPointNormal(&planeField, &pos, &normal);
-	//D3DXMatrixShadow(&mtxShadow, &vecLight, &planeField);
-
-	//D3DXMatrixMultiply(&mtxShadow, &mtxShadow, &m_mtxWorld);
-	//-----------------------------------------------------------------
 
 	//現在のマテリアルを保存
 	pDevice->GetMaterial(&matDef);
 
 	//マテリアルデータへのポインタを取得
 	pMat = (D3DXMATERIAL*)m_buffMat->GetBufferPointer();
+
+	pMat->MatD3D.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+	//マテリアルの設定
+	pDevice->SetMaterial(&pMat->MatD3D);
+
+	//モデルパーツの描画
+	m_mesh->DrawSubset(0);
+
+	//保持していたマテリアルを戻す
+	pDevice->SetMaterial(&matDef);
+}
+
+void CObjectX::Shadow()
+{
+	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();	//デバイスの取得
+	D3DXVECTOR3 vecdir = CApplication::GetLight()->GetVecDir();
+	D3DMATERIAL9 matDef;						//現在のマテリアルを保存
+	D3DXMATERIAL *pMat;							//マテリアルデータへのポインタ
+	D3DXMATRIX mtxShadow;
+	D3DXPLANE planeField;
+	D3DXVECTOR4 vecLight;
+	D3DXVECTOR3 pos, normal;
+
+	//シャドウマトリックスの初期化
+	D3DXMatrixIdentity(&mtxShadow);
+
+	vecLight = D3DXVECTOR4(-vecdir, 0.0f);
+
+	pos = D3DXVECTOR3(0.0f, 2.0f, 0.0f);
+	normal = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+
+	D3DXPlaneFromPointNormal(&planeField, &pos, &normal);
+	D3DXMatrixShadow(&mtxShadow, &vecLight, &planeField);
+
+	D3DXMatrixMultiply(&mtxShadow, &mtxShadow, &m_mtxWorld);
+
+	//ワールドマトリックスの設定
+	pDevice->SetTransform(D3DTS_WORLD, &mtxShadow);
+
+	//現在のマテリアルを保存
+	pDevice->GetMaterial(&matDef);
+
+	//マテリアルデータへのポインタを取得
+	pMat = (D3DXMATERIAL*)m_buffMat->GetBufferPointer();
+
+	pMat->MatD3D.Diffuse = D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f);
 
 	//マテリアルの設定
 	pDevice->SetMaterial(&pMat->MatD3D);

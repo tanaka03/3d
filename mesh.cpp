@@ -167,9 +167,9 @@ void CMesh::Update()
 			fResult2 * fResult3 >= 0 &&
 			fResult3 * fResult1 >= 0)
 		{//ƒ|ƒŠƒSƒ“‚Ì”ÍˆÍ“à‚É“ü‚Á‚½ê‡
-			pVtx[pIdx[i]].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
-			pVtx[pIdx[i + 1]].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
-			pVtx[pIdx[i + 2]].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+			//pVtx[pIdx[i]].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+			//pVtx[pIdx[i + 1]].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+			//pVtx[pIdx[i + 2]].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
 
 			//ƒƒbƒVƒ…‚Ì”»’è
 			auto V1 = posB - posA;

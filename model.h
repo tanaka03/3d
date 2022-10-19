@@ -10,36 +10,43 @@
 class CModel
 {
 public:
-	enum EModel
+	enum MODEL
 	{
-		MODEL_FOKKO = 0,
+		MODEL_FOKKO,
 		MODEL_STAR,
 		MODEL_MAX,
 		MODEL_NONE
 	};
 
-	struct ModelData
-	{
-		LPD3DXBUFFER m_buffMat;
-		DWORD m_dwNum;
-		LPD3DXMESH m_mesh;
-	};
-
 	static const char* s_FileName[];	// ファイルパス
 
-public:
-	CModel();		// デフォルトコンストラクタ
-	~CModel();	// デストラクタ
+	CModel();
+	~CModel();
 
-public: /* メンバ関数 */
-	void LoadAll();										// 全ての読み込み
-	void Load(EModel Model);							// 指定の読み込み
-	void ReleaseAll();									// 全ての破棄
-	void Release(EModel Model);							// 指定の破棄
-	ModelData GetModel(EModel Model);					// 情報の取得
+	static CModel *Create(D3DXVECTOR3 posOffset, D3DXVECTOR3 rotOffset, MODEL parts);
 
-private: /* メンバ変数 */
-	ModelData m_model[MODEL_MAX];
+	HRESULT Init();
+	void ReleaseAll();
+	void Update();
+	void Draw();
+	void Shadow();
+	void Load(MODEL model);
+
+	void SetPosOffset(D3DXVECTOR3 pos) { m_posOffset = pos; }
+	void SetRotOffset(D3DXVECTOR3 rot) { m_rotOffset = rot; }
+	void SetModel(MODEL model) { m_model = model; }
+
+private:
+	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;
+	LPD3DXBUFFER m_buffMat[MODEL_MAX];
+	DWORD m_dwNum[MODEL_MAX];
+	LPD3DXMESH m_mesh[MODEL_MAX];
+	MODEL m_model;
+
+	D3DXVECTOR3 m_posOffset;
+	D3DXVECTOR3 m_rotOffset;
+	D3DXMATRIX m_mtxWorld;
+	bool m_bLoaded[MODEL_MAX];
 };
 
-#endif // !_TEXTURE_H_
+#endif
