@@ -6,6 +6,7 @@
 
 #include <d3d9.h>
 #include <d3dx9.h>
+#include <vector>
 
 class CModel
 {
@@ -35,18 +36,22 @@ public:
 	void SetPosOffset(D3DXVECTOR3 pos) { m_posOffset = pos; }
 	void SetRotOffset(D3DXVECTOR3 rot) { m_rotOffset = rot; }
 	void SetModel(MODEL model) { m_model = model; }
+	void SetParent(CModel* model) { m_pParent = model; }
+
+	CModel GetParent() { return *m_pParent; }
 
 private:
-	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;
-	LPD3DXBUFFER m_buffMat[MODEL_MAX];
-	DWORD m_dwNum[MODEL_MAX];
-	LPD3DXMESH m_mesh[MODEL_MAX];
-	MODEL m_model;
+	static std::vector<CModel*> m_Data;
+	static bool m_bLoaded[MODEL_MAX];
 
+	LPD3DXBUFFER m_buffMat;
+	DWORD m_dwNum;
+	LPD3DXMESH m_mesh;
+	MODEL m_model;
+	CModel *m_pParent;
 	D3DXVECTOR3 m_posOffset;
 	D3DXVECTOR3 m_rotOffset;
 	D3DXMATRIX m_mtxWorld;
-	bool m_bLoaded[MODEL_MAX];
 };
 
 #endif

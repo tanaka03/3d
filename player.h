@@ -46,7 +46,7 @@ private:
 	CShadow *m_pShadow;
 	CCamera *m_pCamera;
 	CBullet *m_pBullet;
-	CModel *m_pModel;
+	CModel *m_pModel[3];
 	float m_fSpeed;
 	bool m_bCollision;
 	bool m_bJump;

@@ -98,13 +98,6 @@ HRESULT CMesh::Init()
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
 void CMesh::Uninit()
 {
-	//頂点バッファの破壊
-	if (m_pVtxBuff != nullptr)
-	{
-		m_pVtxBuff->Release();
-		m_pVtxBuff = nullptr;
-	}
-
 	//インデックスバッファの破壊
 	if (m_pIdxBuff != nullptr)
 	{

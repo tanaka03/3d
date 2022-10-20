@@ -157,14 +157,14 @@ void CApplication::Uninit()
 		m_pFile = nullptr;
 	}
 
-	//モデルクラスの破棄
-	if (m_pModel != nullptr)
-	{
-		m_pModel->ReleaseAll();
+	////モデルクラスの破棄
+	//if (m_pModel != nullptr)
+	//{
+	//	m_pModel->ReleaseAll();
 
-		delete m_pModel;
-		m_pModel = nullptr;
-	}
+	//	delete m_pModel;
+	//	m_pModel = nullptr;
+	//}
 
 	// アプリケーションの解放
 	if (m_pApplication != nullptr)

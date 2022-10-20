@@ -107,52 +107,5 @@ void CFile::LoadText(const char* Path)
 
 	getline(file, m_str);
 
-	//if (strcmp(&g_model->aStrings[0], "SCRIPT") == 0)
-	//{
-	//	while (1)
-	//	{
-	//		//文字列の初期化
-	//		g_model->aStrings[0] = {};
-	//		fscanf(pFile, "%s", &g_model->aStrings[0]);
-
-	//		if (strcmp(&g_model->aStrings[0], "MODEL_FILENAME") == 0)
-	//		{//モデルを読み込み
-	//			fscanf(pFile, "%s", &s_ModelFile);
-	//		}
-
-	//		//設定開始
-	//		else if (strcmp(&g_model->aStrings[0], "MODELSET") == 0)
-	//		{
-	//			while (1)
-	//			{
-	//				//文字列の初期化
-	//				g_model->aStrings[0] = {};
-	//				fscanf(pFile, "%s", &g_model->aStrings[0]);
-
-	//				//位置
-	//				if (strcmp(&g_model->aStrings[0], "pos") == 0)
-	//				{
-	//					fscanf(pFile, "%f", &s_Modelpos.x);
-	//					fscanf(pFile, "%f", &s_Modelpos.y);
-	//					fscanf(pFile, "%f", &s_Modelpos.z);
-	//				}
-
-	//				//設定終了
-	//				if (strcmp(&g_model->aStrings[0], "ENDMODELSET") == 0)
-	//				{
-	//					SetModel(s_Modelpos, s_Modelrot, false, g_nSetModel);
-	//					g_nSetModel++;
-	//					break;
-	//				}
-	//			}
-	//		}
-
-	//		else if (strcmp(&g_model->aStrings[0], "END_SCRIPT") == 0)
-	//		{
-	//			break;
-	//		}
-	//	}
-	//}
-	//開いたら閉じる
-	//fclose(pFile);
+	file.close();
 }

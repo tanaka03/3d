@@ -4,6 +4,11 @@
 #include "light.h"
 #include "player.h"
 
+using namespace std;
+
+vector<CModel*> CModel::m_Data;
+bool CModel::m_bLoaded[MODEL_MAX] = {};
+
 const char* CModel::s_FileName[] =
 {// テクスチャのパス
 	"data\\MODEL\\fokko.x",
@@ -11,7 +16,7 @@ const char* CModel::s_FileName[] =
 };
 static_assert(sizeof(CModel::s_FileName) / sizeof(CModel::s_FileName[0]) == CModel::MODEL_MAX, "aho");
 
-CModel::CModel()
+CModel::CModel() : m_buffMat(), m_dwNum(), m_mesh(), m_pParent()
 {
 }
 
@@ -43,51 +48,45 @@ HRESULT CModel::Init()
 	DWORD sizeFVF;		//頂点フォーマットのサイズ
 	BYTE *pVtxBuff;		//頂点バッファへのポインタ
 
+	m_mesh = m_Data.at(m_model)->m_mesh;
+	m_buffMat = m_Data.at(m_model)->m_buffMat;
+	m_dwNum = m_Data.at(m_model)->m_dwNum;
+
 	//頂点数の取得
-	nNumVtx = m_mesh[m_model]->GetNumVertices();
+	nNumVtx = m_mesh->GetNumVertices();
 
 	//頂点フォーマットのサイズを取得
-	sizeFVF = D3DXGetFVFVertexSize(m_mesh[m_model]->GetFVF());
+	sizeFVF = D3DXGetFVFVertexSize(m_mesh->GetFVF());
 
 	//頂点バッファのロック
-	m_mesh[m_model]->LockVertexBuffer(D3DLOCK_READONLY, (void**)&pVtxBuff);
+	m_mesh->LockVertexBuffer(D3DLOCK_READONLY, (void**)&pVtxBuff);
 
 	//頂点バッファのアンロック
-	m_mesh[m_model]->UnlockVertexBuffer();
+	m_mesh->UnlockVertexBuffer();
 
 	return S_OK;
 }
 
 void CModel::ReleaseAll()
 {
-	for (int i = 0; i < MODEL_MAX; i++)
+	//メッシュの解放
+	if (m_mesh = nullptr)
 	{
-		//頂点バッファの破壊
-		if (m_pVtxBuff != nullptr)
-		{
-			m_pVtxBuff->Release();
-			m_pVtxBuff = nullptr;
-		}
+		m_mesh->Release();
+		m_mesh = nullptr;
+	}
 
-		//メッシュの解放
-		if (m_mesh[i] = nullptr)
-		{
-			m_mesh[i]->Release();
-			m_mesh[i] = nullptr;
-		}
-
-		//マテリアルの破棄
-		if (m_buffMat[i] != nullptr)
-		{
-			m_buffMat[i]->Release();
-			m_buffMat[i] = nullptr;
-		}
+	//マテリアルの破棄
+	if (m_buffMat != nullptr)
+	{
+		m_buffMat->Release();
+		m_buffMat = nullptr;
 	}
 }
 
 void CModel::Update()
 {
-	m_rotOffset.y += 0.2f;
+	//m_rotOffset.y += 0.2f;
 }
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
@@ -118,6 +117,16 @@ void CModel::Draw()
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
 
 	//親のマトリックスとかけ合わせる
+	if (m_pParent != nullptr)
+	{
+		parent = m_pParent->m_mtxWorld;
+	}
+
+	else
+	{
+		pDevice->GetTransform(D3DTS_WORLD, &parent);
+	}
+
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &parent);
 
 	//Zテスト
@@ -134,7 +143,7 @@ void CModel::Draw()
 	pDevice->GetMaterial(&matDef);
 
 	//マテリアルデータへのポインタを取得
-	pMat = (D3DXMATERIAL*)m_buffMat[m_model]->GetBufferPointer();
+	pMat = (D3DXMATERIAL*)m_buffMat->GetBufferPointer();
 
 	pMat->MatD3D.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -142,7 +151,7 @@ void CModel::Draw()
 	pDevice->SetMaterial(&pMat->MatD3D);
 
 	//モデルパーツの描画
-	m_mesh[m_model]->DrawSubset(0);
+	m_mesh->DrawSubset(0);
 
 	//保持していたマテリアルを戻す
 	pDevice->SetMaterial(&matDef);
@@ -179,7 +188,7 @@ void CModel::Shadow()
 	pDevice->GetMaterial(&matDef);
 
 	//マテリアルデータへのポインタを取得
-	pMat = (D3DXMATERIAL*)m_buffMat[m_model]->GetBufferPointer();
+	pMat = (D3DXMATERIAL*)m_buffMat->GetBufferPointer();
 
 	pMat->MatD3D.Diffuse = D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f);
 	pMat->MatD3D.Emissive = D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f);
@@ -188,7 +197,7 @@ void CModel::Shadow()
 	pDevice->SetMaterial(&pMat->MatD3D);
 
 	//モデルパーツの描画
-	m_mesh[m_model]->DrawSubset(0);
+	m_mesh->DrawSubset(0);
 
 	//保持していたマテリアルを戻す
 	pDevice->SetMaterial(&matDef);
@@ -208,10 +217,11 @@ void CModel::Load(MODEL model)
 		D3DXMESH_SYSTEMMEM,
 		pDevice,
 		NULL,
-		&m_buffMat[model],
+		&m_buffMat,
 		NULL,
-		&m_dwNum[model],
-		&m_mesh[model]);
+		&m_dwNum,
+		&m_mesh);
 
 	m_bLoaded[model] = true;
+	m_Data.push_back(this);
 }

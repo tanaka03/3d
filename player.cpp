@@ -70,8 +70,13 @@ HRESULT CPlayer::Init()
 	m_pShadow = CShadow::Create(GetPos(), D3DXVECTOR3(30.0f, 0.0f, 30.0f), 100);
 	m_pShadow->SetLifeNone(true);
 
-	m_pModel = CModel::Create(D3DXVECTOR3(20.0f,20.0f, 20.0f),D3DXVECTOR3(0.0f,0.0f,0.0f),CModel::MODEL_STAR);
+	m_pModel[0] = CModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), CModel::MODEL_FOKKO);
 
+	m_pModel[1] = CModel::Create(D3DXVECTOR3(20.0f,20.0f, 20.0f),D3DXVECTOR3(0.0f,0.0f,0.0f),CModel::MODEL_STAR);
+	m_pModel[1]->SetParent(m_pModel[0]);
+
+	m_pModel[2] = CModel::Create(D3DXVECTOR3(-20.0f, 20.0f, 20.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), CModel::MODEL_STAR);
+	m_pModel[2]->SetParent(m_pModel[0]);
 	return S_OK;
 }
 
@@ -221,7 +226,11 @@ void CPlayer::Update()
 	//モデルの回転の慣性
 	m_rot.y += (m_rotDest.y - m_rot.y) * 0.1f;
 
-	m_pModel->Update();
+	//モデルの更新
+	for (int i = 0; i < 3; i++)
+	{
+		m_pModel[i]->Update();
+	}
 
 	m_pShadow->SetPos(D3DXVECTOR3(m_objpos.x / 2, m_Collisionpos.y, m_objpos.z / 2));
 
@@ -294,7 +303,10 @@ void CPlayer::Draw()
 	pDevice->SetMaterial(&matDef);
 
 	//モデルの描画
-	m_pModel->Draw();
+	for (int i = 0; i < 3; i++)
+	{
+		m_pModel[i]->Draw();
+	}
 }
 
 void CPlayer::Shadow()
