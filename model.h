@@ -27,18 +27,25 @@ public:
 	static CModel *Create(D3DXVECTOR3 posOffset, D3DXVECTOR3 rotOffset, MODEL parts);
 
 	HRESULT Init();
-	void ReleaseAll();
+	void Release();
 	void Update();
 	void Draw();
 	void Shadow();
 	void Load(MODEL model);
 
+	//セッター
 	void SetPosOffset(D3DXVECTOR3 pos) { m_posOffset = pos; }
 	void SetRotOffset(D3DXVECTOR3 rot) { m_rotOffset = rot; }
 	void SetModel(MODEL model) { m_model = model; }
 	void SetParent(CModel* model) { m_pParent = model; }
 
+	//ゲッター
 	CModel GetParent() { return *m_pParent; }
+	D3DXVECTOR3 GetStartPos() { return m_startPos; }
+	D3DXVECTOR3 GetStartRot() { return m_startRot; }
+	LPD3DXBUFFER GetBuffMat() { return m_buffMat; }
+	LPD3DXMESH GetMesh() { return m_mesh; }
+	DWORD GetModelNum() { return m_dwNum; }
 
 private:
 	static std::vector<CModel*> m_Data;
@@ -51,7 +58,10 @@ private:
 	CModel *m_pParent;
 	D3DXVECTOR3 m_posOffset;
 	D3DXVECTOR3 m_rotOffset;
+	D3DXVECTOR3 m_startPos;
+	D3DXVECTOR3 m_startRot;
 	D3DXMATRIX m_mtxWorld;
+	bool m_bRelease;
 };
 
 #endif

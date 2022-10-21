@@ -18,6 +18,7 @@ static_assert(sizeof(CModel::s_FileName) / sizeof(CModel::s_FileName[0]) == CMod
 
 CModel::CModel() : m_buffMat(), m_dwNum(), m_mesh(), m_pParent()
 {
+	m_bRelease = false;
 }
 
 CModel::~CModel()
@@ -42,12 +43,16 @@ CModel *CModel::Create(D3DXVECTOR3 posOffset, D3DXVECTOR3 rotOffset, MODEL parts
 
 HRESULT CModel::Init()
 {
+	m_startPos = m_posOffset;
+	m_startRot = m_rotOffset;
+
 	Load(m_model);
 
 	int nNumVtx;		//頂点数
 	DWORD sizeFVF;		//頂点フォーマットのサイズ
 	BYTE *pVtxBuff;		//頂点バッファへのポインタ
 
+	//Xファイルで読み込んだ情報
 	m_mesh = m_Data.at(m_model)->m_mesh;
 	m_buffMat = m_Data.at(m_model)->m_buffMat;
 	m_dwNum = m_Data.at(m_model)->m_dwNum;
@@ -67,7 +72,7 @@ HRESULT CModel::Init()
 	return S_OK;
 }
 
-void CModel::ReleaseAll()
+void CModel::Release()
 {
 	//メッシュの解放
 	if (m_mesh = nullptr)
@@ -82,11 +87,12 @@ void CModel::ReleaseAll()
 		m_buffMat->Release();
 		m_buffMat = nullptr;
 	}
+
+	delete this;
 }
 
 void CModel::Update()
 {
-	//m_rotOffset.y += 0.2f;
 }
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝

@@ -26,7 +26,6 @@ CCamera *CApplication::m_pCamera = nullptr;
 CPlayer *CApplication::m_pPlayer = nullptr;
 CFile *CApplication::m_pFile = nullptr;
 CDebugProc *CApplication::m_pDebugProc = nullptr;
-CModel *CApplication::m_pModel = nullptr;
 CLight *CApplication::m_pLight = nullptr;
 
 CObject *g_apObject = nullptr;
@@ -66,11 +65,10 @@ HRESULT CApplication::Init(HWND hWnd, HINSTANCE hInstance)
 	//ファイルクラスの生成
 	m_pFile = new CFile;
 
+	m_pFile->LoadText("data/FILE/ModelFile1.txt");
+
 	//テクスチャクラスの生成
 	m_pTexture = new CTexture;
-
-	//モデルクラスの生成
-	m_pModel = new CModel;
 
 	//ライトクラスの生成
 	m_pLight = new CLight;
@@ -83,7 +81,7 @@ HRESULT CApplication::Init(HWND hWnd, HINSTANCE hInstance)
 	//m_pPolygon = CPolygon::Create(D3DXVECTOR3(0.0f, 0.0f,0.0f));
 	m_pPlayer = CPlayer::Create(D3DXVECTOR3(100.0f, 0.0f, -100.0f));
 
-	CMeshField::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(25.0f,0.0f, 25.0f), 50, 50);
+	CMeshField::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(25.0f,0.0f, 25.0f), 10, 10);
 	//CCylinder::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), 10.0f, 25.0f, 10, 10);
 	//CSphere::Create(D3DXVECTOR3(50.0f, 0.0f, 0.0f), 30.0f, 30, 30);
 	return S_OK;
@@ -156,15 +154,6 @@ void CApplication::Uninit()
 		delete m_pFile;
 		m_pFile = nullptr;
 	}
-
-	////モデルクラスの破棄
-	//if (m_pModel != nullptr)
-	//{
-	//	m_pModel->ReleaseAll();
-
-	//	delete m_pModel;
-	//	m_pModel = nullptr;
-	//}
 
 	// アプリケーションの解放
 	if (m_pApplication != nullptr)

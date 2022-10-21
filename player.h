@@ -14,6 +14,18 @@ class CModel;
 class CPlayer : public CObject
 {
 public:
+	struct KEY
+	{
+		D3DXVECTOR3 pos;
+		D3DXVECTOR3 rot;
+	};
+
+	struct KEYSET
+	{
+		int nFrame;
+		KEY key[3];
+	};
+
 	CPlayer();
 	~CPlayer() override;
 
@@ -22,8 +34,8 @@ public:
 	void Uninit() override;
 	void Update() override;
 	void Draw() override;
-	void Shadow();
 	void BackBased(float Y);
+	void Motion(int Num);
 
 	void SetPos(D3DXVECTOR3 pos) override { m_objpos = pos; }
 	void SetCollisionPos(D3DXVECTOR3 pos) { m_Collisionpos = pos; }
@@ -37,6 +49,8 @@ public:
 	bool GetDestroy() override { return m_bRelease; }
 
 private:
+	static const int MaxParts = 3;
+
 	D3DXVECTOR3 m_objpos;
 	D3DXVECTOR3 m_Collisionpos;
 	D3DXVECTOR3 m_move;
@@ -47,6 +61,10 @@ private:
 	CCamera *m_pCamera;
 	CBullet *m_pBullet;
 	CModel *m_pModel[3];
+	KEYSET m_KeySet[2];
+	int m_numKey;
+	int m_currentKey;
+	int m_cntMotion;
 	float m_fSpeed;
 	bool m_bCollision;
 	bool m_bJump;

@@ -105,7 +105,37 @@ void CFile::LoadText(const char* Path)
 		return;
 	}
 
-	getline(file, m_str);
+	string filestr;
+
+	while(!file.eof())
+	{
+		getline(file, filestr);
+		m_str += filestr;
+	}
+
+	vector<int> Find;
+	int nCntStr = 0;
+
+	//“Á’è‚Ì•¶š‚ÌˆÊ’u‚Ì”’l‚ğ•Û‘¶
+	while (nCntStr < m_str.length())
+	{
+		if (m_str.substr(nCntStr, 3) == "pos")
+		{
+			Find.push_back(nCntStr);
+		}
+		nCntStr++;
+	}
+
+	//“Á’è‚Ì•¶š‚ÌêŠ‚ğŒŸõ
+	for (const auto &pos : Find)
+	{
+		string destStr = m_str.substr(pos, 3);
+
+		if (destStr == "pos")
+		{//ğŒ‚É“–‚Ä‚Í‚Ü‚Á‚½ê‡
+
+		}
+	}
 
 	file.close();
 }

@@ -37,7 +37,7 @@ HRESULT CMesh::Init()
 	LPDIRECT3DDEVICE9 pDevice = CApplication::GetRenderer()->GetDevice();
 
 	m_MeshField_VertexNum = (m_meshX + 1) * (m_meshZ + 1);					//頂点数
-	m_MeshField_IndexNum = (m_meshX + 1) * 2 * (m_meshZ - 1) * 2;			//インデックス
+	m_MeshField_IndexNum = (m_meshX + 1) * 2 * m_meshX + (m_meshZ - 1) * 2;			//インデックス
 	m_MeshField_PrimitiveNum = m_meshX * m_meshZ * 2 + (m_meshZ - 1) * 4;	//ポリゴン
 
 	//頂点バッファの生成

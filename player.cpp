@@ -29,6 +29,7 @@ CPlayer::CPlayer()
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 CPlayer::~CPlayer()
 {
+	m_cntMotion = 1;
 }
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
@@ -57,16 +58,6 @@ HRESULT CPlayer::Init()
 {
 	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();
 
-	//Xファイルの読み込み(体)
-	D3DXLoadMeshFromX("data\\MODEL\\fokko.x",
-		D3DXMESH_SYSTEMMEM,
-		pDevice,
-		NULL,
-		&m_buffMat,
-		NULL,
-		&m_dwNum,
-		&m_mesh);
-
 	m_pShadow = CShadow::Create(GetPos(), D3DXVECTOR3(30.0f, 0.0f, 30.0f), 100);
 	m_pShadow->SetLifeNone(true);
 
@@ -74,9 +65,17 @@ HRESULT CPlayer::Init()
 
 	m_pModel[1] = CModel::Create(D3DXVECTOR3(20.0f,20.0f, 20.0f),D3DXVECTOR3(0.0f,0.0f,0.0f),CModel::MODEL_STAR);
 	m_pModel[1]->SetParent(m_pModel[0]);
+	m_KeySet[0].nFrame = 60;
+	m_KeySet[0].key[0].rot = D3DXVECTOR3(0.0f, 120.0f, 0.0f);
+	m_KeySet[0].key[1].rot = D3DXVECTOR3(0.0f, 360.0f, 0.0f);
+
+	m_KeySet[1].key[0].rot = D3DXVECTOR3(0.0f, 360.0f, 0.0f);
+	m_KeySet[1].key[1].rot = D3DXVECTOR3(0.0f, 120.0f, 0.0f);
 
 	m_pModel[2] = CModel::Create(D3DXVECTOR3(-20.0f, 20.0f, 20.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), CModel::MODEL_STAR);
 	m_pModel[2]->SetParent(m_pModel[0]);
+	//m_KeySet.key[2].pos = D3DXVECTOR3(100.0f, 100.0f, 100.0f);
+
 	return S_OK;
 }
 
@@ -105,6 +104,18 @@ void CPlayer::Uninit()
 		m_buffMat->Release();
 		m_buffMat = nullptr;
 	}
+
+	//モデルの破棄
+	for (int i = 0; i < MaxParts; i++)
+	{
+		if (m_pModel[i] == nullptr)
+		{
+			continue;
+		}
+		m_pModel[i]->Release();
+	}
+
+	SetDestroy(true);
 }
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
@@ -223,14 +234,10 @@ void CPlayer::Update()
 		m_rotDest.y += D3DX_PI * 2;
 	}
 
+	Motion(1);
+
 	//モデルの回転の慣性
 	m_rot.y += (m_rotDest.y - m_rot.y) * 0.1f;
-
-	//モデルの更新
-	for (int i = 0; i < 3; i++)
-	{
-		m_pModel[i]->Update();
-	}
 
 	m_pShadow->SetPos(D3DXVECTOR3(m_objpos.x / 2, m_Collisionpos.y, m_objpos.z / 2));
 
@@ -258,8 +265,6 @@ void CPlayer::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();	//デバイスの取得
 	D3DXMATRIX mtxRot, mtxTrans;				//計算用マトリックス
-	D3DMATERIAL9 matDef;						//現在のマテリアルを保存
-	D3DXMATERIAL *pMat;							//マテリアルデータへのポインタ
 
 	//テクスチャの設定を戻す
 	pDevice->SetTexture(0, NULL);
@@ -279,79 +284,18 @@ void CPlayer::Draw()
 	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
 	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 
-	//モデルの影
-	Shadow();
-
 	//ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
 
-	//現在のマテリアルを保存
-	pDevice->GetMaterial(&matDef);
-
-	//マテリアルデータへのポインタを取得
-	pMat = (D3DXMATERIAL*)m_buffMat->GetBufferPointer();
-
-	pMat->MatD3D.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-
-	//マテリアルの設定
-	pDevice->SetMaterial(&pMat->MatD3D);
-
-	//モデルパーツの描画
-	m_mesh->DrawSubset(0);
-
-	//保持していたマテリアルを戻す
-	pDevice->SetMaterial(&matDef);
-
 	//モデルの描画
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < MaxParts; i++)
 	{
+		if (m_pModel[i] == nullptr)
+		{
+			continue;
+		}
 		m_pModel[i]->Draw();
 	}
-}
-
-void CPlayer::Shadow()
-{
-	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();	//デバイスの取得
-	D3DXVECTOR3 vecdir = CApplication::GetLight()->GetVecDir();
-	D3DMATERIAL9 matDef;						//現在のマテリアルを保存
-	D3DXMATERIAL *pMat;							//マテリアルデータへのポインタ
-	D3DXMATRIX mtxShadow;
-	D3DXPLANE planeField;
-	D3DXVECTOR4 vecLight;
-	D3DXVECTOR3 pos, normal;
-
-	//シャドウマトリックスの初期化
-	D3DXMatrixIdentity(&mtxShadow);
-
-	vecLight = D3DXVECTOR4(-vecdir, 0.0f);
-
-	pos = D3DXVECTOR3(0.0f, 2.0f, 0.0f);
-	normal = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-
-	D3DXPlaneFromPointNormal(&planeField, &pos, &normal);
-	D3DXMatrixShadow(&mtxShadow, &vecLight, &planeField);
-
-	D3DXMatrixMultiply(&mtxShadow, &mtxShadow, &m_mtxWorld);
-
-	//ワールドマトリックスの設定
-	pDevice->SetTransform(D3DTS_WORLD, &mtxShadow);
-
-	//現在のマテリアルを保存
-	pDevice->GetMaterial(&matDef);
-
-	//マテリアルデータへのポインタを取得
-	pMat = (D3DXMATERIAL*)m_buffMat->GetBufferPointer();
-
-	pMat->MatD3D.Diffuse = D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f);
-
-	//マテリアルの設定
-	pDevice->SetMaterial(&pMat->MatD3D);
-
-	//モデルパーツの描画
-	m_mesh->DrawSubset(0);
-
-	//保持していたマテリアルを戻す
-	pDevice->SetMaterial(&matDef);
 }
 
 void CPlayer::BackBased(float Y)
@@ -360,5 +304,37 @@ void CPlayer::BackBased(float Y)
 	{
 		m_objpos = m_Collisionpos;
 		m_move.y = 0.0f;
+	}
+}
+
+void CPlayer::Motion(int Num)
+{
+	if (m_pModel[Num] == nullptr)
+	{
+		return;
+	}
+
+	auto relative_Value = m_cntMotion / m_KeySet[m_currentKey].nFrame;
+
+	//auto posDifference = m_KeySet.key[m_currentKey].pos - m_pModel[Num]->GetStartPos();
+	//auto pos_Value = m_pModel[Num]->GetStartPos() + (posDifference * relative_Value);
+
+	auto rotDifference = m_KeySet[m_currentKey].key[m_currentKey].rot - m_pModel[Num]->GetStartRot();
+	auto rot_Value = m_pModel[Num]->GetStartRot() + (rotDifference * relative_Value);
+
+	//m_pModel[Num]->SetPosOffset(pos_Value);
+	m_pModel[Num]->SetRotOffset(rot_Value);
+	 
+	m_cntMotion++;
+
+	if (m_KeySet[m_currentKey].nFrame < m_cntMotion)
+	{
+		m_cntMotion = 1;
+		m_currentKey++;
+	}
+
+	if (m_numKey < m_currentKey)
+	{
+		m_currentKey = 0;
 	}
 }
