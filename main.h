@@ -1,11 +1,6 @@
 #ifndef _MAIN_H_
 #define _MAIN_H_
 
-//*****************************************************************************
-// インクルード
-//*****************************************************************************
-#include <Windows.h>
-
 #pragma comment(lib,"d3d9.lib")
 #pragma comment(lib,"d3dx9.lib")
 #pragma comment(lib,"winmm.lib")	//システム時刻取得に必要

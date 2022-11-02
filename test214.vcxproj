@@ -87,13 +87,14 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>C:\Users\student\Documents\Visual Studio 2015\Projects\test214\nlohmann;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>precompile.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>precompile.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -160,6 +161,7 @@
     <ClCompile Include="effect.cpp" />
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="file.cpp" />
+    <ClCompile Include="gimmick.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="keyboard.cpp" />
     <ClCompile Include="light.cpp" />
@@ -173,6 +175,9 @@
     <ClCompile Include="objectx.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="polygon.cpp" />
+    <ClCompile Include="precompile.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="shadow.cpp" />
     <ClCompile Include="sphere.cpp" />
@@ -188,6 +193,7 @@
     <ClInclude Include="effect.h" />
     <ClInclude Include="enemy.h" />
     <ClInclude Include="file.h" />
+    <ClInclude Include="gimmick.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="keyboard.h" />
     <ClInclude Include="light.h" />
@@ -201,6 +207,7 @@
     <ClInclude Include="objectx.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="polygon.h" />
+    <ClInclude Include="precompile.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="shadow.h" />
     <ClInclude Include="sphere.h" />

@@ -16,7 +16,12 @@ const char* CModel::s_FileName[] =
 };
 static_assert(sizeof(CModel::s_FileName) / sizeof(CModel::s_FileName[0]) == CModel::MODEL_MAX, "aho");
 
-CModel::CModel() : m_buffMat(), m_dwNum(), m_mesh(), m_pParent()
+CModel::CModel() : 
+	m_buffMat(),
+	m_dwNum(), 
+	m_mesh(), 
+	m_pParent(), 
+	m_texture(CTexture::TEXTURE_NONE)
 {
 	m_bRelease = false;
 }
@@ -100,9 +105,9 @@ void CModel::Update()
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
 void CModel::Draw()
 {
+	CTexture* pTexture = CApplication::GetInstance()->GetTexture();
 	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();	//デバイスの取得
-	CPlayer *pPlayer = CApplication::GetPlayer();
-	D3DXMATRIX parent = pPlayer->GetMtx();
+	D3DXMATRIX parent;
 
 	D3DXMATRIX mtxRot, mtxTrans;				//計算用マトリックス
 	D3DMATERIAL9 matDef;						//現在のマテリアルを保存
@@ -125,7 +130,7 @@ void CModel::Draw()
 	//親のマトリックスとかけ合わせる
 	if (m_pParent != nullptr)
 	{
-		parent = m_pParent->m_mtxWorld;
+		parent = m_pParent->GetMtxWorld();
 	}
 
 	else
@@ -155,6 +160,9 @@ void CModel::Draw()
 
 	//マテリアルの設定
 	pDevice->SetMaterial(&pMat->MatD3D);
+
+	//テクスチャの設定
+	pDevice->SetTexture(0, pTexture->GetTexture(m_texture));
 
 	//モデルパーツの描画
 	m_mesh->DrawSubset(0);

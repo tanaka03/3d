@@ -4,10 +4,6 @@
 #ifndef _DEBUGPROC_H_
 #define _DEBUGPROC_H_
 
-#include <d3dx9.h>
-#include <d3d9.h>
-#include <string>
-
 class CDebugProc
 {
 public:

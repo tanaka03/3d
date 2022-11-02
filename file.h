@@ -5,8 +5,6 @@
 #define _FILE_H_
 
 #include "enemy.h"
-#include "nlohmann/json.hpp"
-#include <string>
 
 class CFile
 {

@@ -1,6 +1,5 @@
 #include "main.h"
 #include "input.h"
-#include <dinput.h>
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 //キーボードのコンストラクタ

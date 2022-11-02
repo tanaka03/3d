@@ -129,6 +129,12 @@
     <ClCompile Include="model.cpp">
       <Filter>ソース ファイル\Object</Filter>
     </ClCompile>
+    <ClCompile Include="gimmick.cpp">
+      <Filter>ソース ファイル\Object\objectX</Filter>
+    </ClCompile>
+    <ClCompile Include="precompile.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h">
@@ -208,6 +214,12 @@
     </ClInclude>
     <ClInclude Include="model.h">
       <Filter>ヘッダー ファイル\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="gimmick.h">
+      <Filter>ヘッダー ファイル\Object\objectX</Filter>
+    </ClInclude>
+    <ClInclude Include="precompile.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

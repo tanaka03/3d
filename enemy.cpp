@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include "objectx.h"
 #include "application.h"
 #include "input.h"

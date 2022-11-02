@@ -4,9 +4,6 @@
 #ifndef _RENDERER_H_
 #define _RENDERER_H_
 
-#include <d3dx9.h>
-#include <d3d9.h>
-
 class CRenderer
 {
 public:

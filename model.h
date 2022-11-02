@@ -4,9 +4,7 @@
 #ifndef _MODEL_H_	//このマクロ定義がされてなかったら
 #define _MODEL_H_	//２重インクルード防止のマクロ定義
 
-#include <d3d9.h>
-#include <d3dx9.h>
-#include <vector>
+#include "texture.h"
 
 class CModel
 {
@@ -38,11 +36,13 @@ public:
 	void SetRotOffset(D3DXVECTOR3 rot) { m_rotOffset = rot; }
 	void SetModel(MODEL model) { m_model = model; }
 	void SetParent(CModel* model) { m_pParent = model; }
+	void SetTexture(CTexture::TEXTURE texture) { m_texture = texture; }// テクスチャの設定
 
 	//ゲッター
 	CModel GetParent() { return *m_pParent; }
 	D3DXVECTOR3 GetStartPos() { return m_startPos; }
 	D3DXVECTOR3 GetStartRot() { return m_startRot; }
+	D3DXMATRIX GetMtxWorld() { return m_mtxWorld; }
 	LPD3DXBUFFER GetBuffMat() { return m_buffMat; }
 	LPD3DXMESH GetMesh() { return m_mesh; }
 	DWORD GetModelNum() { return m_dwNum; }
@@ -61,6 +61,7 @@ private:
 	D3DXVECTOR3 m_startPos;
 	D3DXVECTOR3 m_startRot;
 	D3DXMATRIX m_mtxWorld;
+	CTexture::TEXTURE m_texture;	// テクスチャの列挙型
 	bool m_bRelease;
 };
 

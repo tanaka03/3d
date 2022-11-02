@@ -2,9 +2,6 @@
 #include "main.h"
 #include "application.h"
 #include "renderer.h"
-#include <tchar.h> 
-#include <iostream>
-#include <vector>
 
 using namespace std;
 

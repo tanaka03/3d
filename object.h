@@ -5,7 +5,6 @@
 #define _OBJECT_H_
 
 #include "renderer.h"
-#include <list>
 
 #define MAX_OBJECT	(1024)
 

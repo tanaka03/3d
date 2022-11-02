@@ -2,16 +2,6 @@
 #include "renderer.h"
 #include "file.h"
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <windows.h>
-#include <locale.h>
-#include <algorithm>
-#include <vector>
-#include <assert.h>
-
 using namespace std;
 using namespace nlohmann;
 
