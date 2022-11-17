@@ -18,6 +18,7 @@ public:
 	void Update() override;
 	void Draw() override;
 	void Shadow();
+	void BindTexture(std::string inPath);
 
 	//セッター
 	void SetPos(D3DXVECTOR3 pos) override { m_objpos = pos; }
@@ -25,7 +26,6 @@ public:
 	void SetScale(D3DXVECTOR3 scale) { m_scale = scale; }
 	void SetRot(D3DXVECTOR3 rot) { m_rot = rot; }
 	void SetCol(D3DXCOLOR col) { m_col = col; }
-	void SetTexture(CTexture::TEXTURE texture) { m_texture = texture; }// テクスチャの設定
 	void SetDestroy(bool set) override { m_bRelease = set; }
 
 	//ゲッター
@@ -37,8 +37,8 @@ public:
 	bool GetDestroy() override { return m_bRelease; }
 
 private:
+	LPDIRECT3DTEXTURE9 m_pTexture;
 	D3DXVECTOR3 m_objpos;
-	CTexture::TEXTURE m_texture;	// テクスチャの列挙型
 	D3DXVECTOR3 m_move;
 	D3DXVECTOR3 m_rot;
 	D3DXVECTOR3 m_scale;

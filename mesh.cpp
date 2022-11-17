@@ -14,7 +14,8 @@ using namespace std;
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
 //メッシュのコンストラクタ
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
-CMesh::CMesh()
+CMesh::CMesh() :
+	m_pTexture(nullptr)
 {
 	m_col = D3DXCOLOR(1.0f,1.0f,1.0f,1.0f);
 	m_meshX = 5;
@@ -34,7 +35,7 @@ CMesh::~CMesh()
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
 HRESULT CMesh::Init()
 {
-	LPDIRECT3DDEVICE9 pDevice = CApplication::GetRenderer()->GetDevice();
+	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();
 
 	m_MeshField_VertexNum = (m_meshX + 1) * (m_meshZ + 1);					//頂点数
 	m_MeshField_IndexNum = (m_meshX + 1) * 2 * m_meshX + (m_meshZ - 1) * 2;			//インデックス
@@ -113,7 +114,7 @@ void CMesh::Uninit()
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
 void CMesh::Update()
 {
-	CPlayer *pPlayer = CApplication::GetPlayer();
+	CPlayer *pPlayer = CApplication::GetInstance()->GetPlayer();
 	D3DXVECTOR3 playerPos = pPlayer->GetPos();
 
 	//インデックスバッファをロック
@@ -192,7 +193,7 @@ void CMesh::Update()
 void CMesh::Draw()
 {
 	CTexture* pTexture = CApplication::GetInstance()->GetTexture();
-	LPDIRECT3DDEVICE9 pDevice = CApplication::GetRenderer()->GetDevice();
+	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();
 	D3DXMATRIX mtxRot, mtxTrans;				//計算用マトリックス
 
 	//ワールドマトリックスを初期化
@@ -219,7 +220,7 @@ void CMesh::Draw()
 	pDevice->SetFVF(FVF_VERTEX_3D);
 
 	//テクスチャの設定
-	pDevice->SetTexture(0, pTexture->GetTexture(m_texture));
+	pDevice->SetTexture(0, m_pTexture);
 
 	//ポリゴンの描画
 	pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP,
@@ -228,4 +229,9 @@ void CMesh::Draw()
 		m_MeshField_VertexNum,	//頂点数
 		0,
 		m_MeshField_PrimitiveNum	/*描画するプリミティブ数*/);
+}
+
+void CMesh::BindTexture(std::string inPath)
+{
+	m_pTexture = CApplication::GetInstance()->GetTexture()->GetTexture(inPath);		//テクスチャのポインタ
 }

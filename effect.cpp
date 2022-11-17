@@ -40,7 +40,7 @@ HRESULT CEffect::Init()
 	switch (m_type)
 	{
 	case EFFECT_DEFAULT:
-		CBillboard::SetTexture(CTexture::TEXTURE_SHADOW);
+		CBillboard::BindTexture("SHADOW");
 		break;
 
 	default:

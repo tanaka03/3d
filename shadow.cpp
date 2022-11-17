@@ -32,7 +32,7 @@ HRESULT CShadow::Init()
 	CObject3D::Init();
 	CObject3D::SetBlend(BLEND_SUBSTRUCT);
 	SetZBuff(D3DCMP_LESSEQUAL);
-	CObject3D::SetTexture(CTexture::TEXTURE_SHADOW);
+	CObject3D::BindTexture("SHADOW");
 
 	m_startScale = GetScale();
 	return S_OK;

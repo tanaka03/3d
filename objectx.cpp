@@ -5,7 +5,8 @@
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
 //オブジェクトXのコンストラクタ
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
-CObjectX::CObjectX()
+CObjectX::CObjectX() :
+	m_pTexture(nullptr)
 {
 }
 
@@ -134,7 +135,7 @@ void CObjectX::Draw()
 void CObjectX::Shadow()
 {
 	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();	//デバイスの取得
-	D3DXVECTOR3 vecdir = CApplication::GetLight()->GetVecDir();
+	D3DXVECTOR3 vecdir = CApplication::GetInstance()->GetLight()->GetVecDir();
 	D3DMATERIAL9 matDef;						//現在のマテリアルを保存
 	D3DXMATERIAL *pMat;							//マテリアルデータへのポインタ
 	D3DXMATRIX mtxShadow;
@@ -174,4 +175,9 @@ void CObjectX::Shadow()
 
 	//保持していたマテリアルを戻す
 	pDevice->SetMaterial(&matDef);
+}
+
+void CObjectX::BindTexture(std::string inPath)
+{
+	m_pTexture = CApplication::GetInstance()->GetTexture()->GetTexture(inPath);		//テクスチャのポインタ
 }

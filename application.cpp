@@ -19,19 +19,22 @@
 #include "debugproc.h"
 
 CApplication* CApplication::m_pApplication = nullptr;
-CInputKeyboard *CApplication::m_pInputKeyboard = nullptr;
-CRenderer *CApplication::m_pRenderer = nullptr;
-CTexture *CApplication::m_pTexture = nullptr;
-CCamera *CApplication::m_pCamera = nullptr;
-CPlayer *CApplication::m_pPlayer = nullptr;
-CFile *CApplication::m_pFile = nullptr;
-CDebugProc *CApplication::m_pDebugProc = nullptr;
-CLight *CApplication::m_pLight = nullptr;
 
 CObject *g_apObject = nullptr;
 CObject3D *g_apObject3d = nullptr;
 
-CApplication::CApplication()
+CApplication* CApplication::GetInstance()
+{
+	if (m_pApplication == nullptr)
+	{
+		m_pApplication = new CApplication;
+	}
+
+	return m_pApplication;
+}
+
+CApplication::CApplication() :
+	m_pRenderer(nullptr)
 {
 	m_bWire = false;
 }
@@ -65,10 +68,9 @@ HRESULT CApplication::Init(HWND hWnd, HINSTANCE hInstance)
 	//ファイルクラスの生成
 	m_pFile = new CFile;
 
-	m_pFile->LoadText("data/FILE/ModelFile1.txt");
-
 	//テクスチャクラスの生成
 	m_pTexture = new CTexture;
+	m_pTexture->LoadAll();
 
 	//ライトクラスの生成
 	m_pLight = new CLight;
@@ -81,7 +83,7 @@ HRESULT CApplication::Init(HWND hWnd, HINSTANCE hInstance)
 	//m_pPolygon = CPolygon::Create(D3DXVECTOR3(0.0f, 0.0f,0.0f));
 	m_pPlayer = CPlayer::Create(D3DXVECTOR3(100.0f, 0.0f, -100.0f));
 
-	CMeshField::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(25.0f,0.0f, 25.0f), 10, 10);
+	CMeshField::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(25.0f,0.0f, 25.0f), 50, 50);
 	//CCylinder::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), 10.0f, 25.0f, 10, 10);
 	//CSphere::Create(D3DXVECTOR3(50.0f, 0.0f, 0.0f), 30.0f, 30, 30);
 	return S_OK;
@@ -105,7 +107,7 @@ void CApplication::Uninit()
 	//テクスチャクラスの破棄
 	if (m_pTexture != nullptr)
 	{
-		m_pTexture->ReleaseAll();
+		m_pTexture->UnloadAll();
 
 		delete m_pTexture;
 		m_pTexture = nullptr;

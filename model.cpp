@@ -21,7 +21,7 @@ CModel::CModel() :
 	m_dwNum(), 
 	m_mesh(), 
 	m_pParent(), 
-	m_texture(CTexture::TEXTURE_NONE)
+	m_pTexture(nullptr)
 {
 	m_bRelease = false;
 }
@@ -145,7 +145,7 @@ void CModel::Draw()
 	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 
 	//モデルの影
-	//Shadow();
+	Shadow();
 
 	//ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
@@ -162,7 +162,7 @@ void CModel::Draw()
 	pDevice->SetMaterial(&pMat->MatD3D);
 
 	//テクスチャの設定
-	pDevice->SetTexture(0, pTexture->GetTexture(m_texture));
+	pDevice->SetTexture(0, m_pTexture);
 
 	//モデルパーツの描画
 	m_mesh->DrawSubset(0);
@@ -174,7 +174,7 @@ void CModel::Draw()
 void CModel::Shadow()
 {
 	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();	//デバイスの取得
-	D3DXVECTOR3 vecdir = CApplication::GetLight()->GetVecDir();
+	D3DXVECTOR3 vecdir = CApplication::GetInstance()->GetLight()->GetVecDir();
 	D3DMATERIAL9 matDef;						//現在のマテリアルを保存
 	D3DXMATERIAL *pMat;							//マテリアルデータへのポインタ
 	D3DXMATRIX mtxShadow;
@@ -187,13 +187,33 @@ void CModel::Shadow()
 
 	vecLight = D3DXVECTOR4(-vecdir, 0.0f);
 
-	pos = D3DXVECTOR3(0.0f, 2.0f, 0.0f);
+	pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	normal = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 
 	D3DXPlaneFromPointNormal(&planeField, &pos, &normal);
 	D3DXMatrixShadow(&mtxShadow, &vecLight, &planeField);
 
 	D3DXMatrixMultiply(&mtxShadow, &mtxShadow, &m_mtxWorld);
+
+	//ステンシルバッファの有効
+	pDevice->SetRenderState(D3DRS_STENCILENABLE, true);
+
+	//ステンシルバッファと比較する
+	pDevice->SetRenderState(D3DRS_STENCILREF, 0x01);
+
+	//ステンシルバッファの値に対してのマスクの設定
+	pDevice->SetRenderState(D3DRS_STENCILMASK, 0xff);
+
+	//ステンシルテストの比較方法設定
+	pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_GREATEREQUAL);
+
+	//ステンシルテストの結果に対しての反映設定
+	pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_REPLACE);
+	pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);
+	pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP);
+
+	//カリング無効
+	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
 	//ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &mtxShadow);
@@ -215,6 +235,12 @@ void CModel::Shadow()
 
 	//保持していたマテリアルを戻す
 	pDevice->SetMaterial(&matDef);
+
+	//ステンシルバッファの設定を戻す
+	pDevice->SetRenderState(D3DRS_STENCILENABLE, false);
+
+	//カリングの設定を戻す
+	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 }
 
 void CModel::Load(MODEL model)
@@ -238,4 +264,9 @@ void CModel::Load(MODEL model)
 
 	m_bLoaded[model] = true;
 	m_Data.push_back(this);
+}
+
+void CModel::BindTexture(std::string inPath)
+{
+	m_pTexture = CApplication::GetInstance()->GetTexture()->GetTexture(inPath);		//テクスチャのポインタ
 }

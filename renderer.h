@@ -14,8 +14,6 @@ public:
 	void Uninit();
 	void Update();
 	void Draw();
-	void ReCreateDevice();
-	bool DeviceLost();
 
 	LPDIRECT3DDEVICE9 GetDevice() { return m_pD3DDevice; }	/*’l‚ğreturn‚·‚é‚¾‚¯‚Ìê‡‚±‚¤‘‚­A‚QsˆÈã‚Ícpp‚Å*/
 

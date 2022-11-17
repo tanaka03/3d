@@ -48,6 +48,7 @@ public:
 	void Uninit() override;
 	void Update() override;
 	void Draw() override;
+	void BindTexture(std::string inPath);
 	void SetUV(float Xtop, float Xbottom, float Ytop, float Ybottom);
 	void SetAnim(int DivX, int DivY, int speed, int interval, bool loop);
 	bool SquareCollision(D3DXVECTOR3 pos, D3DXVECTOR3 Destpos, float Length, float CollisionVal);
@@ -62,7 +63,6 @@ public:
 	void SetMyCol(EColor col) { m_Ecol = col, m_bUseMyCol = true; }
 	void SetLife(int nLife) { m_nLife = nLife; }
 	void SetScale(float width, float height) { m_Width = width, m_Height = height; }
-	void SetTexture(CTexture::TEXTURE texture) { m_texture = texture; }// テクスチャの設定
 	void SetDestroy(bool set) override { m_bRelease = set; }
 
 	//ゲッター
@@ -77,8 +77,8 @@ public:
 	bool GetDestroy() override { return m_bRelease; }
 
 private:
+	LPDIRECT3DTEXTURE9 m_pTexture;
 	D3DXVECTOR3 m_objpos;
-	CTexture::TEXTURE m_texture;	// テクスチャの列挙型
 	D3DXVECTOR3 m_move;
 	D3DXCOLOR m_col;
 	EColor m_Ecol;

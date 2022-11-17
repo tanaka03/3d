@@ -28,7 +28,7 @@ CPolygon* CPolygon::Create(D3DXVECTOR3 pos)
 HRESULT CPolygon::Init()
 {
 	CObject3D::Init();
-	CObject3D::SetTexture(CTexture::TEXTURE_GRASS);
+	CObject3D::BindTexture("GRASS_01");
 	SetZBuff(D3DCMP_LESSEQUAL);
 	return S_OK;
 }
@@ -40,7 +40,7 @@ void CPolygon::Uninit()
 
 void CPolygon::Update()
 {
-	CPlayer *pPlayer = CApplication::GetPlayer();
+	CPlayer *pPlayer = CApplication::GetInstance()->GetPlayer();
 	CObject3D::Update();
 	m_scale = GetScale();
 	auto pos = GetPos();

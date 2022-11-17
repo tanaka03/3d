@@ -25,6 +25,7 @@ public:
 	void Uninit() override;
 	void Update() override;
 	void Draw() override;
+	void BindTexture(std::string inPath);
 	void SetUV(float Xtop, float Xbottom, float Ytop, float Ybottom);
 
 	//セッター
@@ -32,7 +33,6 @@ public:
 	void SetMove(D3DXVECTOR3 move) { m_move = move; }
 	void SetCol(D3DXCOLOR col) { m_col = col; }
 	void SetScale(D3DXVECTOR3 scale) { m_scale = scale; }
-	void SetTexture(CTexture::TEXTURE texture) { m_texture = texture; }// テクスチャの設定
 	void SetBlend(EBlend blend) { m_blend = blend; }
 	void SetZBuff(_D3DCMPFUNC func) { m_Zfunc = func; }
 	void SetDestroy(bool set) override { m_bRelease = set; }
@@ -48,7 +48,7 @@ public:
 	bool GetDestroy() override { return m_bRelease; }
 
 private:
-	CTexture::TEXTURE m_texture;	// テクスチャの列挙型
+	LPDIRECT3DTEXTURE9 m_pTexture;
 	D3DXVECTOR3 m_objpos;
 	D3DXVECTOR3 m_move;
 	D3DXVECTOR3 m_rot;

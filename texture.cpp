@@ -2,6 +2,7 @@
 // 
 // texture.cpp
 // Author  : katsuki mizuki
+// Author  : Yuda Kaito
 // 
 //**************************************************
 
@@ -9,28 +10,17 @@
 // インクルード
 //==================================================
 #include "application.h"
-#include "texture.h"
 #include "renderer.h"
+#include "texture.h"
+#include "file.h"
 
-//==================================================
-// 定義
-//==================================================
-const char* CTexture::s_FileName[] =
-{// テクスチャのパス
-	"data/TEXTURE/grass.jpg",			// 草
-	"data/TEXTURE/shadow000.jpg",		// 影
-	"data/TEXTURE/bullet000.png",		// 弾
-	"data/TEXTURE/bright.png"			// エフェクト１
-};
-static_assert(sizeof(CTexture::s_FileName) / sizeof(CTexture::s_FileName[0]) == CTexture::TEXTURE_MAX, "aho");
+#include <assert.h>
 
 //--------------------------------------------------
 // デフォルトコンストラクタ
 //--------------------------------------------------
-CTexture::CTexture() :
-	s_pTexture()
+CTexture::CTexture()
 {
-	memset(s_pTexture, 0, sizeof(s_pTexture));
 }
 
 //--------------------------------------------------
@@ -45,87 +35,98 @@ CTexture::~CTexture()
 //--------------------------------------------------
 void CTexture::LoadAll()
 {
-	// デバイスへのポインタの取得
-	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();
+	nlohmann::json list = CFile::LoadJsonStage(L"Data/FILE/texture.json");
 
-	for (int i = 0; i < TEXTURE_MAX; ++i)
+	for (int i = 0; i < (int)list["TEXTURE"].size(); ++i)
 	{
-		if (s_pTexture[i] != nullptr)
-		{// テクスチャの読み込みがされている
-			continue;
-		}
-
-		// テクスチャの読み込み
-		D3DXCreateTextureFromFile(pDevice,
-			s_FileName[i],
-			&s_pTexture[i]);
+		m_texturePath.insert(std::make_pair(list["TEXTURE"].at(i)[0], list["TEXTURE"].at(i)[1]));
 	}
 }
 
 //--------------------------------------------------
 // 読み込み
 //--------------------------------------------------
-void CTexture::Load(TEXTURE inTexture)
+void CTexture::Load(std::string inKey, std::string inFileName)
 {
-	assert(inTexture >= 0 && inTexture < TEXTURE_MAX);
-
-	if (s_pTexture[inTexture] != nullptr)
-	{// テクスチャの読み込みがされている
-		return;
-	}
-
-	// デバイスへのポインタの取得
 	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();
+	LPDIRECT3DTEXTURE9 texture = nullptr;
+	std::string fileName = inFileName;
 
 	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice,
-		s_FileName[inTexture],
-		&s_pTexture[inTexture]);
+	D3DXCreateTextureFromFile(pDevice, &fileName.front(), &texture);
+
+	assert(texture != nullptr);	// テクスチャのURLがないかキーが間違ってる。
+
+
+	if (!ExistsKey(inKey))
+	{
+		m_texture.insert(std::make_pair(inKey, texture));
+	}
+	else
+	{
+		m_texture[inKey] = texture;
+	}
+}
+
+//--------------------------------------------------
+// 読み込み
+//--------------------------------------------------
+void CTexture::Load(std::vector<std::string> inTexture)
+{
+	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();
+	LPDIRECT3DTEXTURE9 texture = nullptr;
+	std::string fileName = inTexture[1];
+
+	// テクスチャの読み込み
+	D3DXCreateTextureFromFile(pDevice, &fileName.front(), &texture);
+
+	assert(texture != nullptr);	// テクスチャのURLがないかキーが間違ってる。
+
+	if (!ExistsKey(inTexture[0]))
+	{
+		m_texture.insert(std::make_pair(inTexture[0], texture));
+	}
+	else
+	{
+		m_texture[inTexture[0]] = texture;
+	}
 }
 
 //--------------------------------------------------
 // 全ての解放
 //--------------------------------------------------
-void CTexture::ReleaseAll(void)
+void CTexture::UnloadAll()
 {
-	for (int i = 0; i < TEXTURE_MAX; ++i)
-	{
-		if (s_pTexture[i] != NULL)
-		{// テクスチャの解放
-			s_pTexture[i]->Release();
-			s_pTexture[i] = NULL;
-		}
-	}
+	m_texture.clear();
 }
 
 //--------------------------------------------------
 // 解放
 //--------------------------------------------------
-void CTexture::Release(TEXTURE inTexture)
+void CTexture::Unload(std::string inKey)
 {
-	assert(inTexture >= 0 && inTexture < TEXTURE_MAX);
-
-	if (s_pTexture[inTexture] != NULL)
-	{// テクスチャの解放
-		s_pTexture[inTexture]->Release();
-		s_pTexture[inTexture] = NULL;
-	}
+	m_texture.erase(inKey);
 }
 
 //--------------------------------------------------
 // 取得
 //--------------------------------------------------
-LPDIRECT3DTEXTURE9 CTexture::GetTexture(TEXTURE inTexture)
+LPDIRECT3DTEXTURE9 CTexture::GetTexture(std::string inKey)
 {
-	if (inTexture == TEXTURE_NONE)
-	{// テクスチャを使用しない
+	// Keyが存在するか否か。
+	if (!ExistsPath(inKey))
+	{
+		// Keyがなかった場合
 		return nullptr;
 	}
 
-	assert(inTexture >= 0 && inTexture < TEXTURE_MAX);
+	// Keyが存在するか否か。
+	if (!ExistsKey(inKey))
+	{
+		Load(inKey, m_texturePath[inKey]);
+	}
 
-	// 読み込み
-	Load(inTexture);
+	/* ↓Keyがあった場合↓ */
 
-	return s_pTexture[inTexture];
+	return m_texture[inKey];
 }

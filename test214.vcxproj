@@ -161,7 +161,6 @@
     <ClCompile Include="effect.cpp" />
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="file.cpp" />
-    <ClCompile Include="gimmick.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="keyboard.cpp" />
     <ClCompile Include="light.cpp" />
@@ -193,7 +192,6 @@
     <ClInclude Include="effect.h" />
     <ClInclude Include="enemy.h" />
     <ClInclude Include="file.h" />
-    <ClInclude Include="gimmick.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="keyboard.h" />
     <ClInclude Include="light.h" />
@@ -212,6 +210,9 @@
     <ClInclude Include="shadow.h" />
     <ClInclude Include="sphere.h" />
     <ClInclude Include="texture.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="data\FILE\texture.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

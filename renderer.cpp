@@ -5,11 +5,11 @@
 #include "debugproc.h"
 #include <tchar.h> // _T
 
-CRenderer::CRenderer()
+CRenderer::CRenderer() : 
+	m_pD3D(nullptr),
+	m_pD3DDevice(nullptr),
+	m_pFont(nullptr)
 {
-	m_pD3D = nullptr;
-	m_pD3DDevice = nullptr;
-	m_pFont = nullptr;
 }
 
 CRenderer::~CRenderer()
@@ -181,44 +181,7 @@ void CRenderer::Draw()
 	}
 
 	// バックバッファとフロントバッファの入れ替え
-	if (m_pD3DDevice->Present(NULL, NULL, NULL, NULL) == D3DERR_DEVICELOST)
-	{
-		DeviceLost();
-	}
-}
-
-//デバイスのリセット
-void CRenderer::ReCreateDevice()
-{
-#ifdef _DEBUG
-	// デバッグ情報表示用フォントの破棄
-	if (m_pFont != nullptr)
-	{
-		m_pFont->Release();
-		m_pFont = nullptr;
-	}
-#endif // _DEBUG
-
-	//リセットが成功しなかった場合アプリケーションを停止
-	if (m_pD3DDevice->Reset(&m_pD3dpp) != D3D_OK)
-	{
-		PostQuitMessage(0);
-		return;
-	}
-}
-
-//デバイスロスト発生時の処理
-bool CRenderer::DeviceLost()
-{
-	HRESULT hr = m_pD3DDevice->TestCooperativeLevel();
-
-	if (hr != D3DERR_DEVICENOTRESET)
-	{
-		return false;
-	}
-
-	ReCreateDevice();
-	return true;
+	m_pD3DDevice->Present(NULL, NULL, NULL, NULL);
 }
 
 #ifdef _DEBUG

@@ -5,7 +5,8 @@
 #include "keyboard.h"
 #include "texture.h"
 
-CBillboard::CBillboard() : m_texture(CTexture::TEXTURE_NONE)
+CBillboard::CBillboard() : 
+	m_pTexture(nullptr)
 {
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	m_scale = D3DXVECTOR3(100.0f, 0.0f, 100.0f);
@@ -172,7 +173,7 @@ void CBillboard::Draw()
 	pDevice->SetFVF(FVF_VERTEX_3D);
 
 	//テクスチャの設定
-	pDevice->SetTexture(0, pTexture->GetTexture(m_texture));
+	pDevice->SetTexture(0, m_pTexture);
 
 	//ポリゴンの描画
 	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP,
@@ -187,7 +188,11 @@ void CBillboard::Draw()
 
 	//テクスチャの設定
 	pDevice->SetTexture(0, NULL);
+}
 
+void CBillboard::BindTexture(std::string inPath)
+{
+	m_pTexture = CApplication::GetInstance()->GetTexture()->GetTexture(inPath);		//テクスチャのポインタ
 }
 
 void CBillboard::SetUV(float Xtop, float Xbottom, float Ytop, float Ybottom)

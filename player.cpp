@@ -63,17 +63,17 @@ HRESULT CPlayer::Init()
 
 	m_pModel[0] = CModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), CModel::MODEL_FOKKO);
 
-	m_pModel[1] = CModel::Create(D3DXVECTOR3(20.0f,20.0f, 20.0f),D3DXVECTOR3(0.0f,0.0f,0.0f),CModel::MODEL_STAR);
-	m_pModel[1]->SetParent(m_pModel[0]);
-	m_KeySet[0].nFrame = 60;
-	m_KeySet[0].key[0].rot = D3DXVECTOR3(0.0f, 120.0f, 0.0f);
-	m_KeySet[0].key[1].rot = D3DXVECTOR3(0.0f, 360.0f, 0.0f);
+	//m_pModel[1] = CModel::Create(D3DXVECTOR3(20.0f,20.0f, 20.0f),D3DXVECTOR3(0.0f,0.0f,0.0f),CModel::MODEL_STAR);
+	//m_pModel[1]->SetParent(m_pModel[0]);
+	//m_KeySet[0].nFrame = 60;
+	//m_KeySet[0].key[0].rot = D3DXVECTOR3(0.0f, 120.0f, 0.0f);
+	//m_KeySet[0].key[1].rot = D3DXVECTOR3(0.0f, 360.0f, 0.0f);
 
-	m_KeySet[1].key[0].rot = D3DXVECTOR3(0.0f, 360.0f, 0.0f);
-	m_KeySet[1].key[1].rot = D3DXVECTOR3(0.0f, 120.0f, 0.0f);
+	//m_KeySet[1].key[0].rot = D3DXVECTOR3(0.0f, 360.0f, 0.0f);
+	//m_KeySet[1].key[1].rot = D3DXVECTOR3(0.0f, 120.0f, 0.0f);
 
-	m_pModel[2] = CModel::Create(D3DXVECTOR3(-20.0f, 20.0f, 20.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), CModel::MODEL_STAR);
-	m_pModel[2]->SetParent(m_pModel[0]);
+	//m_pModel[2] = CModel::Create(D3DXVECTOR3(-20.0f, 20.0f, 20.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), CModel::MODEL_STAR);
+	//m_pModel[2]->SetParent(m_pModel[0]);
 	//m_KeySet.key[2].pos = D3DXVECTOR3(100.0f, 100.0f, 100.0f);
 
 	return S_OK;
@@ -123,7 +123,7 @@ void CPlayer::Uninit()
 //
 void CPlayer::Update()
 {
-	CCamera *pCamera = CApplication::GetCamera();
+	CCamera *pCamera = CApplication::GetInstance()->GetCamera();
 	CCamera::CAMERA *camera = pCamera->GetCamera();
 	m_objpos += m_move;
 	auto posOld = m_objpos;
@@ -314,13 +314,13 @@ void CPlayer::Motion(int Num)
 		return;
 	}
 
-	auto relative_Value = m_cntMotion / m_KeySet[m_currentKey].nFrame;
+	int relative_Value = m_cntMotion / m_KeySet[m_currentKey].nFrame;
 
 	//auto posDifference = m_KeySet.key[m_currentKey].pos - m_pModel[Num]->GetStartPos();
 	//auto pos_Value = m_pModel[Num]->GetStartPos() + (posDifference * relative_Value);
 
-	auto rotDifference = m_KeySet[m_currentKey].key[m_currentKey].rot - m_pModel[Num]->GetStartRot();
-	auto rot_Value = m_pModel[Num]->GetStartRot() + (rotDifference * relative_Value);
+	D3DXVECTOR3 rotDifference = m_KeySet[m_currentKey].key[m_currentKey].rot - m_pModel[Num]->GetStartRot();
+	D3DXVECTOR3 rot_Value = m_pModel[Num]->GetStartRot() + (rotDifference * relative_Value);
 
 	//m_pModel[Num]->SetPosOffset(pos_Value);
 	m_pModel[Num]->SetRotOffset(rot_Value);

@@ -5,7 +5,6 @@
 #include <d3dx9.h>
 #include <d3d9.h>
 #include <assert.h>
-#include <locale.h>
 #include <tchar.h> 
 #include <stdlib.h>
 
@@ -13,10 +12,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <algorithm>
 #include <vector>
-
-#include "nlohmann/json.hpp"
 
 #pragma comment(lib,"d3d9.lib")
 #pragma comment(lib,"d3dx9.lib")

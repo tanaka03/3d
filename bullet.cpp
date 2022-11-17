@@ -34,7 +34,7 @@ HRESULT CBullet::Init()
 {
 	SetCol(D3DXCOLOR(1.0f,1.0f,1.0f,1.0f));
 	SetScale(D3DXVECTOR3(5.0f, 5.0f, 0.0f));
-	CBillboard::SetTexture(CTexture::TEXTURE_BULLET);
+	CBillboard::BindTexture("BULLET");
 	CBillboard::Init();
 	SetBlend(BLEND_NONE);
 	SetZBuff(D3DCMP_LESS);

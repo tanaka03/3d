@@ -1,0 +1,7 @@
+{
+  "TEXTURE": [
+    [ "BULLET", "data\/TEXTURE\/bullet000.png" ],
+    [ "GRASS_01", "data\/TEXTURE\/grass.jpg" ],
+    [ "SHADOW", "data\/TEXTURE\/shadow000.jpg" ]
+  ]
+}

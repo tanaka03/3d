@@ -17,13 +17,13 @@ public:
 	void Uninit();
 	void Update();
 	void Draw();
+	void BindTexture(std::string inPath);
 
 	//セッター
 	void SetPos(D3DXVECTOR3 pos) override { m_objpos = pos; }
 	void SetMove(D3DXVECTOR3 move) { m_move = move; }
 	void SetCol(D3DXCOLOR col) { m_col = col; }
 	void SetScale(D3DXVECTOR3 scale) { m_scale = scale; }
-	void SetTexture(CTexture::TEXTURE texture) { m_texture = texture; }// テクスチャの設定
 	void SetDestroy(bool set) override { m_bRelease = set; }
 	void SetVtxNum(int num) { m_MeshField_VertexNum = num; }
 	void SetIdxNum(int num) { m_MeshField_IndexNum = num; }
@@ -47,7 +47,7 @@ protected:
 	LPDIRECT3DINDEXBUFFER9 m_pIdxBuff;		//インデックスバッファへのポインタ
 
 private:
-	CTexture::TEXTURE m_texture;	// テクスチャの列挙型
+	LPDIRECT3DTEXTURE9 m_pTexture;
 	D3DXVECTOR3 m_objpos;
 	D3DXVECTOR3 m_move;
 	D3DXVECTOR3 m_rot;

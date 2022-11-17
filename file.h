@@ -4,7 +4,7 @@
 #ifndef _FILE_H_
 #define _FILE_H_
 
-#include "enemy.h"
+#include "nlohmann/json.hpp"
 
 class CFile
 {
@@ -12,14 +12,8 @@ public:
 	CFile();
 	~CFile();
 
-	void LoadJson(const char* FileName);
-	void SaveJson(const char* FileName);
-	void LoadText(const char* Path);
-
+	static nlohmann::json LoadJsonStage(const wchar_t* cUrl);
 private:
-	static const int m_Max = 10;
-
-	std::string m_str;
 };
 
 #endif

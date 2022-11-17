@@ -7,7 +7,8 @@
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 //オブジェクト２Ｄのコンストラクタ
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-CObject2D::CObject2D() : m_texture(CTexture::TEXTURE_NONE)
+CObject2D::CObject2D() :
+	m_pTexture(nullptr)
 {
 	m_objpos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_nCounterAnim = 0;
@@ -183,12 +184,17 @@ void CObject2D::Draw()
 	pDevice->SetFVF(FVF_VERTEX_2D);
 
 	//テクスチャの設定
-	pDevice->SetTexture(0, pTexture->GetTexture(m_texture));
+	pDevice->SetTexture(0, m_pTexture);
 
 	//ポリゴンの描画
 	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP,		//プリミティブの種類
 		0,
 		2);						//プリミティブ(ポリゴン)数
+}
+
+void CObject2D::BindTexture(std::string inPath)
+{
+	m_pTexture = CApplication::GetInstance()->GetTexture()->GetTexture(inPath);		//テクスチャのポインタ
 }
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝

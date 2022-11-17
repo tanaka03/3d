@@ -1,131 +1,37 @@
-#include "application.h"
-#include "renderer.h"
+//============================
+//
+// ファイル設定
+// Author:hamada ryuuga
+// Author:Yuda Kaito
+//
+//============================
 #include "file.h"
+#include <fstream>
 
-using namespace std;
-using namespace nlohmann;
-
-//＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-//ファイルのリストの生成
-//＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-json j;	//リストの生成
-
-//＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-//ファイルのコンストラクタ
-//＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 CFile::CFile()
 {
 }
 
-//＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-//ファイルのデストラクタ
-//＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 CFile::~CFile()
 {
 }
 
-//＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-//ファイルの入力処理
-//＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-void CFile::LoadJson(const char* FileName)
+//============================
+// 読込み
+//============================
+nlohmann::json CFile::LoadJsonStage(const wchar_t* cUrl)
 {
-	string Path = "data/FILE/";
-	const string pathToJSON = Path += FileName;
-	ifstream ifs(pathToJSON);//開くやつ
+	std::ifstream ifs(cUrl);
 
 	if (ifs)
-	{//成功した場合
-
-		ifs >> j;
-
-		int idx = j["INDEX"];
-
-		for (int i = 0; i < idx; i++)
-		{
-			string name = "ENEMY";
-			string Number = std::to_string(i);
-			name += Number;
-		}
-	}
-}
-
-//＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-//ファイルの出力処理
-//＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-void CFile::SaveJson(const char* FileName)
-{
-	//データの入れ方サンプル
-	//j["DESTCOL"] = { { "R", DataEffect.color.destCol.r },{ "G" ,DataEffect.color.destCol.g } ,{ "B", DataEffect.color.destCol.b } ,{ "A", DataEffect.color.destCol.a } };
-	//j["ENDTIME"] = DataEffect.color.nEndTime; 
-	int nIndex = m_Max;
-	for (int i = 0; i < nIndex; i++)
 	{
-		string name = "ENEMY";
-		string Number = to_string(i);
-		name += Number;
+		nlohmann::json list;	// リストの作成
 
-		j[name] =
-		{
-			{ "POS",{ { "X", 200.0f + (100.0f * i) },{ "Y", 100.0 },{ "Z", 0.0 } } }
-		};
-
-		j["INDEX"] = nIndex;
+		ifs >> list;
+		return list;
 	}
 
-	//出力するやつ
-	auto jobj = j.dump();
-	ofstream writing_file;
-	string Path = "data/FILE/";
-	const string pathToJSON = Path += FileName;
-	writing_file.open(pathToJSON, ios::out);
-	writing_file << jobj << endl;
-	writing_file.close();
-}
+	/* ↓ファイルを開くのを失敗した場合↓ */
 
-void CFile::LoadText(const char* Path)
-{
-	LPDIRECT3DDEVICE9 pDevice = CApplication::GetRenderer()->GetDevice();
-
-	//ファイルを開く
-	ifstream file(Path);
-
-	if (file.fail())
-	{//ファイルを開けなかった場合
-		printf("ファイルを開けません");
-		return;
-	}
-
-	string filestr;
-
-	while(!file.eof())
-	{
-		getline(file, filestr);
-		m_str += filestr;
-	}
-
-	vector<int> Find;
-	int nCntStr = 0;
-
-	//特定の文字の位置の数値を保存
-	while (nCntStr < m_str.length())
-	{
-		if (m_str.substr(nCntStr, 3) == "pos")
-		{
-			Find.push_back(nCntStr);
-		}
-		nCntStr++;
-	}
-
-	//特定の文字の場所を検索
-	for (const auto &pos : Find)
-	{
-		string destStr = m_str.substr(pos, 3);
-
-		if (destStr == "pos")
-		{//条件に当てはまった場合
-
-		}
-	}
-
-	file.close();
+	return nullptr;
 }

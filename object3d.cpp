@@ -4,7 +4,8 @@
 #include "keyboard.h"
 #include "texture.h"
 
-CObject3D::CObject3D() : m_texture(CTexture::TEXTURE_NONE)
+CObject3D::CObject3D() :
+	m_pTexture(nullptr)
 {
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	m_scale = D3DXVECTOR3(100.0f, 0.0f, 100.0f);
@@ -158,7 +159,7 @@ void CObject3D::Draw()
 	pDevice->SetFVF(FVF_VERTEX_3D);
 
 	//テクスチャの設定
-	pDevice->SetTexture(0, pTexture->GetTexture(m_texture));
+	pDevice->SetTexture(0, m_pTexture);
 
 	//ポリゴンの描画
 	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP,
@@ -175,6 +176,11 @@ void CObject3D::Draw()
 
 	//カリングの設定を元に戻す
 	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+}
+
+void CObject3D::BindTexture(std::string inPath)
+{
+	m_pTexture = CApplication::GetInstance()->GetTexture()->GetTexture(inPath);		//テクスチャのポインタ
 }
 
 void CObject3D::SetUV(float Xtop, float Xbottom, float Ytop, float Ybottom)

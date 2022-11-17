@@ -17,6 +17,9 @@ void CLight::Init()
 {
 	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();
 
+	D3DMATERIAL9 material;
+	memset(&material, 0, sizeof(D3DMATERIAL9));
+
 	//ライトをクリアする
 	memset(&m_light, 0, sizeof(D3DLIGHT9));
 

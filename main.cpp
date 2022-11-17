@@ -77,7 +77,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpC
 		NULL);
 
 	//アプリケーションクラスの生成
-	pApplication = new CApplication;
+	pApplication = CApplication::GetInstance();
 	pApplication->Init(hWnd, hInstance);
 
 	// 分解能を設定
@@ -145,13 +145,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpC
 	}
 
 	//アプリケーションクラスの破棄
-	if (pApplication != nullptr)
-	{
-		pApplication->Uninit();
-
-		delete pApplication;
-		pApplication = nullptr;
-	}
+	pApplication->Uninit();
 
 	// ウィンドウクラスの登録を解除
 	UnregisterClass(CLASS_NAME, wcex.hInstance);

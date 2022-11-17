@@ -49,6 +49,9 @@
     <Filter Include="ヘッダー ファイル\Object\Mesh">
       <UniqueIdentifier>{1467fb33-47d8-4b57-b2b2-3afd0b9df4cd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FILE">
+      <UniqueIdentifier>{9e37966b-45c3-4921-a7b6-cac1563c2ac5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -128,9 +131,6 @@
     </ClCompile>
     <ClCompile Include="model.cpp">
       <Filter>ソース ファイル\Object</Filter>
-    </ClCompile>
-    <ClCompile Include="gimmick.cpp">
-      <Filter>ソース ファイル\Object\objectX</Filter>
     </ClCompile>
     <ClCompile Include="precompile.cpp">
       <Filter>ソース ファイル</Filter>
@@ -215,11 +215,13 @@
     <ClInclude Include="model.h">
       <Filter>ヘッダー ファイル\Object</Filter>
     </ClInclude>
-    <ClInclude Include="gimmick.h">
-      <Filter>ヘッダー ファイル\Object\objectX</Filter>
-    </ClInclude>
     <ClInclude Include="precompile.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="data\FILE\texture.json">
+      <Filter>FILE</Filter>
+    </None>
   </ItemGroup>
 </Project>

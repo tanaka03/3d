@@ -29,6 +29,7 @@ public:
 	void Update();
 	void Draw();
 	void Shadow();
+	void BindTexture(std::string inPath);
 	void Load(MODEL model);
 
 	//セッター
@@ -36,7 +37,6 @@ public:
 	void SetRotOffset(D3DXVECTOR3 rot) { m_rotOffset = rot; }
 	void SetModel(MODEL model) { m_model = model; }
 	void SetParent(CModel* model) { m_pParent = model; }
-	void SetTexture(CTexture::TEXTURE texture) { m_texture = texture; }// テクスチャの設定
 
 	//ゲッター
 	CModel GetParent() { return *m_pParent; }
@@ -51,6 +51,7 @@ private:
 	static std::vector<CModel*> m_Data;
 	static bool m_bLoaded[MODEL_MAX];
 
+	LPDIRECT3DTEXTURE9 m_pTexture;
 	LPD3DXBUFFER m_buffMat;
 	DWORD m_dwNum;
 	LPD3DXMESH m_mesh;
@@ -61,7 +62,6 @@ private:
 	D3DXVECTOR3 m_startPos;
 	D3DXVECTOR3 m_startRot;
 	D3DXMATRIX m_mtxWorld;
-	CTexture::TEXTURE m_texture;	// テクスチャの列挙型
 	bool m_bRelease;
 };
 
