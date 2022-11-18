@@ -13,12 +13,12 @@ public:
 	void Init();
 	void Uninit();
 
-	static void Print(const char *pFormat, ...);
-	static void Draw();
+	void Print(const char *pFormat, ...);
+	void Draw();
 
 private:
-	static std::string m_Str;
-	static LPD3DXFONT m_pFont;
+	std::string m_Str;
+	LPD3DXFONT m_pFont;
 };
 
 #endif

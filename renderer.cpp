@@ -3,6 +3,7 @@
 #include "object.h"
 #include "camera.h"
 #include "debugproc.h"
+#include "myimgui.h"
 #include <tchar.h> // _T
 
 CRenderer::CRenderer() : 
@@ -168,13 +169,15 @@ void CRenderer::Draw()
 		m_pD3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
 #ifdef _DEBUG
-		CDebugProc::Draw();
+		CApplication::GetInstance()->GetDebugProc()->Draw();
 
 		// FPS•\Ž¦
 		DrawFPS();
 #endif // _DEBUG
 
 		CObject::DrawAll();
+
+		CApplication::GetInstance()->GetMyImgui()->Draw();
 
 		// Direct3D‚É‚æ‚é•`‰æ‚ÌI—¹
 		m_pD3DDevice->EndScene();

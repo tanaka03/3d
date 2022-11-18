@@ -33,6 +33,8 @@ public:
 	D3DXVECTOR3 GetMove() { return m_move; }
 	D3DXVECTOR3 GetScale() { return m_scale; }
 	D3DXVECTOR3 GetRot() { return m_rot; }
+	D3DXVECTOR3 GetMaxModel() { return m_maxModel; }
+	D3DXVECTOR3 GetMinModel() { return m_minModel; }
 	D3DXCOLOR GetCol() { return m_col; }
 	bool GetDestroy() override { return m_bRelease; }
 
@@ -42,6 +44,8 @@ private:
 	D3DXVECTOR3 m_move;
 	D3DXVECTOR3 m_rot;
 	D3DXVECTOR3 m_scale;
+	D3DXVECTOR3 m_maxModel;
+	D3DXVECTOR3 m_minModel;
 	D3DXCOLOR m_col;
 	D3DXMATRIX m_mtxWorld;
 	bool m_bRelease;

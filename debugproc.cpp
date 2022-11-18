@@ -5,9 +5,6 @@
 
 using namespace std;
 
-LPD3DXFONT CDebugProc::m_pFont = nullptr;
-string CDebugProc::m_Str;
-
 CDebugProc::CDebugProc()
 {
 }

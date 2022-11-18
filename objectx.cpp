@@ -1,6 +1,7 @@
 #include "objectx.h"
 #include "application.h"
 #include "light.h"
+#include "object3d.h"
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
 //オブジェクトXのコンストラクタ
@@ -34,6 +35,49 @@ HRESULT CObjectX::Init()
 
 	//頂点バッファのロック
 	m_mesh->LockVertexBuffer(D3DLOCK_READONLY, (void**)&pVtxBuff);
+
+	//頂点座標の代入
+	D3DXVECTOR3 vtx = *(D3DXVECTOR3*)pVtxBuff;
+
+	//X
+	if (vtx.x > m_maxModel.x)
+	{
+		m_maxModel.x = floorf(vtx.x);
+	}
+
+	if (vtx.x < m_minModel.x)
+	{
+		m_minModel.x = floorf(vtx.x);
+	}
+
+	//Y
+	if (vtx.y > m_maxModel.y)
+	{
+		m_maxModel.y = floorf(vtx.y);
+	}
+
+	if (vtx.y < m_minModel.y)
+	{
+		m_minModel.y = floorf(vtx.y);
+	}
+
+	//Z
+	if (vtx.z > m_maxModel.z)
+	{
+		m_maxModel.z = floorf(vtx.z);
+	}
+
+	if (vtx.z < m_minModel.z)
+	{
+		m_minModel.z = floorf(vtx.z);
+	}
+	//頂点フォーマットのサイズ分ポインタを進める
+	pVtxBuff += sizeFVF;
+
+	//モデルサイズ
+	m_scale.x = m_maxModel.x - m_minModel.x;
+	m_scale.y = m_maxModel.y - m_minModel.y;
+	m_scale.z = m_maxModel.z - m_minModel.z;
 
 	//頂点バッファのアンロック
 	m_mesh->UnlockVertexBuffer();
@@ -109,7 +153,7 @@ void CObjectX::Draw()
 	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 
 	//モデルの影
-	Shadow();
+	//Shadow();
 
 	//ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
@@ -125,11 +169,19 @@ void CObjectX::Draw()
 	//マテリアルの設定
 	pDevice->SetMaterial(&pMat->MatD3D);
 
+	pDevice->SetFVF(FVF_VERTEX_3D);
+
+	//テクスチャの設定
+	pDevice->SetTexture(0, m_pTexture);
+
 	//モデルパーツの描画
 	m_mesh->DrawSubset(0);
 
 	//保持していたマテリアルを戻す
 	pDevice->SetMaterial(&matDef);
+
+	//テクスチャの設定を戻す
+	pDevice->SetTexture(0, NULL);
 }
 
 void CObjectX::Shadow()

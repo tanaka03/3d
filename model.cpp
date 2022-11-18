@@ -145,7 +145,7 @@ void CModel::Draw()
 	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 
 	//モデルの影
-	Shadow();
+	//Shadow();
 
 	//ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);

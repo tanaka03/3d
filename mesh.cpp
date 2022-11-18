@@ -38,7 +38,7 @@ HRESULT CMesh::Init()
 	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();
 
 	m_MeshField_VertexNum = (m_meshX + 1) * (m_meshZ + 1);					//頂点数
-	m_MeshField_IndexNum = (m_meshX + 1) * 2 * m_meshX + (m_meshZ - 1) * 2;			//インデックス
+	m_MeshField_IndexNum = (m_meshX + 1) * 2 * m_meshX + (m_meshZ - 1) * 2;	//インデックス
 	m_MeshField_PrimitiveNum = m_meshX * m_meshZ * 2 + (m_meshZ - 1) * 4;	//ポリゴン
 
 	//頂点バッファの生成
@@ -114,77 +114,6 @@ void CMesh::Uninit()
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
 void CMesh::Update()
 {
-	CPlayer *pPlayer = CApplication::GetInstance()->GetPlayer();
-	D3DXVECTOR3 playerPos = pPlayer->GetPos();
-
-	//インデックスバッファをロック
-	WORD *pIdx;
-	m_pIdxBuff->Lock(0, 0, (void**)&pIdx, 0);
-
-	//頂点バッファをロック
-	VERTEX_3D *pVtx = nullptr;
-	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
-
-	for (int cnt = 0; cnt < m_MeshField_VertexNum; cnt++)
-	{
-		pVtx[cnt].col = D3DXCOLOR(1.0f,1.0f,1.0f,1.0f);
-	}
-
-	for (int i = 0; i < m_MeshField_PrimitiveNum; i++)
-	{
-		if (pIdx[i] == pIdx[i + 1] && pIdx[i] == pIdx[i + 2] && pIdx[i + 1] == pIdx[i + 2])
-		{
-			continue;
-		}
-
-		//頂点の位置
-		auto posA = pVtx[pIdx[i]].pos;
-		auto posB = pVtx[pIdx[i + 1]].pos;
-		auto posC = pVtx[pIdx[i + 2]].pos;
-
-		//頂点のベクトル
-		auto vecA = posB - posA;
-		auto vecB = posC - posB;
-		auto vecC = posA - posC;
-
-		//ポリゴンの頂点とプレイヤーの位置のベクトル
-		auto DistanceA = playerPos - posA;
-		auto DistanceB = playerPos - posB;
-		auto DistanceC = playerPos - posC;
-
-		//ポリゴンの頂点のベクトルとプレイヤーから頂点のベクトルの計算結果
-		float fResult1 = vecA.x * DistanceA.z - vecA.z * DistanceA.x;
-		float fResult2 = vecB.x * DistanceB.z - vecB.z * DistanceB.x;
-		float fResult3 = vecC.x * DistanceC.z - vecC.z * DistanceC.x;
-
-		if (fResult1 * fResult2 >= 0 &&
-			fResult2 * fResult3 >= 0 &&
-			fResult3 * fResult1 >= 0)
-		{//ポリゴンの範囲内に入った場合
-			//pVtx[pIdx[i]].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
-			//pVtx[pIdx[i + 1]].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
-			//pVtx[pIdx[i + 2]].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
-
-			//メッシュの判定
-			auto V1 = posB - posA;
-			auto V2 = posC - posA;
-			D3DXVECTOR3 normal;
-
-			D3DXVec3Cross(&normal, &V2, &V1);
-			D3DXVec3Normalize(&normal, &normal);
-			playerPos.y = posA.y - ((playerPos.x - posA.x) * normal.x + (playerPos.z - posA.z) * normal.z) / normal.y;
-
-			pPlayer->SetCollision(true);
-			pPlayer->SetPos(playerPos);
-			break;
-		}
-	}
-
-	//頂点バッファのアンロック
-	m_pVtxBuff->Unlock();
-
-	//インデックスバッファのアンロック
-	m_pIdxBuff->Unlock();
 }
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
@@ -234,4 +163,118 @@ void CMesh::Draw()
 void CMesh::BindTexture(std::string inPath)
 {
 	m_pTexture = CApplication::GetInstance()->GetTexture()->GetTexture(inPath);		//テクスチャのポインタ
+}
+
+bool CMesh::Collision(D3DXVECTOR3 pos)
+{
+	//インデックスバッファをロック
+	WORD *pIdx;
+	m_pIdxBuff->Lock(0, 0, (void**)&pIdx, 0);
+
+	//頂点バッファをロック
+	VERTEX_3D *pVtx = nullptr;
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	for (int cnt = 0; cnt < m_MeshField_VertexNum; cnt++)
+	{
+		pVtx[cnt].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	}
+
+	for (int i = 0; i < m_MeshField_PrimitiveNum; i++)
+	{
+		if (pIdx[i] == pIdx[i + 1] && pIdx[i] == pIdx[i + 2] && pIdx[i + 1] == pIdx[i + 2])
+		{
+			continue;
+		}
+
+		//頂点の位置
+		auto posA = pVtx[pIdx[i]].pos;
+		auto posB = pVtx[pIdx[i + 1]].pos;
+		auto posC = pVtx[pIdx[i + 2]].pos;
+
+		//頂点のベクトル
+		auto vecA = posB - posA;
+		auto vecB = posC - posB;
+		auto vecC = posA - posC;
+
+		//ポリゴンの頂点とプレイヤーの位置のベクトル
+		auto DistanceA = pos - posA;
+		auto DistanceB = pos - posB;
+		auto DistanceC = pos - posC;
+
+		//ポリゴンの頂点のベクトルとプレイヤーから頂点のベクトルの計算結果
+		float fResult1 = vecA.x * DistanceA.z - vecA.z * DistanceA.x;
+		float fResult2 = vecB.x * DistanceB.z - vecB.z * DistanceB.x;
+		float fResult3 = vecC.x * DistanceC.z - vecC.z * DistanceC.x;
+
+		if (fResult1 * fResult2 >= 0 &&
+			fResult2 * fResult3 >= 0 &&
+			fResult3 * fResult1 >= 0)
+		{//ポリゴンの範囲内に入った場合
+		 //pVtx[pIdx[i]].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+		 //pVtx[pIdx[i + 1]].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+		 //pVtx[pIdx[i + 2]].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+			m_meshPt = i;
+
+		 //メッシュの判定
+			auto V1 = posB - posA;
+			auto V2 = posC - posA;
+			D3DXVECTOR3 normal;
+
+			D3DXVec3Cross(&normal, &V2, &V1);
+			D3DXVec3Normalize(&normal, &normal);
+			pos.y = posA.y - ((pos.x - posA.x) * normal.x + (pos.z - posA.z) * normal.z) / normal.y;
+			m_CollisionPos = pos;
+			return true;
+		}
+	}
+
+	//頂点バッファのアンロック
+	m_pVtxBuff->Unlock();
+
+	//インデックスバッファのアンロック
+	m_pIdxBuff->Unlock();
+}
+
+void CMesh::SetIdxPos(D3DXVECTOR3 pos, int idx)
+{
+	//インデックスバッファをロック
+	WORD *pIdx;
+	m_pIdxBuff->Lock(0, 0, (void**)&pIdx, 0);
+
+
+	//頂点バッファをロック
+	VERTEX_3D *pVtx = nullptr;
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	pVtx[pIdx[idx]].pos = pos;
+
+	//頂点バッファのアンロック
+	m_pVtxBuff->Unlock();
+
+	//インデックスバッファのアンロック
+	m_pIdxBuff->Unlock();
+}
+
+D3DXVECTOR3 CMesh::GetIdxPos(int idx)
+{
+	//インデックスバッファをロック
+	WORD *pIdx;
+	m_pIdxBuff->Lock(0, 0, (void**)&pIdx, 0);
+
+
+	//頂点バッファをロック
+	VERTEX_3D *pVtx = nullptr;
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	D3DXVECTOR3 pos;
+	pos = pVtx[pIdx[idx]].pos;
+
+	//頂点バッファのアンロック
+	m_pVtxBuff->Unlock();
+
+	//インデックスバッファのアンロック
+	m_pIdxBuff->Unlock();
+
+	return pos;
 }

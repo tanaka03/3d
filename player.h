@@ -6,7 +6,6 @@
 
 #include "object.h"
 
-class CShadow;
 class CCamera;
 class CBullet;
 class CModel;
@@ -41,12 +40,14 @@ public:
 	void SetCollisionPos(D3DXVECTOR3 pos) { m_Collisionpos = pos; }
 	void SetCollision(bool set) { m_bCollision = set; }
 	void SetDestroy(bool set) override { m_bRelease = set; }
+	void SetMeshIdx(int idx) { m_meshIdx = idx; }
 
 	D3DXVECTOR3 GetPos() override { return m_objpos; }
 	D3DXVECTOR3 GetCollisionPos() { return m_Collisionpos; }
 	D3DXMATRIX GetMtx() { return m_mtxWorld; }
 	bool GetCollision() { return m_bCollision; }
 	bool GetDestroy() override { return m_bRelease; }
+	int GetMeshIdx() { return m_meshIdx; }
 
 private:
 	static const int MaxParts = 3;
@@ -57,11 +58,12 @@ private:
 	D3DXVECTOR3 m_rot;
 	D3DXVECTOR3 m_rotDest;
 	D3DXMATRIX m_mtxWorld;
-	CShadow *m_pShadow;
 	CCamera *m_pCamera;
 	CBullet *m_pBullet;
 	CModel *m_pModel[3];
 	KEYSET m_KeySet[2];
+	int m_meshIdx;
+
 	int m_numKey;
 	int m_currentKey;
 	int m_cntMotion;

@@ -11,6 +11,7 @@
 #include "file.h"
 #include "light.h"
 #include "model.h"
+#include "meshfield.h"
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 //プレイヤーのコンストラクタ
@@ -57,9 +58,6 @@ CPlayer * CPlayer::Create(D3DXVECTOR3 pos)
 HRESULT CPlayer::Init()
 {
 	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();
-
-	m_pShadow = CShadow::Create(GetPos(), D3DXVECTOR3(30.0f, 0.0f, 30.0f), 100);
-	m_pShadow->SetLifeNone(true);
 
 	m_pModel[0] = CModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), CModel::MODEL_FOKKO);
 
@@ -128,13 +126,16 @@ void CPlayer::Update()
 	m_objpos += m_move;
 	auto posOld = m_objpos;
 
-	//床判定の上だった場合
-	if (m_bCollision)
+	CMeshField *pMesh = CApplication::GetInstance()->GetMeshField();
+	bool collision = pMesh->Collision(m_objpos);
+
+	if (collision)
 	{
-		m_objpos.y = posOld.y;
+		D3DXVECTOR3 collisionPos =  pMesh->GetHitPos();
+		m_objpos = D3DXVECTOR3(collisionPos.x, collisionPos.y + 1.5f, collisionPos.z);
+		m_meshIdx = pMesh->GetPointIdx();
 		m_bJump = true;
 	}
-
 	else
 	{
 		m_move.y -= 0.5f;
@@ -196,25 +197,12 @@ void CPlayer::Update()
 
 	if (CApplication::GetInstance()->GetInputKeyboard()->GetTrigger(DIK_SPACE))
 	{
-		if (m_bJump)
-		{
- 			m_move.y = ((m_move.y + 20.0f) - m_move.y) * 0.4f;
-		}
+ 		m_move.y = ((m_move.y + 20.0f) - m_move.y) * 0.4f;
 	}
 
 	if (m_bCollision)
 	{
-		m_pShadow->SetScale(D3DXVECTOR3(30.0f, 0.0f, 30.0f));
-
 		if(m_objpos.y < m_Collisionpos.y) m_objpos.y = m_Collisionpos.y;
-	}
-
-	else if(!m_bCollision)
-	{
-		//落ちる速度が０より上だった場合、影が縮小
-		if (m_move.y > 0) m_pShadow->SetScaleDown(true);
-		//落ちる速度が-３より下だった場合、影が拡大
-		else if (m_move.y < -3) m_pShadow->SetScaleDown(false);
 	}
 
 	BackBased(-300.0f);
@@ -238,8 +226,6 @@ void CPlayer::Update()
 
 	//モデルの回転の慣性
 	m_rot.y += (m_rotDest.y - m_rot.y) * 0.1f;
-
-	m_pShadow->SetPos(D3DXVECTOR3(m_objpos.x / 2, m_Collisionpos.y, m_objpos.z / 2));
 
 	//こいつがやりました↓
 	//m_pShadow->SetZBuff(D3DCMP_EQUAL);

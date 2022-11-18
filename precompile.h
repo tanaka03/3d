@@ -23,4 +23,9 @@
 #define DIRECTINPUT_VERSION (0x0800)
 #include <dinput.h>
 
+// スクリーンの幅
+const int SCREEN_WIDTH = 1280;
+// スクリーンの高さ
+const int SCREEN_HEIGHT = 720;
+
 #endif // PRECOMPILE_H_

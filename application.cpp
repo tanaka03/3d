@@ -11,10 +11,12 @@
 #include "player.h"
 #include "file.h"
 #include "model.h"
+#include "myimgui.h"
 
 #include "meshfield.h"
 #include "cylinder.h"
 #include "sphere.h"
+#include "ball.h"
 
 #include "debugproc.h"
 
@@ -72,6 +74,10 @@ HRESULT CApplication::Init(HWND hWnd, HINSTANCE hInstance)
 	m_pTexture = new CTexture;
 	m_pTexture->LoadAll();
 
+	//Imgui
+	m_pMyImgui = new CMyImgui;
+	m_pMyImgui->Init();
+
 	//ライトクラスの生成
 	m_pLight = new CLight;
 	m_pLight->Init();
@@ -83,7 +89,9 @@ HRESULT CApplication::Init(HWND hWnd, HINSTANCE hInstance)
 	//m_pPolygon = CPolygon::Create(D3DXVECTOR3(0.0f, 0.0f,0.0f));
 	m_pPlayer = CPlayer::Create(D3DXVECTOR3(100.0f, 0.0f, -100.0f));
 
-	CMeshField::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(25.0f,0.0f, 25.0f), 50, 50);
+	CBall::Create(D3DXVECTOR3(100.0f, 0.0f, -100.0f));
+
+	m_pMesh = CMeshField::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(25.0f,0.0f, 25.0f), 50, 50);
 	//CCylinder::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), 10.0f, 25.0f, 10, 10);
 	//CSphere::Create(D3DXVECTOR3(50.0f, 0.0f, 0.0f), 30.0f, 30, 30);
 	return S_OK;
@@ -103,6 +111,15 @@ void CApplication::Uninit()
 #endif
 
 	CObject::ReleaseAll();
+
+	//Imgui
+	if (m_pMyImgui != nullptr)
+	{
+		m_pMyImgui->Uninit();
+
+		delete m_pMyImgui;
+		m_pMyImgui = nullptr;
+	}
 
 	//テクスチャクラスの破棄
 	if (m_pTexture != nullptr)
@@ -174,6 +191,7 @@ void CApplication::Update()
 	}
 
 	m_pRenderer->Update();
+	m_pMyImgui->Update();
 	m_pCamera->Update();
 
 	//ワイヤーフレームにする処理
