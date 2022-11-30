@@ -10,11 +10,13 @@
 #include "application.h"
 #include "player.h"
 #include "meshfield.h"
+#include "model.h"
 
 CMyImgui::CMyImgui() : 
 	show_demo_window(true),
 	show_another_window(false)
 {
+	m_modelScale = D3DXVECTOR3(1.0f,1.0f,1.0f);
 }
 
 CMyImgui::~CMyImgui()
@@ -52,8 +54,9 @@ bool CMyImgui::ImGuiText(bool show_demo_window, bool show_another_window)
 
 	CPlayer *pPlayer = CApplication::GetInstance()->GetPlayer();
 	m_pMesh = CApplication::GetInstance()->GetMeshField();
-
 	m_meshPos = m_pMesh->GetIdxPos(pPlayer->GetMeshIdx());
+
+	static int ButtonCnt = 0;
 
 	//ImGuiのスタイル変更
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -69,12 +72,44 @@ bool CMyImgui::ImGuiText(bool show_demo_window, bool show_another_window)
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
 		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too
-		//ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
 
-		ImGui::DragFloat3("MeshPos", m_meshPos, 0.1f, -100.0f, 500.0f );
-		if (m_pMesh != nullptr)
+		if (ImGui::CollapsingHeader("Mesh"))
 		{
-			m_pMesh->SetIdxPos(m_meshPos, pPlayer->GetMeshIdx());
+			//メッシュの位置
+			ImGui::DragFloat3("MeshPos", m_meshPos, 0.1f, -100.0f, 500.0f);
+			if (m_pMesh != nullptr)
+			{
+				m_pMesh->SetIdxPos(m_meshPos, pPlayer->GetMeshIdx());
+			}
+
+			if (ImGui::Button("+")) ButtonCnt++;
+			ImGui::SameLine();
+
+			if (ImGui::Button("-")) ButtonCnt--;
+
+			ImGui::Text("%d", ButtonCnt);
+			switch (ButtonCnt)
+			{
+			case 1:
+				m_pMesh->BindTexture("STAR");
+				break;
+			case 2:
+				m_pMesh->BindTexture("EFFECT_0");
+				break;
+			case 3:
+				m_pMesh->BindTexture("GRASS_01");
+				break;
+			case 4:
+				m_pMesh->BindTexture("BULLET");
+				break;
+			default:
+				m_pMesh->BindTexture("NONE");
+				break;
+			}
+
+			//メッシュの位置
+			ImGui::DragFloat3("ModelScale", m_modelScale, 0.1f, -50.0f, 200.0f);
+			pPlayer->GetPlayerModel(1)->SetScale(m_modelScale);
 		}
 
 		//別ウィンドウを生成

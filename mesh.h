@@ -50,6 +50,7 @@ public:
 
 protected:
 	LPDIRECT3DINDEXBUFFER9 m_pIdxBuff;		//インデックスバッファへのポインタ
+	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;
 
 private:
 	LPDIRECT3DTEXTURE9 m_pTexture;

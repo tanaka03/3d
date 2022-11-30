@@ -38,7 +38,7 @@ HRESULT CCylinder::Init()
 
 	SetScale(D3DXVECTOR3(10.0f, 10.0f, 10.0f));
 
-	auto pos = GetPos();
+	D3DXVECTOR3 pos = GetPos();
 	int meshX = GetX();
 	int meshZ = GetZ();
 

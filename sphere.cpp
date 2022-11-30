@@ -35,7 +35,7 @@ HRESULT CSphere::Init()
 {
 	CMesh::Init();
 
-	auto pos = GetPos();
+	D3DXVECTOR3 pos = GetPos();
 	int meshX = GetX();
 	int meshZ = GetZ();
 

@@ -119,7 +119,7 @@ void CObjectX::Uninit()
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
 void CObjectX::Update()
 {
-	auto pos = GetPos();
+	D3DXVECTOR3 pos = GetPos();
 	pos += GetMove();
 	SetPos(pos);
 }
@@ -168,8 +168,6 @@ void CObjectX::Draw()
 
 	//マテリアルの設定
 	pDevice->SetMaterial(&pMat->MatD3D);
-
-	pDevice->SetFVF(FVF_VERTEX_3D);
 
 	//テクスチャの設定
 	pDevice->SetTexture(0, m_pTexture);

@@ -6,6 +6,8 @@
 
 #include "texture.h"
 
+class CLine;
+
 class CModel
 {
 public:
@@ -13,8 +15,14 @@ public:
 	{
 		MODEL_FOKKO,
 		MODEL_STAR,
+		MODEL_CYLINDER,
 		MODEL_MAX,
 		MODEL_NONE
+	};
+
+	struct PROPERTY
+	{
+		bool bLight;
 	};
 
 	static const char* s_FileName[];	// ファイルパス
@@ -35,8 +43,12 @@ public:
 	//セッター
 	void SetPosOffset(D3DXVECTOR3 pos) { m_posOffset = pos; }
 	void SetRotOffset(D3DXVECTOR3 rot) { m_rotOffset = rot; }
+	void SetModelPos(D3DXVECTOR3 pos) { m_modelPos = pos; }
+	void SetScale(D3DXVECTOR3 scale) { m_scale = scale; }
+	void SetAlphaTest(D3DCMPFUNC func) { m_AlphaFunc = func; }
 	void SetModel(MODEL model) { m_model = model; }
 	void SetParent(CModel* model) { m_pParent = model; }
+	void SetProperty(bool light);
 
 	//ゲッター
 	CModel GetParent() { return *m_pParent; }
@@ -55,12 +67,20 @@ private:
 	LPD3DXBUFFER m_buffMat;
 	DWORD m_dwNum;
 	LPD3DXMESH m_mesh;
+	D3DCMPFUNC m_AlphaFunc;
 	MODEL m_model;
+	PROPERTY m_property;
 	CModel *m_pParent;
+	CLine *m_pLine[12];
 	D3DXVECTOR3 m_posOffset;
 	D3DXVECTOR3 m_rotOffset;
 	D3DXVECTOR3 m_startPos;
 	D3DXVECTOR3 m_startRot;
+	D3DXVECTOR3 m_scale;
+	D3DXVECTOR3 m_modelPos;
+	D3DXVECTOR3 m_modelSize;
+	D3DXVECTOR3 m_maxModel;
+	D3DXVECTOR3 m_minModel;
 	D3DXMATRIX m_mtxWorld;
 	bool m_bRelease;
 };

@@ -61,6 +61,12 @@ HRESULT CPlayer::Init()
 
 	m_pModel[0] = CModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), CModel::MODEL_FOKKO);
 
+	m_pModel[1] = CModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), CModel::MODEL_CYLINDER);
+	m_pModel[1]->BindTexture("EFFECT_0");
+
+	m_pModel[1]->SetProperty(true);
+	m_pModel[1]->SetAlphaTest(D3DCMP_NOTEQUAL);
+
 	//m_pModel[1] = CModel::Create(D3DXVECTOR3(20.0f,20.0f, 20.0f),D3DXVECTOR3(0.0f,0.0f,0.0f),CModel::MODEL_STAR);
 	//m_pModel[1]->SetParent(m_pModel[0]);
 	//m_KeySet[0].nFrame = 60;
@@ -124,7 +130,7 @@ void CPlayer::Update()
 	CCamera *pCamera = CApplication::GetInstance()->GetCamera();
 	CCamera::CAMERA *camera = pCamera->GetCamera();
 	m_objpos += m_move;
-	auto posOld = m_objpos;
+	D3DXVECTOR3 posOld = m_objpos;
 
 	CMeshField *pMesh = CApplication::GetInstance()->GetMeshField();
 	bool collision = pMesh->Collision(m_objpos);
@@ -132,7 +138,7 @@ void CPlayer::Update()
 	if (collision)
 	{
 		D3DXVECTOR3 collisionPos =  pMesh->GetHitPos();
-		m_objpos = D3DXVECTOR3(collisionPos.x, collisionPos.y + 1.5f, collisionPos.z);
+		m_objpos = D3DXVECTOR3(m_objpos.x, collisionPos.y + 1.5f, m_objpos.z);
 		m_meshIdx = pMesh->GetPointIdx();
 		m_bJump = true;
 	}
@@ -205,6 +211,8 @@ void CPlayer::Update()
 		if(m_objpos.y < m_Collisionpos.y) m_objpos.y = m_Collisionpos.y;
 	}
 
+	m_pModel[0]->SetModelPos(m_objpos);
+
 	BackBased(-300.0f);
 
 #ifdef _DEBUG
@@ -222,10 +230,13 @@ void CPlayer::Update()
 		m_rotDest.y += D3DX_PI * 2;
 	}
 
-	Motion(1);
+	//Motion(1);
 
 	//モデルの回転の慣性
 	m_rot.y += (m_rotDest.y - m_rot.y) * 0.1f;
+
+	m_rotate.y += 0.2f;
+	m_pModel[1]->SetRotOffset(m_rotate);
 
 	//こいつがやりました↓
 	//m_pShadow->SetZBuff(D3DCMP_EQUAL);
@@ -241,6 +252,16 @@ void CPlayer::Update()
 	else if (m_rot.y < -D3DX_PI)
 	{
 		m_rot.y += D3DX_PI * 2;
+	}
+
+	//モデルの更新
+	for (int i = 0; i < MaxParts; i++)
+	{
+		if (m_pModel[i] == nullptr)
+		{
+			continue;
+		}
+		m_pModel[i]->Update();
 	}
 }
 

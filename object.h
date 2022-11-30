@@ -6,8 +6,6 @@
 
 #include "renderer.h"
 
-#define MAX_OBJECT	(1024)
-
 class CObject
 {
 public:
@@ -46,10 +44,6 @@ public:
 
 protected:
 	void Release();
-	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;
-	LPD3DXBUFFER m_buffMat;
-	DWORD m_dwNum;
-	LPD3DXMESH m_mesh;
 
 private:
 	//static std::list<CObject*> m_lst;
@@ -64,6 +58,11 @@ private:
 	int m_nID;			//äiî[êÊÇÃî‘çÜ
 
 	bool m_bDestroy = false;
+
+	//LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;
+	//LPD3DXBUFFER m_buffMat;
+	//DWORD m_dwNum;
+	//LPD3DXMESH m_mesh;
 };
 
 #endif

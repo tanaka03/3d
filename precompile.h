@@ -24,8 +24,8 @@
 #include <dinput.h>
 
 // スクリーンの幅
-const int SCREEN_WIDTH = 1280;
+constexpr int SCREEN_WIDTH = 1280;
 // スクリーンの高さ
-const int SCREEN_HEIGHT = 720;
+constexpr int SCREEN_HEIGHT = 720;
 
 #endif // PRECOMPILE_H_

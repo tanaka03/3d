@@ -188,19 +188,19 @@ bool CMesh::Collision(D3DXVECTOR3 pos)
 		}
 
 		//頂点の位置
-		auto posA = pVtx[pIdx[i]].pos;
-		auto posB = pVtx[pIdx[i + 1]].pos;
-		auto posC = pVtx[pIdx[i + 2]].pos;
+		D3DXVECTOR3 posA = pVtx[pIdx[i]].pos;
+		D3DXVECTOR3 posB = pVtx[pIdx[i + 1]].pos;
+		D3DXVECTOR3 posC = pVtx[pIdx[i + 2]].pos;
 
 		//頂点のベクトル
-		auto vecA = posB - posA;
-		auto vecB = posC - posB;
-		auto vecC = posA - posC;
+		D3DXVECTOR3 vecA = posB - posA;
+		D3DXVECTOR3 vecB = posC - posB;
+		D3DXVECTOR3 vecC = posA - posC;
 
 		//ポリゴンの頂点とプレイヤーの位置のベクトル
-		auto DistanceA = pos - posA;
-		auto DistanceB = pos - posB;
-		auto DistanceC = pos - posC;
+		D3DXVECTOR3 DistanceA = pos - posA;
+		D3DXVECTOR3 DistanceB = pos - posB;
+		D3DXVECTOR3 DistanceC = pos - posC;
 
 		//ポリゴンの頂点のベクトルとプレイヤーから頂点のベクトルの計算結果
 		float fResult1 = vecA.x * DistanceA.z - vecA.z * DistanceA.x;
@@ -217,8 +217,8 @@ bool CMesh::Collision(D3DXVECTOR3 pos)
 			m_meshPt = i;
 
 		 //メッシュの判定
-			auto V1 = posB - posA;
-			auto V2 = posC - posA;
+			D3DXVECTOR3 V1 = posB - posA;
+			D3DXVECTOR3 V2 = posC - posA;
 			D3DXVECTOR3 normal;
 
 			D3DXVec3Cross(&normal, &V2, &V1);
@@ -242,7 +242,6 @@ void CMesh::SetIdxPos(D3DXVECTOR3 pos, int idx)
 	WORD *pIdx;
 	m_pIdxBuff->Lock(0, 0, (void**)&pIdx, 0);
 
-
 	//頂点バッファをロック
 	VERTEX_3D *pVtx = nullptr;
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
@@ -261,7 +260,6 @@ D3DXVECTOR3 CMesh::GetIdxPos(int idx)
 	//インデックスバッファをロック
 	WORD *pIdx;
 	m_pIdxBuff->Lock(0, 0, (void**)&pIdx, 0);
-
 
 	//頂点バッファをロック
 	VERTEX_3D *pVtx = nullptr;

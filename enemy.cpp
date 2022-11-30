@@ -81,7 +81,7 @@ void CEnemy::Update()
 {
 	CObjectX::Update();
 	m_pos = GetPos();
-	auto posOld = GetPos();
+	D3DXVECTOR3 posOld = GetPos();
 
 	//è∞îªíËÇÃè„ÇæÇ¡ÇΩèÍçá
 	if (m_bCollision)

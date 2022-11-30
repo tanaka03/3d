@@ -3,6 +3,7 @@
 #include "renderer.h"
 #include "light.h"
 #include "player.h"
+#include "line.h"
 
 using namespace std;
 
@@ -12,7 +13,8 @@ bool CModel::m_bLoaded[MODEL_MAX] = {};
 const char* CModel::s_FileName[] =
 {// テクスチャのパス
 	"data\\MODEL\\fokko.x",
-	"data\\MODEL\\star.x"
+	"data\\MODEL\\star.x",
+	"data\\MODEL\\Circle.x"
 };
 static_assert(sizeof(CModel::s_FileName) / sizeof(CModel::s_FileName[0]) == CModel::MODEL_MAX, "aho");
 
@@ -21,9 +23,12 @@ CModel::CModel() :
 	m_dwNum(), 
 	m_mesh(), 
 	m_pParent(), 
+	m_scale(D3DXVECTOR3(1.0f, 1.0f, 1.0f)),
+	m_AlphaFunc(D3DCMP_GREATER),
 	m_pTexture(nullptr)
 {
 	m_bRelease = false;
+	m_Data.resize(MODEL_MAX);
 }
 
 CModel::~CModel()
@@ -71,8 +76,118 @@ HRESULT CModel::Init()
 	//頂点バッファのロック
 	m_mesh->LockVertexBuffer(D3DLOCK_READONLY, (void**)&pVtxBuff);
 
+	for (int i = 0; i < nNumVtx; i++)
+	{
+		//頂点座標の代入
+		D3DXVECTOR3 vtx = *(D3DXVECTOR3*)pVtxBuff;
+
+		//X
+		if (vtx.x > m_maxModel.x)
+		{
+			m_maxModel.x = floorf(vtx.x);
+		}
+
+		if (vtx.x < m_minModel.x)
+		{
+			m_minModel.x = floorf(vtx.x);
+		}
+
+		//Y
+		if (vtx.y > m_maxModel.y)
+		{
+			m_maxModel.y = floorf(vtx.y);
+		}
+
+		if (vtx.y < m_minModel.y)
+		{
+			m_minModel.y = floorf(vtx.y);
+		}
+
+		//Z
+		if (vtx.z > m_maxModel.z)
+		{
+			m_maxModel.z = floorf(vtx.z);
+		}
+
+		if (vtx.z < m_minModel.z)
+		{
+			m_minModel.z = floorf(vtx.z);
+		}
+		//頂点フォーマットのサイズ分ポインタを進める
+		pVtxBuff += sizeFVF;
+	}
+
+	//モデルサイズ
+	m_modelSize.x = m_maxModel.x - m_minModel.x;
+	m_modelSize.y = m_maxModel.y - m_minModel.y;
+	m_modelSize.z = m_maxModel.z - m_minModel.z;
+
 	//頂点バッファのアンロック
 	m_mesh->UnlockVertexBuffer();
+
+	//======================
+	//判定の線
+	//======================
+	//下四角
+	m_pLine[0] = CLine::Create(m_posOffset, m_minModel,
+	D3DXVECTOR3(m_maxModel.x, m_minModel.y, m_minModel.z),
+	D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	m_pLine[1] = CLine::Create(m_posOffset, m_minModel,
+	D3DXVECTOR3(m_minModel.x, m_minModel.y, m_maxModel.z),
+	D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	m_pLine[2] = CLine::Create(m_posOffset,
+	D3DXVECTOR3(m_maxModel.x, m_minModel.y, m_maxModel.z),
+	D3DXVECTOR3(m_minModel.x, m_minModel.y, m_maxModel.z),
+	D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	m_pLine[3] = CLine::Create(m_posOffset,
+	D3DXVECTOR3(m_maxModel.x, m_minModel.y, m_maxModel.z),
+	D3DXVECTOR3(m_maxModel.x, m_minModel.y, m_minModel.z),
+	D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	//縦棒
+	m_pLine[4] = CLine::Create(m_posOffset,
+	D3DXVECTOR3(m_minModel.x, m_minModel.y, m_minModel.z),
+	D3DXVECTOR3(m_minModel.x, m_maxModel.y, m_minModel.z),
+	D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	m_pLine[5] = CLine::Create(m_posOffset,
+	D3DXVECTOR3(m_maxModel.x, m_minModel.y, m_minModel.z),
+	D3DXVECTOR3(m_maxModel.x, m_maxModel.y, m_minModel.z),
+	D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	m_pLine[6] = CLine::Create(m_posOffset,
+	D3DXVECTOR3(m_minModel.x, m_minModel.y, m_maxModel.z),
+	D3DXVECTOR3(m_minModel.x, m_maxModel.y, m_maxModel.z),
+	D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	m_pLine[7] = CLine::Create(m_posOffset,
+	D3DXVECTOR3(m_maxModel.x, m_minModel.y, m_maxModel.z),
+	D3DXVECTOR3(m_maxModel.x, m_maxModel.y, m_maxModel.z),
+	D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	//上四角
+	m_pLine[8] = CLine::Create(m_posOffset,
+	D3DXVECTOR3(m_minModel.x, m_maxModel.y, m_minModel.z),
+	D3DXVECTOR3(m_maxModel.x, m_maxModel.y, m_minModel.z),
+	D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	m_pLine[9] = CLine::Create(m_posOffset,
+	D3DXVECTOR3(m_minModel.x, m_maxModel.y, m_minModel.z),
+	D3DXVECTOR3(m_minModel.x, m_maxModel.y, m_maxModel.z),
+	D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	m_pLine[10] = CLine::Create(m_posOffset,
+	D3DXVECTOR3(m_maxModel.x, m_maxModel.y, m_maxModel.z),
+	D3DXVECTOR3(m_minModel.x, m_maxModel.y, m_maxModel.z),
+	D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	m_pLine[11] = CLine::Create(m_posOffset,
+	D3DXVECTOR3(m_maxModel.x, m_maxModel.y, m_maxModel.z),
+	D3DXVECTOR3(m_maxModel.x, m_maxModel.y, m_minModel.z),
+	D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 
 	return S_OK;
 }
@@ -93,11 +208,29 @@ void CModel::Release()
 		m_buffMat = nullptr;
 	}
 
+	for (int i = 0; i < 12; i++)
+	{
+		if (m_pLine[i] != nullptr)
+		{
+			m_pLine[i]->Uninit();
+			delete m_pLine[i];
+		}
+	}
+
 	delete this;
 }
 
 void CModel::Update()
 {
+	for (int i = 0; i < 12; i++)
+	{
+		if (m_pLine[i] == nullptr)
+		{
+			continue;
+		}
+		m_pLine[i]->SetPos(m_modelPos);
+		m_pLine[i]->Update();
+	}
 }
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
@@ -105,11 +238,10 @@ void CModel::Update()
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
 void CModel::Draw()
 {
-	CTexture* pTexture = CApplication::GetInstance()->GetTexture();
 	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();	//デバイスの取得
 	D3DXMATRIX parent;
 
-	D3DXMATRIX mtxRot, mtxTrans;				//計算用マトリックス
+	D3DXMATRIX mtxRot, mtxTrans, mtxScale;		//計算用マトリックス
 	D3DMATERIAL9 matDef;						//現在のマテリアルを保存
 	D3DXMATERIAL *pMat;							//マテリアルデータへのポインタ
 
@@ -127,6 +259,10 @@ void CModel::Draw()
 	D3DXMatrixTranslation(&mtxTrans, m_posOffset.x, m_posOffset.y, m_posOffset.z);
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
 
+	// 行列拡縮関数
+	D3DXMatrixScaling(&mtxScale, m_scale.x, m_scale.y, m_scale.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxScale);
+
 	//親のマトリックスとかけ合わせる
 	if (m_pParent != nullptr)
 	{
@@ -140,10 +276,28 @@ void CModel::Draw()
 
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &parent);
 
+	for (int i = 0; i < 12; i++)
+	{
+		if (m_pLine[i] == nullptr)
+		{
+			continue;
+		}
+		m_pLine[i]->Draw();
+	}
+
 	//Zテスト
 	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
 	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 
+	//アルファテスト
+	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+	pDevice->SetRenderState(D3DRS_ALPHAREF, 0);
+	pDevice->SetRenderState(D3DRS_ALPHAFUNC, m_AlphaFunc);
+
+	//ライトを無効にする
+	if (m_property.bLight)
+		pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+	
 	//モデルの影
 	//Shadow();
 
@@ -169,6 +323,15 @@ void CModel::Draw()
 
 	//保持していたマテリアルを戻す
 	pDevice->SetMaterial(&matDef);
+
+	//ライトを有効にする
+	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
+
+	//アルファテストを無効
+	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+
+	//テクスチャの設定を戻す
+	pDevice->SetTexture(0, NULL);
 }
 
 void CModel::Shadow()
@@ -263,10 +426,15 @@ void CModel::Load(MODEL model)
 		&m_mesh);
 
 	m_bLoaded[model] = true;
-	m_Data.push_back(this);
+	m_Data.insert(m_Data.begin() + model, this);
 }
 
 void CModel::BindTexture(std::string inPath)
 {
 	m_pTexture = CApplication::GetInstance()->GetTexture()->GetTexture(inPath);		//テクスチャのポインタ
+}
+
+void CModel::SetProperty(bool light)
+{
+	m_property.bLight = light;
 }

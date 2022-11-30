@@ -38,6 +38,12 @@ public:
 	D3DXCOLOR GetCol() { return m_col; }
 	bool GetDestroy() override { return m_bRelease; }
 
+protected:
+	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;
+	LPD3DXBUFFER m_buffMat;
+	LPD3DXMESH m_mesh;
+	DWORD m_dwNum;
+
 private:
 	LPDIRECT3DTEXTURE9 m_pTexture;
 	D3DXVECTOR3 m_objpos;

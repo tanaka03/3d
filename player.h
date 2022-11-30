@@ -48,9 +48,14 @@ public:
 	bool GetCollision() { return m_bCollision; }
 	bool GetDestroy() override { return m_bRelease; }
 	int GetMeshIdx() { return m_meshIdx; }
+	CModel *GetPlayerModel(int idx) { return m_pModel[idx]; }
 
 private:
 	static const int MaxParts = 3;
+
+	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;
+	LPD3DXMESH m_mesh;
+	LPD3DXBUFFER m_buffMat;
 
 	D3DXVECTOR3 m_objpos;
 	D3DXVECTOR3 m_Collisionpos;
@@ -71,6 +76,8 @@ private:
 	bool m_bCollision;
 	bool m_bJump;
 	bool m_bRelease;
+
+	D3DXVECTOR3 m_rotate;
 };
 
 #endif

@@ -2,6 +2,9 @@
   "TEXTURE": [
     [ "BULLET", "data\/TEXTURE\/bullet000.png" ],
     [ "GRASS_01", "data\/TEXTURE\/grass.jpg" ],
+    [ "STAR", "data\/TEXTURE\/star.png" ],
+    [ "FLARE", "data\/TEXTURE\/flare.png" ],
+    [ "EFFECT_0", "data\/TEXTURE\/211_20221127224616.png" ],
     [ "SHADOW", "data\/TEXTURE\/shadow000.jpg" ]
   ]
 }

@@ -61,7 +61,7 @@ HRESULT CBall::Init()
 		&m_mesh);
 
 	CObjectX::Init();
-	CObjectX::BindTexture("GRASS_01");
+	CObjectX::BindTexture("BULLET");
 
 	//m_pShadow = CShadow::Create(GetPos(), D3DXVECTOR3(30.0f, 0.0f, 30.0f), 100);
 	//m_pShadow->SetLifeNone(true);
@@ -89,11 +89,19 @@ void CBall::Update()
 	CMeshField *pMesh = CApplication::GetInstance()->GetMeshField();
 	bool collision = pMesh->Collision(m_pos);
 
-	float fSpeed = 0.2f;
+	float fSpeed = 3.0f;
+	float length = GetMaxModel().y - GetMinModel().y;
+
+	//ボールの回転
+	auto Rotate = [length, fSpeed]() {
+		float pi = length * D3DX_PI;
+		float rotate = fSpeed / pi * (D3DX_PI * 2);
+		return rotate;
+	};
 
 	if (collision)
 	{
-		m_pos = pMesh->GetHitPos();
+		m_pos = D3DXVECTOR3(m_pos.x, pMesh->GetHitPos().y, m_pos.z);
 	}
 
 	if (m_bCollision)
@@ -106,6 +114,9 @@ void CBall::Update()
 	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_UP))
 	{
 		m_pos.z -= fSpeed;
+
+		//ボールの回転
+		m_rot.x += Rotate();
 
 		//右奥
 		if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_RIGHT))
@@ -121,6 +132,9 @@ void CBall::Update()
 	{
 		m_pos.z += fSpeed;
 
+		//ボールの回転
+		m_rot.x -= Rotate();
+
 		//右後
 		if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_RIGHT))
 			m_pos.x -= fSpeed;
@@ -134,12 +148,18 @@ void CBall::Update()
 	else if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_RIGHT))
 	{
 		m_pos.x -= fSpeed;
+
+		//ボールの回転
+		m_rot.z -= Rotate();
 	}
 
 	//左
 	else if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_LEFT))
 	{
 		m_pos.x += fSpeed;
+
+		//ボールの回転
+		m_rot.z += Rotate();
 	}
 
 	//目的の方向の正規化
@@ -148,19 +168,6 @@ void CBall::Update()
 
 	else if (m_rotDest.y - m_rot.y < -D3DX_PI)
 		m_rotDest.y += D3DX_PI * 2;
-
-	float length = GetMaxModel().y - GetMinModel().y;;
-
-	//ボールの回転
-	if (m_pos != posOld)
-	{
-		float pi = length * D3DX_PI;
-		float move = ((2 * D3DX_PI) / 360) * pi;
-		float rotate = length * ((2 * D3DX_PI) / 360);
-
-		//モデルの回転の慣性
-		m_rot.z += rotate;
-	}
 
 	SetPos(D3DXVECTOR3(m_pos.x, m_pos.y + length, m_pos.z));
 	SetMove(m_move);

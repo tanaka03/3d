@@ -32,8 +32,8 @@ HRESULT CMeshField::Init()
 {
 	CMesh::Init();
 
-	auto pos = GetPos();
-	auto scale = GetScale();
+	D3DXVECTOR3 pos = GetPos();
+	D3DXVECTOR3 scale = GetScale();
 	int meshX = GetX();
 	int meshZ = GetZ();
 	m_MeshField_VertexNum = GetVtxNum();

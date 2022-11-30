@@ -47,6 +47,9 @@ public:
 	float GetHeight() { return m_Height; }
 	bool GetDestroy() override { return m_bRelease; }
 
+protected:
+	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;
+
 private:
 	LPDIRECT3DTEXTURE9 m_pTexture;
 	D3DXVECTOR3 m_objpos;

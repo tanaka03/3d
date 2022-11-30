@@ -23,6 +23,8 @@ private:
 
 	D3DXVECTOR3 m_meshPos;
 
+	D3DXVECTOR3 m_modelScale;
+
 	bool show_demo_window = true;
 	bool show_another_window = false;
 };
