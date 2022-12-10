@@ -20,6 +20,12 @@
 #pragma comment(lib,"dinput8.lib")
 #pragma comment(lib,"dxguid.lib")
 
+//fbx
+#pragma comment(lib,"libfbxsdk-md.lib")
+#pragma comment(lib,"libxml2-md.lib")
+#pragma comment(lib,"zlib-md.lib")
+#include <fbxsdk.h>
+
 #define DIRECTINPUT_VERSION (0x0800)
 #include <dinput.h>
 

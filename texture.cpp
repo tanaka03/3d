@@ -37,7 +37,7 @@ void CTexture::LoadAll()
 {
 	nlohmann::json list = CFile::LoadJsonStage(L"Data/FILE/texture.json");
 
-	for (int i = 0; i < (int)list["TEXTURE"].size(); ++i)
+	for (int i = 0; i < (int)list["TEXTURE"].size(); i++)
 	{
 		m_texturePath.insert(std::make_pair(list["TEXTURE"].at(i)[0], list["TEXTURE"].at(i)[1]));
 	}
@@ -56,7 +56,6 @@ void CTexture::Load(std::string inKey, std::string inFileName)
 	D3DXCreateTextureFromFile(pDevice, &fileName.front(), &texture);
 
 	assert(texture != nullptr);	// テクスチャのURLがないかキーが間違ってる。
-
 
 	if (!ExistsKey(inKey))
 	{

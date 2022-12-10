@@ -51,6 +51,10 @@ void CCamera::Uninit()
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
 void CCamera::Update()
 {	
+	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();
+	CPlayer *pPlayer = CApplication::GetInstance()->GetPlayer();
+	D3DXMATRIX mtxTrans, mtxRot;
+
 	//===========================
 	//注視点
 	//===========================
@@ -58,16 +62,12 @@ void CCamera::Update()
 	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_Q))
 	{
 		m_camera.rot.y -= 0.05f;
-		m_camera.posR.x = m_camera.posV.x - sinf(m_camera.rot.y) * m_camera.fDistance;
-		m_camera.posR.z = m_camera.posV.z - cosf(m_camera.rot.y) * m_camera.fDistance;
 	}
 
 	//右
 	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_E))
 	{
 		m_camera.rot.y += 0.05f;
-		m_camera.posR.x = m_camera.posV.x - sinf(m_camera.rot.y) * m_camera.fDistance;
-		m_camera.posR.z = m_camera.posV.z - cosf(m_camera.rot.y) * m_camera.fDistance;
 	}
 
 	//===========================
@@ -89,115 +89,34 @@ void CCamera::Update()
 		m_camera.posV.z = m_camera.posR.z + cosf(m_camera.rot.y) * m_camera.fDistance;
 	}
 
-	//===========================
-	//カメラ移動
-	//===========================
-	//前
-	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_W))
-	{
-		m_camera.posV.x -= sinf(m_camera.rot.y) * 0.8f;
-		m_camera.posV.z -= cosf(m_camera.rot.y) * 0.8f;
-		m_camera.posR.x = m_camera.posV.x - sinf(m_camera.rot.y) * m_camera.fDistance;
-		m_camera.posR.z = m_camera.posV.z - cosf(m_camera.rot.y) * m_camera.fDistance;
-	}
-
-	//後
-	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_S))
-	{
-		m_camera.posV.x += sinf(m_camera.rot.y) * 0.8f;
-		m_camera.posV.z += cosf(m_camera.rot.y) * 0.8f;
-		m_camera.posR.x = m_camera.posV.x - sinf(m_camera.rot.y) * m_camera.fDistance;
-		m_camera.posR.z = m_camera.posV.z - cosf(m_camera.rot.y) * m_camera.fDistance;
-	}
-
-	//右
-	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_D))
-	{
-		m_camera.posV.x -= sinf(m_camera.rot.y + D3DX_PI * 0.5f) * 0.8f;
-		m_camera.posV.z -= cosf(m_camera.rot.y + D3DX_PI * 0.5f) * 0.8f;
-		m_camera.posR.x = m_camera.posV.x - sinf(m_camera.rot.y) * m_camera.fDistance;
-		m_camera.posR.z = m_camera.posV.z - cosf(m_camera.rot.y) * m_camera.fDistance;
-	}
-
-	//左
-	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_A))
-	{
-		m_camera.posV.x += sinf(m_camera.rot.y + D3DX_PI * 0.5f) * 0.8f;
-		m_camera.posV.z += cosf(m_camera.rot.y + D3DX_PI * 0.5f) * 0.8f;
-		m_camera.posR.x = m_camera.posV.x - sinf(m_camera.rot.y) * m_camera.fDistance;
-		m_camera.posR.z = m_camera.posV.z - cosf(m_camera.rot.y) * m_camera.fDistance;
-	}
-
-	//上昇
 	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_R))
 	{
-		m_camera.posV.y += sinf(m_camera.rot.x + D3DX_PI * 0.5f) * 0.8f;
-		m_camera.posV.y += cosf(m_camera.rot.z + D3DX_PI * 0.5f) * 0.8f;
+		m_camera.posV.y -= 0.5f;
+		m_camera.posV.z -= 1.5f;
 	}
 
-	//下降
 	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_F))
 	{
-		m_camera.posV.y -= sinf(m_camera.rot.x + D3DX_PI * 0.5f) * 0.8f;
-		m_camera.posV.y -= cosf(m_camera.rot.z + D3DX_PI * 0.5f) * 0.8f;
+		m_camera.posV.y += 0.5f;
+		m_camera.posV.z += 1.5f;
 	}
 
-	//上
-	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_I))
-	{
-		m_camera.rot.x -= 0.05f;
-		m_camera.posR.y = m_camera.posV.y - tanf(m_camera.rot.x) * m_camera.fDistance;
-	}
+	//ワールドマトリックスを初期化
+	D3DXMatrixIdentity(&m_mtxWorld);
 
-	//下
-	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_K))
-	{
-		m_camera.rot.x += 0.05f;
-		m_camera.posR.y = m_camera.posV.y - tanf(m_camera.rot.x) * m_camera.fDistance;
-	}
-	
-	if (CApplication::GetInstance()->GetInputKeyboard()->GetTrigger(DIK_Z))
-	{
-		m_bTraction = ((!m_bTraction) ? true : false);
-	}
+	//向きを反映
+	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_camera.rot.y, m_camera.rot.x, m_camera.rot.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
 
-	//===========================
-	//モデルに追従
-	//===========================
-	//if (m_bTraction)
-	//{
-	//	for (int i = 0; i < MAX_OBJECT; i++)
-	//	{
-	//		CObject *pObject = nullptr;
-	//		pObject = pObject->GetMyObject(i);
+	//位置を反映
+	D3DXMatrixTranslation(&mtxTrans, pPlayer->GetPos().x, pPlayer->GetPos().y, pPlayer->GetPos().z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
 
-	//		if (pObject == nullptr)
-	//		{
-	//			continue;
-	//		}
+	//ワールドマトリックスの設定
+	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
 
-	//		CObject::EObjType objType;
-	//		objType = pObject->GetObjType();
-
-	//		if (objType != CObject::OBJTYPE_PLAYER)
-	//		{
-	//			continue;
-	//		}
-	//		CPlayer *pPlayer = (CPlayer*)pObject;
-
-	//		m_camera.posR.x += (m_camera.posRDest.x - m_camera.posR.x) * 0.5f;
-	//		m_camera.posV.x += (m_camera.posVDest.x - m_camera.posV.x) * 0.5f;
-
-	//		m_camera.posR.z += (m_camera.posRDest.z - m_camera.posR.z) * 0.5f;
-	//		m_camera.posV.z += (m_camera.posVDest.z - m_camera.posV.z) * 0.5f;
-
-	//		m_camera.posRDest.x = pPlayer->GetPos().x + sinf(pPlayer->GetRot().y) * 0.5f;
-	//		m_camera.posRDest.z = pPlayer->GetPos().z + cosf(pPlayer->GetRot().y) * 0.5f;
-
-	//		m_camera.posVDest.x = pPlayer->GetPos().x + sinf(m_camera.rot.x) * m_camera.fDistance;
-	//		m_camera.posVDest.z = pPlayer->GetPos().z + cosf(m_camera.rot.z) * m_camera.fDistance;
-	//	}
-	//}
+	D3DXVec3TransformCoord(&m_worldposV, &m_camera.posV, &m_mtxWorld);
+	D3DXVec3TransformCoord(&m_worldposR, &m_camera.posR, &m_mtxWorld);
 
 	//======================
 	//正規化
@@ -210,19 +129,6 @@ void CCamera::Update()
 	else if (m_camera.rot.y < -D3DX_PI)
 	{
 		m_camera.rot.y += D3DX_PI * 2;
-	}
-
-	//======================
-	//なんかいろいろ
-	//======================
-	//初期の位置に戻す
-	if (CApplication::GetInstance()->GetInputKeyboard()->GetTrigger(DIK_F1) == true)
-	{
-		//視点・注視点・上方向を設定する
-		m_camera.posV = D3DXVECTOR3(0.0f, 150.0f, 300.0f);	//視点
-		m_camera.posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		//注視点
-		m_camera.vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);		//上方向ベクトル
-		m_camera.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		//向き
 	}
 }
 
@@ -238,8 +144,8 @@ void CCamera::SetCamera()
 
 	//ビューマトリックスの作成
 	D3DXMatrixLookAtLH(&m_camera.mtxView,
-		&m_camera.posV,
-		&m_camera.posR,
+		&m_worldposV,
+		&m_worldposR,
 		&m_camera.vecU);
 
 	//ビューマトリックスの設定
@@ -253,7 +159,7 @@ void CCamera::SetCamera()
 		D3DXToRadian(45.0f),
 		(float)SCREEN_WIDTH / (float)SCREEN_HEIGHT,
 		5.0f,
-		1000.0f);
+		10000.0f);
 
 	//プロジェクションマトリックスの設定
 	pDevice->SetTransform(D3DTS_PROJECTION, &m_camera.mtxProjection);

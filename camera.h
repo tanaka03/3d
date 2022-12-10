@@ -38,9 +38,14 @@ public:
 
 	//ゲッター
 	CAMERA *GetCamera(void) { return &m_camera; }
+	D3DXVECTOR3 GetWorldPosR() { return m_worldposR; }
 
 private:
 	CAMERA m_camera;
+	D3DXMATRIX m_mtxWorld;
+	D3DXVECTOR3 m_worldposV;	//視点
+	D3DXVECTOR3 m_worldposR;	//注視点
+
 	bool m_bTraction;
 };
 

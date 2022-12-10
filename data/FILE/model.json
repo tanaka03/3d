@@ -1,0 +1,8 @@
+{
+  "MODEL": [
+    [ "FOKKO", "data\\MODEL\\fokko.x" ],
+    [ "STAR", "data\\MODEL\\star.x" ],
+    [ "CIRCLE", "data\\MODEL\\Circle.x" ],
+    [ "UnityChan", "data/MODEL/unitychan.fbx"]
+  ]
+}

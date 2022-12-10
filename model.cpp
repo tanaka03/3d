@@ -4,77 +4,187 @@
 #include "light.h"
 #include "player.h"
 #include "line.h"
-
-using namespace std;
-
-vector<CModel*> CModel::m_Data;
-bool CModel::m_bLoaded[MODEL_MAX] = {};
-
-const char* CModel::s_FileName[] =
-{// テクスチャのパス
-	"data\\MODEL\\fokko.x",
-	"data\\MODEL\\star.x",
-	"data\\MODEL\\Circle.x"
-};
-static_assert(sizeof(CModel::s_FileName) / sizeof(CModel::s_FileName[0]) == CModel::MODEL_MAX, "aho");
+#include "file.h"
+#include "object3d.h"
 
 CModel::CModel() : 
-	m_buffMat(),
-	m_dwNum(), 
-	m_mesh(), 
 	m_pParent(), 
 	m_scale(D3DXVECTOR3(1.0f, 1.0f, 1.0f)),
-	m_AlphaFunc(D3DCMP_GREATER),
 	m_pTexture(nullptr)
 {
-	m_bRelease = false;
-	m_Data.resize(MODEL_MAX);
 }
 
 CModel::~CModel()
 {
 }
 
-CModel *CModel::Create(D3DXVECTOR3 posOffset, D3DXVECTOR3 rotOffset, MODEL parts)
+void CModel::Load(std::string str, std::string path)
 {
-	CModel *pModel = nullptr;
-	pModel = new CModel;
-
-	if (pModel != nullptr)
+	if (m_model.count(str) != 0)
 	{
-		pModel->SetPosOffset(posOffset);
-		pModel->SetRotOffset(rotOffset);
-		pModel->SetModel(parts);
-		pModel->Init();
+		return;
 	}
 
-	return pModel;
+	SModelData model = {};
+	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();	//デバイスの取得
+
+	std::string fileName = path;
+	std::string ext = std::strrchr(fileName.c_str(), '.');
+
+	if (ext == ".x")
+	{
+		//Xファイルの読み込み
+		D3DXLoadMeshFromX(&path.front(),
+			D3DXMESH_SYSTEMMEM,
+			pDevice,
+			NULL,
+			&model.buffMat,
+			NULL,
+			&model.dwNum,
+			&model.mesh);
+
+		int nNumVtx;		//頂点数
+		DWORD sizeFVF;		//頂点フォーマットのサイズ
+		BYTE *pVtxBuff;		//頂点バッファへのポインタ
+
+		//頂点数の取得
+		nNumVtx = model.mesh->GetNumVertices();
+
+		//頂点フォーマットのサイズを取得
+		sizeFVF = D3DXGetFVFVertexSize(model.mesh->GetFVF());
+
+		//頂点バッファのロック
+		model.mesh->LockVertexBuffer(D3DLOCK_READONLY, (void**)&pVtxBuff);
+
+		for (int i = 0; i < nNumVtx; i++)
+		{
+			//頂点座標の代入
+			D3DXVECTOR3 vtx = *(D3DXVECTOR3*)pVtxBuff;
+
+			//X
+			if (vtx.x > model.maxModel.x)
+			{
+				model.maxModel.x = floorf(vtx.x);
+			}
+
+			if (vtx.x < model.minModel.x)
+			{
+				model.minModel.x = floorf(vtx.x);
+			}
+
+			//Y
+			if (vtx.y > model.maxModel.y)
+			{
+				model.maxModel.y = floorf(vtx.y);
+			}
+
+			if (vtx.y < model.minModel.y)
+			{
+				model.minModel.y = floorf(vtx.y);
+			}
+
+			//Z
+			if (vtx.z > model.maxModel.z)
+			{
+				model.maxModel.z = floorf(vtx.z);
+			}
+
+			if (vtx.z < model.minModel.z)
+			{
+				model.minModel.z = floorf(vtx.z);
+			}
+			//頂点フォーマットのサイズ分ポインタを進める
+			pVtxBuff += sizeFVF;
+		}
+
+		//モデルサイズ
+		m_modelSize = D3DXVECTOR3(model.maxModel.x - model.minModel.x, model.maxModel.y - model.minModel.y, model.maxModel.z - model.minModel.z);
+
+		//頂点バッファのアンロック
+		model.mesh->UnlockVertexBuffer();
+	}
+
+#ifndef _DEBUG
+	SetLines();
+#endif // !_DEBUG
+
+	if (m_model.count(str) == 0)
+	{
+		m_model.insert(std::make_pair(str, model));
+	}
+	else
+	{
+		m_model[str] = model;
+	}
 }
 
-HRESULT CModel::Init()
+void CModel::Load(std::vector<std::string> data)
 {
-	m_startPos = m_posOffset;
-	m_startRot = m_rotOffset;
+	if (m_model.count(data[0]) != 0)
+	{
+		return;
+	}
 
-	Load(m_model);
+	std::string ext = std::strrchr(data[1].c_str(), '.');
 
-	int nNumVtx;		//頂点数
-	DWORD sizeFVF;		//頂点フォーマットのサイズ
-	BYTE *pVtxBuff;		//頂点バッファへのポインタ
+	if (ext == ".x")
+	{
+		Load_XFile(data);
+	}
 
-	//Xファイルで読み込んだ情報
-	m_mesh = m_Data.at(m_model)->m_mesh;
-	m_buffMat = m_Data.at(m_model)->m_buffMat;
-	m_dwNum = m_Data.at(m_model)->m_dwNum;
+	else if (ext == ".fbx")
+	{
+		Load_FbxFile(data);
+	}
+}
+
+void CModel::LoadAll()
+{
+	nlohmann::json list = CFile::LoadJsonStage(L"Data/FILE/model.json");
+
+	int size = (int)list["MODEL"].size();
+
+	std::string test = list["MODEL"][0][0];
+	for (int i = 0; i < size; i++)
+	{
+		Load(list["MODEL"].at(i));
+	}
+}
+
+void CModel::Load_XFile(std::vector<std::string> data)
+{
+	//デバイスの取得
+	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();
+
+	SModelData model = {};
+	std::string path = data[1];
+
+	model.minModel = D3DXVECTOR3(10000.0f, 10000.0f, 10000.0f);
+	model.maxModel = D3DXVECTOR3(-10000.0f, -10000.0f, -10000.0f);
+	model.modelMode = "xFile";
+
+	//Xファイルの読み込み
+	D3DXLoadMeshFromX(&path.front(),
+		D3DXMESH_SYSTEMMEM,
+		pDevice,
+		NULL,
+		&model.buffMat,
+		NULL,
+		&model.dwNum,
+		&model.mesh);
+
+	int nNumVtx;	// 頂点数保存用変数
+	DWORD sizeFVF;	// 頂点フォーマットのサイズ
+	BYTE *pVtxBuff;	// 頂点バッファへのポインタ
 
 	//頂点数の取得
-	nNumVtx = m_mesh->GetNumVertices();
+	nNumVtx = model.mesh->GetNumVertices();
 
 	//頂点フォーマットのサイズを取得
-	sizeFVF = D3DXGetFVFVertexSize(m_mesh->GetFVF());
+	sizeFVF = D3DXGetFVFVertexSize(model.mesh->GetFVF());
 
 	//頂点バッファのロック
-	m_mesh->LockVertexBuffer(D3DLOCK_READONLY, (void**)&pVtxBuff);
+	model.mesh->LockVertexBuffer(D3DLOCK_READONLY, (void**)&pVtxBuff);
 
 	for (int i = 0; i < nNumVtx; i++)
 	{
@@ -82,351 +192,419 @@ HRESULT CModel::Init()
 		D3DXVECTOR3 vtx = *(D3DXVECTOR3*)pVtxBuff;
 
 		//X
-		if (vtx.x > m_maxModel.x)
+		if (vtx.x > model.maxModel.x)
 		{
-			m_maxModel.x = floorf(vtx.x);
+			model.maxModel.x = floorf(vtx.x);
 		}
 
-		if (vtx.x < m_minModel.x)
+		if (vtx.x < model.minModel.x)
 		{
-			m_minModel.x = floorf(vtx.x);
+			model.minModel.x = floorf(vtx.x);
 		}
 
 		//Y
-		if (vtx.y > m_maxModel.y)
+		if (vtx.y >model.maxModel.y)
 		{
-			m_maxModel.y = floorf(vtx.y);
+			model.maxModel.y = floorf(vtx.y);
 		}
 
-		if (vtx.y < m_minModel.y)
+		if (vtx.y < model.minModel.y)
 		{
-			m_minModel.y = floorf(vtx.y);
+			model.minModel.y = floorf(vtx.y);
 		}
 
 		//Z
-		if (vtx.z > m_maxModel.z)
+		if (vtx.z > model.maxModel.z)
 		{
-			m_maxModel.z = floorf(vtx.z);
+			model.maxModel.z = floorf(vtx.z);
 		}
 
-		if (vtx.z < m_minModel.z)
+		if (vtx.z < model.minModel.z)
 		{
-			m_minModel.z = floorf(vtx.z);
+			model.minModel.z = floorf(vtx.z);
 		}
 		//頂点フォーマットのサイズ分ポインタを進める
 		pVtxBuff += sizeFVF;
 	}
 
 	//モデルサイズ
-	m_modelSize.x = m_maxModel.x - m_minModel.x;
-	m_modelSize.y = m_maxModel.y - m_minModel.y;
-	m_modelSize.z = m_maxModel.z - m_minModel.z;
+	m_modelSize = D3DXVECTOR3(model.maxModel.x - model.minModel.x, model.maxModel.y - model.minModel.y, model.maxModel.z - model.minModel.z);
 
 	//頂点バッファのアンロック
-	m_mesh->UnlockVertexBuffer();
+	model.mesh->UnlockVertexBuffer();
 
-	//======================
-	//判定の線
-	//======================
-	//下四角
-	m_pLine[0] = CLine::Create(m_posOffset, m_minModel,
-	D3DXVECTOR3(m_maxModel.x, m_minModel.y, m_minModel.z),
-	D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-
-	m_pLine[1] = CLine::Create(m_posOffset, m_minModel,
-	D3DXVECTOR3(m_minModel.x, m_minModel.y, m_maxModel.z),
-	D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-
-	m_pLine[2] = CLine::Create(m_posOffset,
-	D3DXVECTOR3(m_maxModel.x, m_minModel.y, m_maxModel.z),
-	D3DXVECTOR3(m_minModel.x, m_minModel.y, m_maxModel.z),
-	D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-
-	m_pLine[3] = CLine::Create(m_posOffset,
-	D3DXVECTOR3(m_maxModel.x, m_minModel.y, m_maxModel.z),
-	D3DXVECTOR3(m_maxModel.x, m_minModel.y, m_minModel.z),
-	D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-
-	//縦棒
-	m_pLine[4] = CLine::Create(m_posOffset,
-	D3DXVECTOR3(m_minModel.x, m_minModel.y, m_minModel.z),
-	D3DXVECTOR3(m_minModel.x, m_maxModel.y, m_minModel.z),
-	D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-
-	m_pLine[5] = CLine::Create(m_posOffset,
-	D3DXVECTOR3(m_maxModel.x, m_minModel.y, m_minModel.z),
-	D3DXVECTOR3(m_maxModel.x, m_maxModel.y, m_minModel.z),
-	D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-
-	m_pLine[6] = CLine::Create(m_posOffset,
-	D3DXVECTOR3(m_minModel.x, m_minModel.y, m_maxModel.z),
-	D3DXVECTOR3(m_minModel.x, m_maxModel.y, m_maxModel.z),
-	D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-
-	m_pLine[7] = CLine::Create(m_posOffset,
-	D3DXVECTOR3(m_maxModel.x, m_minModel.y, m_maxModel.z),
-	D3DXVECTOR3(m_maxModel.x, m_maxModel.y, m_maxModel.z),
-	D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-
-	//上四角
-	m_pLine[8] = CLine::Create(m_posOffset,
-	D3DXVECTOR3(m_minModel.x, m_maxModel.y, m_minModel.z),
-	D3DXVECTOR3(m_maxModel.x, m_maxModel.y, m_minModel.z),
-	D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-
-	m_pLine[9] = CLine::Create(m_posOffset,
-	D3DXVECTOR3(m_minModel.x, m_maxModel.y, m_minModel.z),
-	D3DXVECTOR3(m_minModel.x, m_maxModel.y, m_maxModel.z),
-	D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-
-	m_pLine[10] = CLine::Create(m_posOffset,
-	D3DXVECTOR3(m_maxModel.x, m_maxModel.y, m_maxModel.z),
-	D3DXVECTOR3(m_minModel.x, m_maxModel.y, m_maxModel.z),
-	D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-
-	m_pLine[11] = CLine::Create(m_posOffset,
-	D3DXVECTOR3(m_maxModel.x, m_maxModel.y, m_maxModel.z),
-	D3DXVECTOR3(m_maxModel.x, m_maxModel.y, m_minModel.z),
-	D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-
-	return S_OK;
-}
-
-void CModel::Release()
-{
-	//メッシュの解放
-	if (m_mesh = nullptr)
+	if (m_model.count(data[0]) == 0)
 	{
-		m_mesh->Release();
-		m_mesh = nullptr;
+		m_model.insert(std::make_pair(data[0], model));
 	}
-
-	//マテリアルの破棄
-	if (m_buffMat != nullptr)
-	{
-		m_buffMat->Release();
-		m_buffMat = nullptr;
-	}
-
-	for (int i = 0; i < 12; i++)
-	{
-		if (m_pLine[i] != nullptr)
-		{
-			m_pLine[i]->Uninit();
-			delete m_pLine[i];
-		}
-	}
-
-	delete this;
-}
-
-void CModel::Update()
-{
-	for (int i = 0; i < 12; i++)
-	{
-		if (m_pLine[i] == nullptr)
-		{
-			continue;
-		}
-		m_pLine[i]->SetPos(m_modelPos);
-		m_pLine[i]->Update();
-	}
-}
-
-//＝＝＝＝＝＝＝＝＝＝＝＝＝
-//オブジェクトXの描画
-//＝＝＝＝＝＝＝＝＝＝＝＝＝
-void CModel::Draw()
-{
-	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();	//デバイスの取得
-	D3DXMATRIX parent;
-
-	D3DXMATRIX mtxRot, mtxTrans, mtxScale;		//計算用マトリックス
-	D3DMATERIAL9 matDef;						//現在のマテリアルを保存
-	D3DXMATERIAL *pMat;							//マテリアルデータへのポインタ
-
-	//テクスチャの設定を戻す
-	pDevice->SetTexture(0, NULL);
-
-	//ワールドマトリックスを初期化
-	D3DXMatrixIdentity(&m_mtxWorld);
-
-	//向きを反映
-	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_rotOffset.y, m_rotOffset.x, m_rotOffset.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
-
-	//位置を反映
-	D3DXMatrixTranslation(&mtxTrans, m_posOffset.x, m_posOffset.y, m_posOffset.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
-
-	// 行列拡縮関数
-	D3DXMatrixScaling(&mtxScale, m_scale.x, m_scale.y, m_scale.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxScale);
-
-	//親のマトリックスとかけ合わせる
-	if (m_pParent != nullptr)
-	{
-		parent = m_pParent->GetMtxWorld();
-	}
-
 	else
 	{
-		pDevice->GetTransform(D3DTS_WORLD, &parent);
+		m_model[data[0]] = model;
 	}
+}
 
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &parent);
+void CModel::Load_FbxFile(std::vector<std::string> data)
+{
+	//デバイスの取得
+	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();
 
-	for (int i = 0; i < 12; i++)
+	SModelData model = {};
+	std::string path = data[1];
+
+	model.minModel = D3DXVECTOR3(10000.0f, 10000.0f, 10000.0f);
+	model.maxModel = D3DXVECTOR3(-10000.0f, -10000.0f, -10000.0f);
+	model.modelMode = "fbxFile";
+
+	//FbxManagerを生成
+	FbxManager *pManager = FbxManager::Create();
+
+	//IOSettingを生成
+	FbxIOSettings *pSettings = FbxIOSettings::Create(pManager, IOSROOT);
+	pManager->SetIOSettings(pSettings);
+
+	//Importerを生成
+	FbxImporter *pImporter = FbxImporter::Create(pManager, "Importer");
+
+	//シーンオブジェクトにFbxファイルの情報を流す
+	FbxScene *pScene = FbxScene::Create(pManager, "Scene");
+
+	if (pImporter->Initialize(path.c_str(), -1, pManager->GetIOSettings()) == false)
+	{	//Fbxの読み込みに失敗した場合
+		pManager->Destroy();
+		return;
+	}
+	pImporter->Import(pScene);
+	pImporter->Destroy();
+
+	//シーンオブジェクトの解析
+	FbxNode *pRootNode = pScene->GetRootNode();
+
+	std::map<std::string, FbxNode*, std::less<>> meshnode;
+
+	if (pRootNode)
 	{
-		if (m_pLine[i] == nullptr)
+		//ポリゴンを三角形で再生成
+		FbxGeometryConverter Converter(pManager);
+		Converter.Triangulate(pScene, true);
+
+		//ノードを探す処理
+		FbxCollectMeshNode(pRootNode, meshnode);
+
+		//モデルデータを取得する処理
+		for (int i = 0; i < m_nodeStr.size(); i++)
 		{
-			continue;
+			ExtractionModelData(model, meshnode, m_nodeStr[i]);
 		}
-		m_pLine[i]->Draw();
+
+		//マテリアルを取得する処理
+		ExtractionMaterial(pScene);
 	}
 
-	//Zテスト
-	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
-	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+	//FbxSceneの破棄
+	pScene->Destroy();
 
-	//アルファテスト
-	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-	pDevice->SetRenderState(D3DRS_ALPHAREF, 0);
-	pDevice->SetRenderState(D3DRS_ALPHAFUNC, m_AlphaFunc);
+	//FbxManagerの破棄
+	pManager->Destroy();
 
-	//ライトを無効にする
-	if (m_property.bLight)
-		pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
-	
-	//モデルの影
-	//Shadow();
-
-	//ワールドマトリックスの設定
-	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
-
-	//現在のマテリアルを保存
-	pDevice->GetMaterial(&matDef);
-
-	//マテリアルデータへのポインタを取得
-	pMat = (D3DXMATERIAL*)m_buffMat->GetBufferPointer();
-
-	pMat->MatD3D.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-
-	//マテリアルの設定
-	pDevice->SetMaterial(&pMat->MatD3D);
-
-	//テクスチャの設定
-	pDevice->SetTexture(0, m_pTexture);
-
-	//モデルパーツの描画
-	m_mesh->DrawSubset(0);
-
-	//保持していたマテリアルを戻す
-	pDevice->SetMaterial(&matDef);
-
-	//ライトを有効にする
-	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
-
-	//アルファテストを無効
-	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-
-	//テクスチャの設定を戻す
-	pDevice->SetTexture(0, NULL);
+	if (m_model.count(data[0]) == 0)
+	{
+		m_model.insert(std::make_pair(data[0], model));
+	}
+	else
+	{
+		m_model[data[0]] = model;
+	}
 }
 
-void CModel::Shadow()
+void CModel::FbxCollectMeshNode(FbxNode* node, std::map<std::string, FbxNode*, std::less<>>& list)
 {
-	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();	//デバイスの取得
-	D3DXVECTOR3 vecdir = CApplication::GetInstance()->GetLight()->GetVecDir();
-	D3DMATERIAL9 matDef;						//現在のマテリアルを保存
-	D3DXMATERIAL *pMat;							//マテリアルデータへのポインタ
-	D3DXMATRIX mtxShadow;
-	D3DXPLANE planeField;
-	D3DXVECTOR4 vecLight;
-	D3DXVECTOR3 pos, normal;
+	for (int i = 0; i < node->GetNodeAttributeCount(); i++)
+	{
+		FbxNodeAttribute* attr = node->GetNodeAttributeByIndex(i);
 
-	//シャドウマトリックスの初期化
-	D3DXMatrixIdentity(&mtxShadow);
+		switch (attr->GetAttributeType())
+		{
+		case FbxNodeAttribute::eMesh:	//メッシュだった場合
+			list[node->GetName()] = node;
+			m_nodeStr.push_back(node->GetName());
+			break;
+		}
+	}
 
-	vecLight = D3DXVECTOR4(-vecdir, 0.0f);
-
-	pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	normal = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-
-	D3DXPlaneFromPointNormal(&planeField, &pos, &normal);
-	D3DXMatrixShadow(&mtxShadow, &vecLight, &planeField);
-
-	D3DXMatrixMultiply(&mtxShadow, &mtxShadow, &m_mtxWorld);
-
-	//ステンシルバッファの有効
-	pDevice->SetRenderState(D3DRS_STENCILENABLE, true);
-
-	//ステンシルバッファと比較する
-	pDevice->SetRenderState(D3DRS_STENCILREF, 0x01);
-
-	//ステンシルバッファの値に対してのマスクの設定
-	pDevice->SetRenderState(D3DRS_STENCILMASK, 0xff);
-
-	//ステンシルテストの比較方法設定
-	pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_GREATEREQUAL);
-
-	//ステンシルテストの結果に対しての反映設定
-	pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_REPLACE);
-	pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);
-	pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP);
-
-	//カリング無効
-	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-
-	//ワールドマトリックスの設定
-	pDevice->SetTransform(D3DTS_WORLD, &mtxShadow);
-
-	//現在のマテリアルを保存
-	pDevice->GetMaterial(&matDef);
-
-	//マテリアルデータへのポインタを取得
-	pMat = (D3DXMATERIAL*)m_buffMat->GetBufferPointer();
-
-	pMat->MatD3D.Diffuse = D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f);
-	pMat->MatD3D.Emissive = D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f);
-
-	//マテリアルの設定
-	pDevice->SetMaterial(&pMat->MatD3D);
-
-	//モデルパーツの描画
-	m_mesh->DrawSubset(0);
-
-	//保持していたマテリアルを戻す
-	pDevice->SetMaterial(&matDef);
-
-	//ステンシルバッファの設定を戻す
-	pDevice->SetRenderState(D3DRS_STENCILENABLE, false);
-
-	//カリングの設定を戻す
-	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+	//子メッシュの再帰処理
+	for (int i = 0; i < node->GetChildCount(); i++)
+	{
+		FbxCollectMeshNode(node->GetChild(i), list);
+	}
 }
 
-void CModel::Load(MODEL model)
+void CModel::ExtractionModelData(SModelData& data, std::map<std::string, FbxNode*, std::less<>>& list, std::string str)
 {
-	if (m_bLoaded[model])
+	//デバイスの取得
+	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();
+
+	FbxMesh* mesh = list[str]->GetMesh();
+
+	//頂点バッファの取得
+	FbxVector4* vtxbuff = mesh->GetControlPoints();
+
+	//インデックスバッファの取得
+	int* idx = mesh->GetPolygonVertices();
+
+	//頂点数の取得
+	int polygonVtxCount = mesh->GetPolygonVertexCount();
+
+	//インデックスバッファ
+	for (int i = 0; i < polygonVtxCount; i++)
+	{
+		m_indices[str].push_back(idx[i]);
+	}
+
+	//頂点バッファの生成
+	if (FAILED(pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * polygonVtxCount,
+		D3DUSAGE_WRITEONLY,
+		FVF_VERTEX_3D,
+		D3DPOOL_MANAGED,
+		&m_pVtxBuff,
+		NULL)))
 	{
 		return;
 	}
 
-	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();	//デバイスの取得
+	//インデックスバッファの生成
+	if (FAILED(pDevice->CreateIndexBuffer(sizeof(UINT) * m_indices[str].size(),
+		D3DUSAGE_WRITEONLY,
+		D3DFMT_INDEX16,
+		D3DPOOL_MANAGED,
+		&m_pIdxBuff,
+		NULL)))
+	{
+		return;
+	}
 
-	//Xファイルの読み込み
-	D3DXLoadMeshFromX(s_FileName[model],
+	//頂点座標情報の宣言
+	D3DVERTEXELEMENT9 VtxDecl[] =
+	{
+		{ 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
+		{ 0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 },
+		{ 0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
+		D3DDECL_END()
+	};
+
+	//メッシュの生成
+	if (FAILED(D3DXCreateMesh((DWORD)polygonVtxCount,
+		mesh->GetControlPointsCount(),
 		D3DXMESH_SYSTEMMEM,
+		VtxDecl,
 		pDevice,
-		NULL,
-		&m_buffMat,
-		NULL,
-		&m_dwNum,
-		&m_mesh);
+		&data.mesh)))
+	{	//メッシュの生成に失敗した場合
+		assert(false);
+	}
 
-	m_bLoaded[model] = true;
-	m_Data.insert(m_Data.begin() + model, this);
+	//インデックスバッファをロック
+	WORD *pIdx;
+	m_pIdxBuff->Lock(0, 0, (void**)&pIdx, 0);
+
+	for (int i = 0; i < polygonVtxCount; i++)
+	{
+		pIdx[i] = idx[i];
+	}
+
+	//頂点バッファをロック
+	VERTEX_3D * pVtx = nullptr;
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	//頂点座標の取得
+	for (int i = 0; i < mesh->GetControlPointsCount(); i++)
+	{
+		m_vertices[str].push_back(D3DXVECTOR3((float)vtxbuff[i][0],
+			(float)vtxbuff[i][1],
+			(float)vtxbuff[i][2]));
+	}
+
+	for (int i = 0; i < polygonVtxCount; i++)
+	{
+		pVtx[idx[i]].pos = m_vertices[str].at(idx[i]);
+	}
+
+	//法線情報の取得
+	for (int i = 0; i < mesh->GetLayerCount(); i++)
+	{
+		FbxLayer* layer = mesh->GetLayer(i);
+		FbxLayerElementNormal* normals = layer->GetNormals();
+
+		if (normals == 0)	//法線が見つからなかった場合
+			continue;
+
+		//マッピングモードの取得
+		FbxLayerElement::EMappingMode mappingMode;
+		mappingMode = normals->GetMappingMode();
+
+		//リファレンスモードの取得
+		FbxLayerElement::EReferenceMode refMode;
+		refMode = normals->GetReferenceMode();
+
+		if (mappingMode == FbxLayerElement::eByPolygonVertex)
+		{	//ポリゴン単位でデータが格納されている場合
+			if (refMode == FbxLayerElement::eDirect)
+			{
+				for (int i = 0; i < normals->GetDirectArray().GetCount(); i++)
+				{
+					pVtx[idx[i]].nor = D3DXVECTOR3((float)normals->GetDirectArray().GetAt(idx[i])[0],
+						(float)normals->GetDirectArray().GetAt(idx[i])[1], 
+						(float)normals->GetDirectArray().GetAt(idx[i])[2]);
+				}
+			}
+		}
+		else if (mappingMode == FbxLayerElement::eByControlPoint)
+		{	//頂点単位でデータが格納されている場合
+			if (refMode == FbxLayerElement::eDirect)
+			{
+				for (int i = 0; i < normals->GetDirectArray().GetCount(); i++)
+				{
+					pVtx[idx[i]].nor = D3DXVECTOR3((float)normals->GetDirectArray().GetAt(idx[i])[0],
+						(float)normals->GetDirectArray().GetAt(idx[i])[1],
+						(float)normals->GetDirectArray().GetAt(idx[i])[2]);
+				}
+			}
+		}
+	}
+
+	//頂点カラー情報の取得
+	for (int i = 0; i < mesh->GetElementVertexColorCount(); i++)
+	{
+		FbxGeometryElementVertexColor* color = mesh->GetElementVertexColor(i);
+
+		FbxGeometryElement::EMappingMode mappingMode;
+		mappingMode = color->GetMappingMode();
+
+		FbxGeometryElement::EReferenceMode refMode;
+		refMode = color->GetReferenceMode();
+
+		FbxLayerElementArrayTemplate<int>* colIdx = &color->GetIndexArray();
+
+		if (mappingMode == FbxGeometryElement::eByPolygonVertex)
+		{
+			if (refMode == FbxGeometryElement::eIndexToDirect)
+			{
+				for (int j = 0; j < colIdx->GetCount(); j++)
+				{
+					pVtx[j].col = D3DXCOLOR((float)color->GetDirectArray().GetAt(colIdx->GetAt(idx[j]))[0],
+						(float)color->GetDirectArray().GetAt(colIdx->GetAt(idx[j]))[1],
+						(float)color->GetDirectArray().GetAt(colIdx->GetAt(idx[j]))[2],
+						(float)color->GetDirectArray().GetAt(colIdx->GetAt(idx[j]))[3]);
+				}
+			}
+		}
+	}
+
+	D3DXCreateBuffer((DWORD)mesh->GetPolygonCount(), &data.buffMat);
+	data.dwNum = 1;
+	data.vtxBuff = m_pVtxBuff;
+	data.idxBuff = m_pIdxBuff;
+	data.vtxCount = polygonVtxCount;
+	data.primitiveCount = polygonVtxCount;
+
+	int nNumVtx;	// 頂点数保存用変数
+	DWORD sizeFVF;	// 頂点フォーマットのサイズ
+
+	//頂点数の取得
+	nNumVtx = data.mesh->GetNumVertices();
+
+	//頂点フォーマットのサイズを取得
+	sizeFVF = D3DXGetFVFVertexSize(data.mesh->GetFVF());
+
+	for (int i = 0; i < nNumVtx; i++)
+	{
+		//頂点座標の代入
+		D3DXVECTOR3 vtx = pVtx[pIdx[i]].pos;
+
+		//X
+		if (vtx.x > data.maxModel.x)
+		{
+			data.maxModel.x = floorf(vtx.x);
+		}
+		if (vtx.x < data.minModel.x)
+		{
+			data.minModel.x = floorf(vtx.x);
+		}
+
+		//Y
+		if (vtx.y >data.maxModel.y)
+		{
+			data.maxModel.y = floorf(vtx.y);
+		}
+		if (vtx.y < data.minModel.y)
+		{
+			data.minModel.y = floorf(vtx.y);
+		}
+
+		//Z
+		if (vtx.z > data.maxModel.z)
+		{
+			data.maxModel.z = floorf(vtx.z);
+		}
+		if (vtx.z < data.minModel.z)
+		{
+			data.minModel.z = floorf(vtx.z);
+		}
+	}
+
+	//モデルサイズ
+	m_modelSize = D3DXVECTOR3(data.maxModel.x - data.minModel.x, data.maxModel.y - data.minModel.y, data.maxModel.z - data.minModel.z);
+
+	//頂点バッファのアンロック
+	m_pVtxBuff->Unlock();
+
+	//インデックスバッファのアンロック
+	m_pIdxBuff->Unlock();
+}
+
+void CModel::ExtractionMaterial(FbxScene* scene)
+{
+	std::vector<const char*> matName;
+	D3DXMATERIAL d3dxmat = {};
+
+	//マテリアル情報の取得
+	for (int i = 0; i < scene->GetMaterialCount(); i++)
+	{
+		FbxSurfaceMaterial* pMat = scene->GetMaterial(i);
+		matName.push_back(pMat->GetName());
+
+		if (pMat->GetClassId().Is(FbxSurfaceLambert::ClassId))
+		{	//ランバートマテリアルの場合
+			FbxSurfaceLambert* pLambert = (FbxSurfaceLambert*)pMat;
+
+			float alphaVal = (float)pLambert->TransparencyFactor.Get();				//透過度
+
+			d3dxmat.MatD3D.Ambient = D3DXCOLOR((float)pLambert->Ambient.Get()[0],	//アンビエント
+				(float)pLambert->Ambient.Get()[1],
+				(float)pLambert->Ambient.Get()[2],
+				alphaVal);
+
+			d3dxmat.MatD3D.Diffuse = D3DXCOLOR((float)pLambert->Diffuse.Get()[0],	//ディフューズ
+				(float)pLambert->Diffuse.Get()[1],
+				(float)pLambert->Diffuse.Get()[2],
+				alphaVal);
+
+			d3dxmat.MatD3D.Emissive = D3DXCOLOR((float)pLambert->Emissive.Get()[0],	//エミッシブ
+				(float)pLambert->Emissive.Get()[1],
+				(float)pLambert->Emissive.Get()[2],
+				alphaVal);
+		}
+		else if (pMat->GetClassId().Is(FbxSurfacePhong::ClassId))
+		{	//フォンマテリアルの場合
+			FbxSurfacePhong* pPhong = (FbxSurfacePhong*)pMat;
+
+			d3dxmat.MatD3D.Specular = D3DXCOLOR((float)pPhong->Specular.Get()[0],	//スペキュラー
+				(float)pPhong->Specular.Get()[1],
+				(float)pPhong->Specular.Get()[2],
+				(float)pPhong->TransparencyFactor.Get());
+
+			d3dxmat.MatD3D.Power = (float)pPhong->SpecularFactor.Get();				//スペキュラーの減衰
+		}
+	}
 }
 
 void CModel::BindTexture(std::string inPath)
@@ -434,7 +612,102 @@ void CModel::BindTexture(std::string inPath)
 	m_pTexture = CApplication::GetInstance()->GetTexture()->GetTexture(inPath);		//テクスチャのポインタ
 }
 
-void CModel::SetProperty(bool light)
+LPDIRECT3DVERTEXBUFFER9 CModel::GetVtxBuff(std::string model)
 {
-	m_property.bLight = light;
+	if (m_model.count(model) == 0)
+	{	//モデルデータが入ってなかった場合
+		return 0;
+	}
+
+	return m_model[model].vtxBuff;
+}
+
+LPDIRECT3DINDEXBUFFER9 CModel::GetIdxBuff(std::string model)
+{
+	if (m_model.count(model) == 0)
+	{	//モデルデータが入ってなかった場合
+		return 0;
+	}
+
+	return m_model[model].idxBuff;
+}
+
+LPD3DXBUFFER CModel::GetBuffMat(std::string model)
+{
+	if (m_model.count(model) == 0)
+	{	//モデルデータが入ってなかった場合
+		return 0;
+	}
+
+	return m_model[model].buffMat;
+}
+
+LPD3DXMESH CModel::GetMesh(std::string model)
+{
+	if (m_model.count(model) == 0)
+	{	//モデルデータが入ってなかった場合
+		return 0;
+	}
+
+	return m_model[model].mesh;
+}
+
+DWORD CModel::GetModelNum(std::string model)
+{
+	if (m_model.count(model) == 0)
+	{	//モデルデータが入ってなかった場合
+		return 0;
+	}
+
+	return m_model[model].dwNum;
+}
+
+D3DXVECTOR3 CModel::GetMinModel(std::string model)
+{
+	if (m_model.count(model) == 0)
+	{	//モデルデータが入ってなかった場合
+		return D3DXVECTOR3(0.0f,0.0f,0.0f);
+	}
+
+	return m_model[model].minModel;
+}
+
+D3DXVECTOR3 CModel::GetMaxModel(std::string model)
+{
+	if (m_model.count(model) == 0)
+	{	//モデルデータが入ってなかった場合
+		return D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	}
+
+	return m_model[model].maxModel;
+}
+
+std::string CModel::GetModelMode(std::string model)
+{
+	if (m_model.count(model) == 0)
+	{	//モデルデータが入ってなかった場合
+		return "null";
+	}
+
+	return m_model[model].modelMode;
+}
+
+int CModel::GetVertexCount(std::string model)
+{
+	if (m_model.count(model) == 0)
+	{	//モデルデータが入ってなかった場合
+		return 0;
+	}
+
+	return m_model[model].vtxCount;
+}
+
+int CModel::GetPrimitiveCount(std::string model)
+{
+	if (m_model.count(model) == 0)
+	{	//モデルデータが入ってなかった場合
+		return 0;
+	}
+
+	return m_model[model].primitiveCount;
 }

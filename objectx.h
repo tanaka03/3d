@@ -13,11 +13,14 @@ public:
 	CObjectX();
 	~CObjectX() override;
 
+	static CObjectX *Create(D3DXVECTOR3 pos);	// 生成処理
+
 	HRESULT Init() override;
 	void Uninit() override;
 	void Update() override;
 	void Draw() override;
 	void Shadow();
+	void LoadModel(std::string path);
 	void BindTexture(std::string inPath);
 
 	//セッター

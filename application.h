@@ -15,7 +15,7 @@ class CLight;
 class CDebugProc;
 class CFile;
 class CMyImgui;
-
+class CModel;
 class CMeshField;
 class CPolygon;
 class CPlayer;
@@ -43,6 +43,7 @@ public:
 	CTexture *GetTexture() { return m_pTexture; }
 	CMyImgui *GetMyImgui() { return m_pMyImgui; }
 	CMeshField *GetMeshField() { return m_pMesh; }
+	CModel *GetModel() { return m_pModel; }
 
 private:
 	static CApplication *m_pApplication;
@@ -59,6 +60,7 @@ private:
 	CFile *m_pFile;
 	CMyImgui *m_pMyImgui;
 	CMeshField *m_pMesh;
+	CModel *m_pModel;
 
 	bool m_bWire;
 };

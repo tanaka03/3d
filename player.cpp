@@ -13,6 +13,8 @@
 #include "model.h"
 #include "meshfield.h"
 
+#include "line.h"
+
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 //プレイヤーのコンストラクタ
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
@@ -59,13 +61,26 @@ HRESULT CPlayer::Init()
 {
 	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();
 
-	m_pModel[0] = CModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), CModel::MODEL_FOKKO);
+	LoadModel("UnityChan");
 
-	m_pModel[1] = CModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), CModel::MODEL_CYLINDER);
-	m_pModel[1]->BindTexture("EFFECT_0");
+	//頂点バッファをロック
+	VERTEX_3D * pVtx = nullptr;
 
-	m_pModel[1]->SetProperty(true);
-	m_pModel[1]->SetAlphaTest(D3DCMP_NOTEQUAL);
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	for (int nCnt = 0; nCnt < m_numVtx; nCnt++)
+	{
+		//頂点カラー
+		pVtx[nCnt].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	}
+
+	//頂点バッファのアンロック
+	m_pVtxBuff->Unlock();
+
+	//m_pModel[0] = CModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), CModel::MODEL_FOKKO);
+
+	//m_pModel[1] = CModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), CModel::MODEL_CYLINDER);
+	//m_pModel[1]->BindTexture("EFFECT_0");
 
 	//m_pModel[1] = CModel::Create(D3DXVECTOR3(20.0f,20.0f, 20.0f),D3DXVECTOR3(0.0f,0.0f,0.0f),CModel::MODEL_STAR);
 	//m_pModel[1]->SetParent(m_pModel[0]);
@@ -79,6 +94,76 @@ HRESULT CPlayer::Init()
 	//m_pModel[2] = CModel::Create(D3DXVECTOR3(-20.0f, 20.0f, 20.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), CModel::MODEL_STAR);
 	//m_pModel[2]->SetParent(m_pModel[0]);
 	//m_KeySet.key[2].pos = D3DXVECTOR3(100.0f, 100.0f, 100.0f);
+
+	for (int i = 0; i < MaxLine; i++)
+	{
+		if (m_pLine[i] != nullptr)
+		{
+			m_pLine[i]->Uninit();
+			delete m_pLine[i];
+		}
+	}
+
+	//下四角
+	m_pLine[0] = CLine::Create(m_objpos, m_minModel,
+		D3DXVECTOR3(m_maxModel.x, m_minModel.y, m_minModel.z),
+		D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	m_pLine[1] = CLine::Create(m_objpos, m_minModel,
+		D3DXVECTOR3(m_minModel.x, m_minModel.y, m_maxModel.z),
+		D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	m_pLine[2] = CLine::Create(m_objpos,
+		D3DXVECTOR3(m_maxModel.x, m_minModel.y, m_maxModel.z),
+		D3DXVECTOR3(m_minModel.x, m_minModel.y, m_maxModel.z),
+		D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	m_pLine[3] = CLine::Create(m_objpos,
+		D3DXVECTOR3(m_maxModel.x, m_minModel.y, m_maxModel.z),
+		D3DXVECTOR3(m_maxModel.x, m_minModel.y, m_minModel.z),
+		D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	//縦棒
+	m_pLine[4] = CLine::Create(m_objpos,
+		D3DXVECTOR3(m_minModel.x, m_minModel.y, m_minModel.z),
+		D3DXVECTOR3(m_minModel.x, m_maxModel.y, m_minModel.z),
+		D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	m_pLine[5] = CLine::Create(m_objpos,
+		D3DXVECTOR3(m_maxModel.x, m_minModel.y, m_minModel.z),
+		D3DXVECTOR3(m_maxModel.x, m_maxModel.y, m_minModel.z),
+		D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	m_pLine[6] = CLine::Create(m_objpos,
+		D3DXVECTOR3(m_minModel.x, m_minModel.y, m_maxModel.z),
+		D3DXVECTOR3(m_minModel.x, m_maxModel.y, m_maxModel.z),
+		D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	m_pLine[7] = CLine::Create(m_objpos,
+		D3DXVECTOR3(m_maxModel.x, m_minModel.y, m_maxModel.z),
+		m_maxModel,
+		D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	//上四角
+	m_pLine[8] = CLine::Create(m_objpos,
+		D3DXVECTOR3(m_minModel.x, m_maxModel.y, m_minModel.z),
+		D3DXVECTOR3(m_maxModel.x, m_maxModel.y, m_minModel.z),
+		D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	m_pLine[9] = CLine::Create(m_objpos,
+		D3DXVECTOR3(m_minModel.x, m_maxModel.y, m_minModel.z),
+		D3DXVECTOR3(m_minModel.x, m_maxModel.y, m_maxModel.z),
+		D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	m_pLine[10] = CLine::Create(m_objpos,
+		D3DXVECTOR3(m_maxModel.x, m_maxModel.y, m_maxModel.z),
+		D3DXVECTOR3(m_minModel.x, m_maxModel.y, m_maxModel.z),
+		D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	m_pLine[11] = CLine::Create(m_objpos,
+		D3DXVECTOR3(m_maxModel.x, m_maxModel.y, m_maxModel.z),
+		D3DXVECTOR3(m_maxModel.x, m_maxModel.y, m_minModel.z),
+		D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 
 	return S_OK;
 }
@@ -96,7 +181,7 @@ void CPlayer::Uninit()
 	}
 
 	//メッシュの解放
-	if (m_mesh = nullptr)
+	if (m_mesh != nullptr)
 	{
 		m_mesh->Release();
 		m_mesh = nullptr;
@@ -109,14 +194,13 @@ void CPlayer::Uninit()
 		m_buffMat = nullptr;
 	}
 
-	//モデルの破棄
-	for (int i = 0; i < MaxParts; i++)
+	for (int i = 0; i < MaxLine; i++)
 	{
-		if (m_pModel[i] == nullptr)
+		if (m_pLine[i] != nullptr)
 		{
-			continue;
+			m_pLine[i]->Uninit();
+			delete m_pLine[i];
 		}
-		m_pModel[i]->Release();
 	}
 
 	SetDestroy(true);
@@ -132,21 +216,21 @@ void CPlayer::Update()
 	m_objpos += m_move;
 	D3DXVECTOR3 posOld = m_objpos;
 
-	CMeshField *pMesh = CApplication::GetInstance()->GetMeshField();
-	bool collision = pMesh->Collision(m_objpos);
+	//CMeshField *pMesh = CApplication::GetInstance()->GetMeshField();
+	//bool collision = pMesh->Collision(m_objpos);
 
-	if (collision)
-	{
-		D3DXVECTOR3 collisionPos =  pMesh->GetHitPos();
-		m_objpos = D3DXVECTOR3(m_objpos.x, collisionPos.y + 1.5f, m_objpos.z);
-		m_meshIdx = pMesh->GetPointIdx();
-		m_bJump = true;
-	}
-	else
-	{
-		m_move.y -= 0.5f;
-		m_bJump = false;
-	}
+	//if (collision)
+	//{
+	//	D3DXVECTOR3 collisionPos =  pMesh->GetHitPos();
+	//	m_objpos = D3DXVECTOR3(m_objpos.x, collisionPos.y + 1.5f, m_objpos.z);
+	//	m_meshIdx = pMesh->GetPointIdx();
+	//	m_bJump = true;
+	//}
+	//else
+	//{
+	//	m_move.y -= 0.5f;
+	//	m_bJump = false;
+	//}
 
 	//奥
 	if (CApplication::GetInstance()->GetInputKeyboard()->GetPress(DIK_UP))
@@ -211,7 +295,7 @@ void CPlayer::Update()
 		if(m_objpos.y < m_Collisionpos.y) m_objpos.y = m_Collisionpos.y;
 	}
 
-	m_pModel[0]->SetModelPos(m_objpos);
+	//m_pModel[0]->SetModelPos(m_objpos);
 
 	BackBased(-300.0f);
 
@@ -236,7 +320,7 @@ void CPlayer::Update()
 	m_rot.y += (m_rotDest.y - m_rot.y) * 0.1f;
 
 	m_rotate.y += 0.2f;
-	m_pModel[1]->SetRotOffset(m_rotate);
+	//m_pModel[1]->SetRotOffset(m_rotate);
 
 	//こいつがやりました↓
 	//m_pShadow->SetZBuff(D3DCMP_EQUAL);
@@ -254,14 +338,12 @@ void CPlayer::Update()
 		m_rot.y += D3DX_PI * 2;
 	}
 
-	//モデルの更新
-	for (int i = 0; i < MaxParts; i++)
+	for (int i = 0; i < MaxLine; i++)
 	{
-		if (m_pModel[i] == nullptr)
+		if (m_pLine[i] != nullptr)
 		{
-			continue;
+			m_pLine[i]->Update();
 		}
-		m_pModel[i]->Update();
 	}
 }
 
@@ -270,8 +352,31 @@ void CPlayer::Update()
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 void CPlayer::Draw()
 {
+	for (int i = 0; i < MaxLine; i++)
+	{
+		if (m_pLine[i] != nullptr)
+		{
+			m_pLine[i]->Draw();
+		}
+	}
+
+	if (m_modelMode == "xFile")
+	{
+		ModelDrawX();
+	}
+
+	if (m_modelMode == "fbxFile")
+	{
+		ModelDrawFbx();
+	}
+}
+
+void CPlayer::ModelDrawX()
+{
 	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();	//デバイスの取得
 	D3DXMATRIX mtxRot, mtxTrans;				//計算用マトリックス
+	D3DMATERIAL9 matDef;						//現在のマテリアルを保存
+	D3DXMATERIAL *pMat;							//マテリアルデータへのポインタ
 
 	//テクスチャの設定を戻す
 	pDevice->SetTexture(0, NULL);
@@ -291,18 +396,83 @@ void CPlayer::Draw()
 	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
 	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 
+	//ライトを無効にする
+	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+
 	//ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
 
-	//モデルの描画
-	for (int i = 0; i < MaxParts; i++)
+	//現在のマテリアルを保存
+	pDevice->GetMaterial(&matDef);
+
+	//マテリアルデータへのポインタを取得
+	pMat = (D3DXMATERIAL*)m_buffMat->GetBufferPointer();
+
+	pMat->MatD3D.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+	for (int i = 0; i < (int)m_dwNum; i++)
 	{
-		if (m_pModel[i] == nullptr)
-		{
-			continue;
-		}
-		m_pModel[i]->Draw();
+		//マテリアルの設定
+		pDevice->SetMaterial(&pMat->MatD3D);
+
+		//モデルパーツの描画
+		m_mesh->DrawSubset(i);
 	}
+
+	//保持していたマテリアルを戻す
+	pDevice->SetMaterial(&matDef);
+
+	//テクスチャの設定を戻す
+	pDevice->SetTexture(0, NULL);
+}
+
+void CPlayer::ModelDrawFbx()
+{
+	LPDIRECT3DDEVICE9 pDevice = CApplication::GetInstance()->GetRenderer()->GetDevice();	//デバイスの取得
+	D3DXMATRIX mtxRot, mtxTrans;				//計算用マトリックス
+	D3DMATERIAL9 matDef;						//現在のマテリアルを保存
+	D3DXMATERIAL *pMat;							//マテリアルデータへのポインタ
+
+	//テクスチャの設定を戻す
+	pDevice->SetTexture(0, NULL);
+
+	//ワールドマトリックスを初期化
+	D3DXMatrixIdentity(&m_mtxWorld);
+
+	//向きを反映
+	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_rot.y, m_rot.x, m_rot.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
+
+	//位置を反映
+	D3DXMatrixTranslation(&mtxTrans, m_objpos.x, m_objpos.y, m_objpos.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
+
+	//Zテスト
+	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
+	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+
+	//ライトを無効にする
+	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+
+	//ワールドマトリックスの設定
+	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
+
+	//頂点バッファをデバイスのデータストリームに設定
+	pDevice->SetStreamSource(0, m_pVtxBuff, 0, sizeof(VERTEX_3D));
+
+	//インデックスバッファをデバイスのデータストリームに設定
+	pDevice->SetIndices(m_pIdxBuff);
+
+	//頂点フォーマットの設定
+	pDevice->SetFVF(FVF_VERTEX_3D);
+
+	//ポリゴンの描画
+	pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST,
+		0,
+		0,
+		m_numVtx,	//頂点数
+		0,
+		m_numPrim	/*描画するプリミティブ数*/);
 }
 
 void CPlayer::BackBased(float Y)
@@ -316,32 +486,48 @@ void CPlayer::BackBased(float Y)
 
 void CPlayer::Motion(int Num)
 {
-	if (m_pModel[Num] == nullptr)
-	{
-		return;
-	}
+	//if (m_pModel[Num] == nullptr)
+	//{
+	//	return;
+	//}
 
-	int relative_Value = m_cntMotion / m_KeySet[m_currentKey].nFrame;
+	//int relative_Value = m_cntMotion / m_KeySet[m_currentKey].nFrame;
 
 	//auto posDifference = m_KeySet.key[m_currentKey].pos - m_pModel[Num]->GetStartPos();
 	//auto pos_Value = m_pModel[Num]->GetStartPos() + (posDifference * relative_Value);
 
-	D3DXVECTOR3 rotDifference = m_KeySet[m_currentKey].key[m_currentKey].rot - m_pModel[Num]->GetStartRot();
-	D3DXVECTOR3 rot_Value = m_pModel[Num]->GetStartRot() + (rotDifference * relative_Value);
+	//D3DXVECTOR3 rotDifference = m_KeySet[m_currentKey].key[m_currentKey].rot - m_pModel[Num]->GetStartRot();
+	//D3DXVECTOR3 rot_Value = m_pModel[Num]->GetStartRot() + (rotDifference * relative_Value);
 
 	//m_pModel[Num]->SetPosOffset(pos_Value);
-	m_pModel[Num]->SetRotOffset(rot_Value);
+	//m_pModel[Num]->SetRotOffset(rot_Value);
 	 
-	m_cntMotion++;
+	//m_cntMotion++;
 
-	if (m_KeySet[m_currentKey].nFrame < m_cntMotion)
-	{
-		m_cntMotion = 1;
-		m_currentKey++;
-	}
+	//if (m_KeySet[m_currentKey].nFrame < m_cntMotion)
+	//{
+	//	m_cntMotion = 1;
+	//	m_currentKey++;
+	//}
 
-	if (m_numKey < m_currentKey)
-	{
-		m_currentKey = 0;
-	}
+	//if (m_numKey < m_currentKey)
+	//{
+	//	m_currentKey = 0;
+	//}
+}
+
+void CPlayer::LoadModel(std::string path)
+{
+	CModel *pModel = CApplication::GetInstance()->GetModel();
+
+	m_mesh = pModel->GetMesh(path);
+	m_buffMat = pModel->GetBuffMat(path);
+	m_dwNum = pModel->GetModelNum(path);
+	m_maxModel = pModel->GetMaxModel(path);
+	m_minModel = pModel->GetMinModel(path);
+	m_pVtxBuff = pModel->GetVtxBuff(path);
+	m_pIdxBuff = pModel->GetIdxBuff(path);
+	m_numVtx = pModel->GetVertexCount(path);
+	m_numPrim = pModel->GetPrimitiveCount(path);
+	m_modelMode = pModel->GetModelMode(path);
 }

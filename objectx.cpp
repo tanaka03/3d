@@ -2,6 +2,7 @@
 #include "application.h"
 #include "light.h"
 #include "object3d.h"
+#include "model.h"
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
 //オブジェクトXのコンストラクタ
@@ -16,6 +17,22 @@ CObjectX::CObjectX() :
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
 CObjectX::~CObjectX()
 {
+}
+
+CObjectX * CObjectX::Create(D3DXVECTOR3 pos)
+{
+	CObjectX *pObj = nullptr;
+	pObj = new CObjectX;
+
+	//ヌルチェック
+	if (pObj != nullptr)
+	{
+		// ポリゴンの初期化処理
+		pObj->Init();
+		pObj->SetPos(pos);
+	}
+
+	return pObj;
 }
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝
@@ -39,40 +56,46 @@ HRESULT CObjectX::Init()
 	//頂点座標の代入
 	D3DXVECTOR3 vtx = *(D3DXVECTOR3*)pVtxBuff;
 
-	//X
-	if (vtx.x > m_maxModel.x)
+	for (int i = 0; i < nNumVtx; i++)
 	{
-		m_maxModel.x = floorf(vtx.x);
-	}
+		//頂点座標の代入
+		D3DXVECTOR3 vtx = *(D3DXVECTOR3*)pVtxBuff;
 
-	if (vtx.x < m_minModel.x)
-	{
-		m_minModel.x = floorf(vtx.x);
-	}
+		//X
+		if (vtx.x > m_maxModel.x)
+		{
+			m_maxModel.x = floorf(vtx.x);
+		}
 
-	//Y
-	if (vtx.y > m_maxModel.y)
-	{
-		m_maxModel.y = floorf(vtx.y);
-	}
+		if (vtx.x < m_minModel.x)
+		{
+			m_minModel.x = floorf(vtx.x);
+		}
 
-	if (vtx.y < m_minModel.y)
-	{
-		m_minModel.y = floorf(vtx.y);
-	}
+		//Y
+		if (vtx.y > m_maxModel.y)
+		{
+			m_maxModel.y = floorf(vtx.y);
+		}
 
-	//Z
-	if (vtx.z > m_maxModel.z)
-	{
-		m_maxModel.z = floorf(vtx.z);
-	}
+		if (vtx.y < m_minModel.y)
+		{
+			m_minModel.y = floorf(vtx.y);
+		}
 
-	if (vtx.z < m_minModel.z)
-	{
-		m_minModel.z = floorf(vtx.z);
+		//Z
+		if (vtx.z > m_maxModel.z)
+		{
+			m_maxModel.z = floorf(vtx.z);
+		}
+
+		if (vtx.z < m_minModel.z)
+		{
+			m_minModel.z = floorf(vtx.z);
+		}
+		//頂点フォーマットのサイズ分ポインタを進める
+		pVtxBuff += sizeFVF;
 	}
-	//頂点フォーマットのサイズ分ポインタを進める
-	pVtxBuff += sizeFVF;
 
 	//モデルサイズ
 	m_scale.x = m_maxModel.x - m_minModel.x;
@@ -166,14 +189,17 @@ void CObjectX::Draw()
 
 	pMat->MatD3D.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
-	//マテリアルの設定
-	pDevice->SetMaterial(&pMat->MatD3D);
+	for (int nCntMat = 0; nCntMat < (int)m_dwNum; nCntMat++)
+	{
+		//マテリアルの設定
+		pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
 
-	//テクスチャの設定
-	pDevice->SetTexture(0, m_pTexture);
+		//テクスチャの設定
+		pDevice->SetTexture(0, m_pTexture);
 
-	//モデルパーツの描画
-	m_mesh->DrawSubset(0);
+		//モデルパーツの描画
+		m_mesh->DrawSubset(nCntMat);
+	}
 
 	//保持していたマテリアルを戻す
 	pDevice->SetMaterial(&matDef);
@@ -225,6 +251,15 @@ void CObjectX::Shadow()
 
 	//保持していたマテリアルを戻す
 	pDevice->SetMaterial(&matDef);
+}
+
+void CObjectX::LoadModel(std::string path)
+{
+	CModel *pModel = CApplication::GetInstance()->GetModel();
+
+	m_mesh = pModel->GetMesh(path);
+	m_buffMat = pModel->GetBuffMat(path);
+	m_dwNum = pModel->GetModelNum(path);
 }
 
 void CObjectX::BindTexture(std::string inPath)

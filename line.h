@@ -18,6 +18,7 @@ public:
 	void Draw();
 
 	void SetPos(D3DXVECTOR3 pos) { m_pos = pos; }
+	void SetRot(D3DXVECTOR3 rot) { m_rot = rot; }
 	void SetCol(D3DXCOLOR col) { m_col = col; }
 
 private:
@@ -25,6 +26,7 @@ private:
 	D3DXVECTOR3 m_pos;
 	D3DXVECTOR3 m_start;
 	D3DXVECTOR3 m_end;
+	D3DXVECTOR3 m_rot;
 	D3DXCOLOR m_col;
 	D3DXMATRIX mtxWorld;	//ワールドマトリックス
 };

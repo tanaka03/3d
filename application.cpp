@@ -74,6 +74,9 @@ HRESULT CApplication::Init(HWND hWnd, HINSTANCE hInstance)
 	m_pTexture = new CTexture;
 	m_pTexture->LoadAll();
 
+	m_pModel = new CModel;
+	m_pModel->LoadAll();
+
 	//Imgui
 	m_pMyImgui = new CMyImgui;
 	m_pMyImgui->Init();
@@ -87,11 +90,11 @@ HRESULT CApplication::Init(HWND hWnd, HINSTANCE hInstance)
 	m_pCamera->Init();
 
 	//m_pPolygon = CPolygon::Create(D3DXVECTOR3(0.0f, 0.0f,0.0f));
-	m_pPlayer = CPlayer::Create(D3DXVECTOR3(100.0f, 0.0f, -100.0f));
+	m_pPlayer = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
 	//CBall::Create(D3DXVECTOR3(100.0f, 0.0f, -100.0f));
 
-	m_pMesh = CMeshField::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(25.0f,0.0f, 25.0f), 50, 50);
+	//m_pMesh = CMeshField::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(25.0f,0.0f, 25.0f), 40, 40);
 	//CCylinder::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), 10.0f, 25.0f, 10, 10);
 	//CSphere::Create(D3DXVECTOR3(50.0f, 0.0f, 0.0f), 30.0f, 30, 30);
 	return S_OK;
@@ -128,6 +131,15 @@ void CApplication::Uninit()
 
 		delete m_pTexture;
 		m_pTexture = nullptr;
+	}
+
+	//モデルクラスの破棄
+	if (m_pModel != nullptr)
+	{
+		m_pModel->Clear();
+
+		delete m_pModel;
+		m_pModel = nullptr;
 	}
 
 	//カメラクラスの破棄

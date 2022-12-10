@@ -55,6 +55,9 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{3d9cff7a-4457-4cf8-8bba-bca17ebaf26c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fbx">
+      <UniqueIdentifier>{e9dd2753-bbe7-4ef9-b2c9-62ba85574ed1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -132,9 +135,6 @@
     <ClCompile Include="file.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="model.cpp">
-      <Filter>ソース ファイル\Object</Filter>
-    </ClCompile>
     <ClCompile Include="precompile.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -185,6 +185,9 @@
     </ClCompile>
     <ClCompile Include="line.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="model.cpp">
+      <Filter>ソース ファイル\Object\objectX</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -317,9 +320,15 @@
     <ClInclude Include="line.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="FBX SDK\2020.3.2\include\fbxsdk.h">
+      <Filter>Fbx</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="data\FILE\texture.json">
+      <Filter>FILE</Filter>
+    </None>
+    <None Include="data\FILE\model.json">
       <Filter>FILE</Filter>
     </None>
   </ItemGroup>

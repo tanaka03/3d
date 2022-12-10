@@ -56,6 +56,7 @@ private:
 	LPDIRECT3DTEXTURE9 m_pTexture;
 	D3DXVECTOR3 m_CollisionPos;
 	D3DXVECTOR3 m_objpos;
+	D3DXVECTOR3 m_posOld;
 	D3DXVECTOR3 m_move;
 	D3DXVECTOR3 m_rot;
 	D3DXVECTOR3 m_scale;

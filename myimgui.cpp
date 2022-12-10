@@ -53,8 +53,8 @@ bool CMyImgui::ImGuiText(bool show_demo_window, bool show_another_window)
 	ImGui::NewFrame();
 
 	CPlayer *pPlayer = CApplication::GetInstance()->GetPlayer();
-	m_pMesh = CApplication::GetInstance()->GetMeshField();
-	m_meshPos = m_pMesh->GetIdxPos(pPlayer->GetMeshIdx());
+	//m_pMesh = CApplication::GetInstance()->GetMeshField();
+	//m_meshPos = m_pMesh->GetIdxPos(pPlayer->GetMeshIdx());
 
 	static int ButtonCnt = 0;
 
@@ -82,34 +82,9 @@ bool CMyImgui::ImGuiText(bool show_demo_window, bool show_another_window)
 				m_pMesh->SetIdxPos(m_meshPos, pPlayer->GetMeshIdx());
 			}
 
-			if (ImGui::Button("+")) ButtonCnt++;
-			ImGui::SameLine();
-
-			if (ImGui::Button("-")) ButtonCnt--;
-
-			ImGui::Text("%d", ButtonCnt);
-			switch (ButtonCnt)
-			{
-			case 1:
-				m_pMesh->BindTexture("STAR");
-				break;
-			case 2:
-				m_pMesh->BindTexture("EFFECT_0");
-				break;
-			case 3:
-				m_pMesh->BindTexture("GRASS_01");
-				break;
-			case 4:
-				m_pMesh->BindTexture("BULLET");
-				break;
-			default:
-				m_pMesh->BindTexture("NONE");
-				break;
-			}
-
 			//メッシュの位置
 			ImGui::DragFloat3("ModelScale", m_modelScale, 0.1f, -50.0f, 200.0f);
-			pPlayer->GetPlayerModel(1)->SetScale(m_modelScale);
+			//pPlayer->GetPlayerModel(1)->SetScale(m_modelScale);
 		}
 
 		//別ウィンドウを生成

@@ -58,7 +58,7 @@ void CDebugProc::Print(const char *pFormat, ...)
 
 		if (destStr == "%d")
 		{//intå^
-			auto Arg = va_arg(args, int);
+			int Arg = va_arg(args, int);
 			argStr = to_string(Arg);
 			nCntAdd = argStr.length();
 			m_Str.replace(pos - nCntDeleted, destStr.length(), argStr);
@@ -67,7 +67,7 @@ void CDebugProc::Print(const char *pFormat, ...)
 
 		if (destStr == "%f")
 		{//doubleå^ÅifloatÇæÇ∆va_argÇ≈à√ñŸìIÇ…doubleÇ…ïœä∑Ç≥ÇÍÇƒÇ§Ç‹Ç≠Ç¢Ç©Ç»Ç¢Åj
-			auto Arg = va_arg(args, double);
+			double Arg = va_arg(args, double);
 			argStr = to_string(Arg);
 			argStr += 'f';
 			nCntAdd = argStr.length();
@@ -77,7 +77,7 @@ void CDebugProc::Print(const char *pFormat, ...)
 
 		if (destStr == "%c")
 		{//charå^
-			auto Arg = va_arg(args, char);
+			char Arg = va_arg(args, char);
 			argStr = Arg;
 			nCntAdd = argStr.length();
 			m_Str.replace(pos - nCntDeleted, destStr.length(), argStr);

@@ -223,7 +223,15 @@ bool CMesh::Collision(D3DXVECTOR3 pos)
 
 			D3DXVec3Cross(&normal, &V2, &V1);
 			D3DXVec3Normalize(&normal, &normal);
+
+			m_posOld = pos;
 			pos.y = posA.y - ((pos.x - posA.x) * normal.x + (pos.z - posA.z) * normal.z) / normal.y;
+
+			if (normal == D3DXVECTOR3(0.0f,0.0f,0.0f))
+			{//法線が0の時、pos.yの値が-nan(ind)になる為、ヒットした地点が代入される前に終了
+				return true;
+			}
+
 			m_CollisionPos = pos;
 			return true;
 		}
